@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>File Source for main.php</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+		</head>
+		<body>
+						<h1>Source for file main.php</h1>
+<p>Documentation is available at <a href="../WPHP/_app---config---main.php.html">main.php</a></p>
+<div class="src-code">
+<div class="src-code"><ol><li><div class="src-line"><a name="a1"></a><span class="src-php">&lt;?php</span></div></li>
+<li><div class="src-line"><a name="a2"></a><span class="src-doc">/**</span></div></li>
+<li><div class="src-line"><a name="a3"></a><span class="src-doc">&nbsp;*&nbsp;个人的一些配置</span></div></li>
+<li><div class="src-line"><a name="a4"></a><span class="src-doc">&nbsp;*&nbsp;这是你可以修改的文件</span></div></li>
+<li><div class="src-line"><a name="a5"></a><span class="src-doc">&nbsp;*&nbsp;</span></div></li>
+<li><div class="src-line"><a name="a6"></a><span class="src-doc">&nbsp;*&nbsp;filename:&nbsp;&nbsp;&nbsp;&nbsp;main.php</span></div></li>
+<li><div class="src-line"><a name="a7"></a><span class="src-doc">&nbsp;*&nbsp;charset:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UTF-8</span></div></li>
+<li><div class="src-line"><a name="a8"></a><span class="src-doc">&nbsp;*&nbsp;create&nbsp;date:&nbsp;2012-5-25</span></div></li>
+<li><div class="src-line"><a name="a9"></a><span class="src-doc">&nbsp;*&nbsp;</span></div></li>
+<li><div class="src-line"><a name="a10"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@todo</span><span class="src-doc">&nbsp;define('IS_SECURITY',&nbsp;FALSE);</span></div></li>
+<li><div class="src-line"><a name="a11"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@todo</span><span class="src-doc">&nbsp;sae&nbsp;环境隐藏入口文件代码可参考（待验证）</span></div></li>
+<li><div class="src-line"><a name="a12"></a><span class="src-doc">&nbsp;*&nbsp;</span></div></li>
+<li><div class="src-line"><a name="a13"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@author</span><span class="src-doc">&nbsp;Zhao&nbsp;Binyan&nbsp;&lt;itbudaoweng@gmail.com&gt;</span></div></li>
+<li><div class="src-line"><a name="a14"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;2011-2012&nbsp;Zhao&nbsp;Binyan</span></div></li>
+<li><div class="src-line"><a name="a15"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@link</span><span class="src-doc">&nbsp;http://yungbo.com</span></div></li>
+<li><div class="src-line"><a name="a16"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@link</span><span class="src-doc">&nbsp;http://weibo.com/itbudaoweng</span></div></li>
+<li><div class="src-line"><a name="a17"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li><div class="src-line"><a name="a18"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a19"></a><span class="src-comm">/*</span></div></li>
+<li><div class="src-line"><a name="a20"></a><span class="src-comm">&nbsp;*&nbsp;共有三种环境，分别为开发环境、测试环境、生产环境</span></div></li>
+<li><div class="src-line"><a name="a21"></a><span class="src-comm">&nbsp;*&nbsp;development</span></div></li>
+<li><div class="src-line"><a name="a22"></a><span class="src-comm">&nbsp;*&nbsp;testing</span></div></li>
+<li><div class="src-line"><a name="a23"></a><span class="src-comm">&nbsp;*&nbsp;pruduction</span></div></li>
+<li><div class="src-line"><a name="a24"></a><span class="src-comm">&nbsp;*/</span></div></li>
+<li><div class="src-line"><a name="a25"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'SYS_MODE'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'development'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a26"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a27"></a><span class="src-comm">//跳转规则，网址为索引部分，跳转到值部分</span></div></li>
+<li><div class="src-line"><a name="a28"></a><span class="src-var">$rewrite_rules&nbsp;</span>=&nbsp;<span class="src-key">array</span><span class="src-sym">(</span></div></li>
+<li><div class="src-line"><a name="a29"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-str">'about'</span>=&gt;<span class="src-str">'hello/about'</span><span class="src-sym">,</span></div></li>
+<li><div class="src-line"><a name="a30"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-str">'contact'</span>=&gt;<span class="src-str">'hello/content'</span><span class="src-sym">,</span></div></li>
+<li><div class="src-line"><a name="a31"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a32"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a33"></a><span class="src-comm">//主题包</span></div></li>
+<li><div class="src-line"><a name="a34"></a><span class="src-comm">//&nbsp;可使用&nbsp;get_conf['theme_package']访问</span></div></li>
+<li><div class="src-line"><a name="a35"></a><span class="src-var">$theme_package&nbsp;</span>=&nbsp;<span class="src-str">'default'</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a36"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a37"></a><span class="src-comm">//是否使用&nbsp;path&nbsp;类型的网址，即&nbsp;xxx/yyy/zzz</span></div></li>
+<li><div class="src-line"><a name="a38"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'IS_PATH_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-id">FALSE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a39"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a40"></a><span class="src-comm">//是否进行安全过滤，暂未实现</span></div></li>
+<li><div class="src-line"><a name="a41"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'IS_SECURITY'</span><span class="src-sym">,&nbsp;</span><span class="src-id">FALSE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a42"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a43"></a><span class="src-comm">//是否记录错误日志</span></div></li>
+<li><div class="src-line"><a name="a44"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'IS_LOG'</span><span class="src-sym">,&nbsp;</span><span class="src-id">TRUE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a45"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a46"></a><span class="src-comm">//设置字符集，utf-8,&nbsp;gbk,&nbsp;gb-2312&nbsp;等，这将影响到【数据库】和程序，建议统一保持&nbsp;utf-8&nbsp;编码</span></div></li>
+<li><div class="src-line"><a name="a47"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'CHATSET'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'utf-8'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a48"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a49"></a><span class="src-comm">//设置时区</span></div></li>
+<li><div class="src-line"><a name="a50"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'TIME_ZONE'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'PRC'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a51"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a52"></a><span class="src-comm">//默认控制器</span></div></li>
+<li><div class="src-line"><a name="a53"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'CONTROLLER'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'hello'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a54"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a55"></a><span class="src-comm">//默认方法</span></div></li>
+<li><div class="src-line"><a name="a56"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'ACTION'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'index'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a57"></a>&nbsp;</div></li>
+<li><div class="src-line"><a name="a58"></a><span class="src-comm">//是否隐藏前端控制器，需要配合&nbsp;apache&nbsp;的&nbsp;rewrite&nbsp;模块</span></div></li>
+<li><div class="src-line"><a name="a59"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'IS_HIDE_INDEX_PAGE'</span><span class="src-sym">,&nbsp;</span><span class="src-id">FALSE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line"><a name="a60"></a><span class="src-doc">/**</span></div></li>
+<li><div class="src-line"><a name="a61"></a><span class="src-doc">&nbsp;*&nbsp;注意，仅可以隐藏一个入口文件</span></div></li>
+<li><div class="src-line"><a name="a62"></a><span class="src-doc">&nbsp;*&nbsp;如果需要隐藏入口文件，请保证服务器开启了&nbsp;rewrite&nbsp;模块，并且在前端控制器目录存在文件&nbsp;.htaccess</span></div></li>
+<li><div class="src-line"><a name="a63"></a><span class="src-doc">&nbsp;*&nbsp;并写好了跳转规则，apache服务器可参考下面的代码</span></div></li>
+<li><div class="src-line"><a name="a64"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li><div class="src-line"><a name="a65"></a><span class="src-doc">&nbsp;RewriteEngine&nbsp;On</span></div></li>
+<li><div class="src-line"><a name="a66"></a><span class="src-doc">&nbsp;RewriteCond&nbsp;%{REQUEST_FILENAME}&nbsp;!-f</span></div></li>
+<li><div class="src-line"><a name="a67"></a><span class="src-doc">&nbsp;RewriteCond&nbsp;%{REQUEST_FILENAME}&nbsp;!-d</span></div></li>
+<li><div class="src-line"><a name="a68"></a><span class="src-doc">&nbsp;RewriteRule&nbsp;^(.*)$&nbsp;index.php?$1&nbsp;[L]</span></div></li>
+<li><div class="src-line"><a name="a69"></a><span class="src-doc">&nbsp;*&nbsp;sae&nbsp;环境隐藏入口文件代码可参考（待验证）</span></div></li>
+<li><div class="src-line"><a name="a70"></a><span class="src-doc">&nbsp;handle:</span></div></li>
+<li><div class="src-line"><a name="a71"></a><span class="src-doc">&nbsp;-&nbsp;rewrite:&nbsp;if(&nbsp;!is_file()&nbsp;&amp;&amp;&nbsp;!is_dir())&nbsp;goto&nbsp;&quot;index.php?%{QUERY_STRING}&quot;</span></div></li>
+<li><div class="src-line"><a name="a72"></a><span class="src-doc">&nbsp;*/</span></div></li>
+</ol></div>
+</div>
+	<p class="notes" id="credit">
+		Documentation generated on Sun, 24 Jun 2012 10:39:57 +0200 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</body>
+</html>
