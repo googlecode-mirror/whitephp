@@ -24,9 +24,9 @@ define('LOG_PATH', 'log');
 define('WPHP_GLOBAL_CONFIG_NAME', 'config');
 
 //加载数据库配置文件
-require '1/wphp/app/config/database.php';
+require 'database.php';
 
-//加载自1/wphp/app/config/main.php
+//加载自
 require 'main.php';
 
 /**
