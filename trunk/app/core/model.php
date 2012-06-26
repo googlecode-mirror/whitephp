@@ -62,7 +62,7 @@ class Model {
 	 * INSERT INTO `user` (`id`, `username`, `password`) 
 	 * VALUES (NULL, '胡锦涛', '123456abc');
 	 */
-	public function add($data = array()) {
+	public function insert($data = array()) {
 		//组合后的 sql 语句
 		$sql = '';
 		
@@ -141,7 +141,7 @@ class Model {
 	 * @param string $where
 	 * @return array $ret
 	 */
-	public function get($field = '*', $where = null) {
+	public function select($field = '*', $where = null) {
 		$ret = array();
 		$field_new = '';
 		if (is_array($field)) {
@@ -178,7 +178,7 @@ class Model {
 	 * @param string $where
 	 * @return array $ret
 	 */
-	public function get_line($field = '*', $where = null) {
+	public function select_line($field = '*', $where = null) {
 		$ret = array();
 		$field_new = '';
 		if (is_array($field)) {
@@ -213,11 +213,15 @@ class Model {
 	}
 	
 	/**
-	 * 提供原生的查询接口
+	 * 提供原生的查询接口，并且自动设置主从
 	 * @param unknown_type $sql
 	 */
 	public function query($sql) {
-		return $this->dbS->query($sql);
+		if (preg_match('/^select /i', $sql)) {
+			return $this->dbS->query($sql);
+		} else {
+			return $this->db->query($sql);
+		}
 	}
 	
 	/**
@@ -265,27 +269,19 @@ class Muser extends Model {
 
 控制器某个方法中
 $user = new Model('user');//如若不传递第二个参数，获取的是 default 组的数据库配置文件
-$user = new Muser();
-$user = new Muser('user');
+
+//或者
+//$user = new Muser();
+
+//或者
+//$user = new Muser('user');
+
 $user_info = $user->get();
 $info = $user->db->query();//利用原生资源
+$info = $user->query();//利用封装好的直接执行sql语句的函数
 var_dump($user_info);
-
-*/
-
-
-// class Muser extends Model {
-	
-// 	public function __construct($tb_name = 'user') {
-// 		parent::__construct($tb_name);
-// 	}
-	
-// }
 
 // // $user = new Model('user');
 // $user = new Muser();
 // $user_info = $user->get_line('*', '1 order by id asc');
 // var_dump($user_info);
-
-// die;
-// echo __FILE__;die;
