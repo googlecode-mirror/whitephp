@@ -285,3 +285,6 @@ var_dump($user_info);
 // $user = new Muser();
 // $user_info = $user->get_line('*', '1 order by id asc');
 // var_dump($user_info);
+
+ * /
+ */
