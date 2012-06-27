@@ -286,5 +286,8 @@ var_dump($user_info);
 // $user_info = $user->get_line('*', '1 order by id asc');
 // var_dump($user_info);
 
+//如果需要解决主从延时的问题时，可以直接调用主数据库资源。。。受不了了，赶集问这样的问题，竟然这样回应
+$this->db->query();
+
  * /
  */
