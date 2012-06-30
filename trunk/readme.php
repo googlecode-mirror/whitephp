@@ -78,7 +78,7 @@ IS_PATH_URL 			是否使用 path url
 IS_SECURITY 			是否开启安全过滤，防止 xss和csf攻击
 IS_LOG 					是否记录错误日志
 IS_HIDE_INDEX_PAGE 		是否隐藏入口文件，需要配合 apche 的rewrite 模块或相关模块
-CHATSET 				字符集设计，建议保持 utf-8，默认即可
+CHARSET 				字符集设计，建议保持 utf-8，默认即可
 TIME_ZONE 				时区设置，东八区使用 PRC 即可，默认即可
 CONTROLLER 				默认控制器，hello
 ACTION 					默认方法，index
@@ -92,3 +92,39 @@ db_conf 				返回数据库配置数据，索引是数据库组
 
 </pre>
 
+<?php ?>
+/*---------------- 数据库类使用说明 -----------------*/
+/*
+1，可以直接实例化，并为参数提供表名即可返回一个数据库资源。
+控制器某个方法中
+$user = new Model('user');
+$user_info = $user->get();
+var_dump($user_info);
+
+2，在模型文件夹建立模型文件，在书写 __construct() 函数时提供默认参数为表名，用 load_model() 函数加载之后，可以自由使用。
+muser.php
+class Muser extends Model {
+	public function __construct($tb_name = 'user') {
+		parent::__construct($tb_name);
+	}
+}
+
+// $user = new Muser('user');
+
+//或者直接在控制器某个方法中
+// $user = new Model('user');//如若不传递第二个参数，获取的是 default 组的数据库配置文件
+
+// $user_info = $user->query('SELECT * FROM user');//$user->db->query()
+// var_dump($user_info->num_rows);
+
+// 直接使用最原始的资源
+// $user = db_init('default');
+// $user_info = $user->query('SELECT * FROM user');
+// var_dump($user_info->num_rows);
+
+//如果需要解决主从延时的问题时，可以直接调用主数据库资源。。。受不了了，赶集问这样的问题，竟然这样回应
+// $this->db->query();
+
+ */
+
+<?php ?>

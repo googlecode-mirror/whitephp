@@ -17,7 +17,7 @@
 require APP_PATH . '/config/system.php';
 
 //设置时区，编码等信息
-header('Content-Type:text/html; charset="' . CHATSET . '"');	//可以覆写
+header('Content-Type:text/html; charset="' . CHARSET . '"');	//可以覆写
 date_default_timezone_set(TIME_ZONE);
 
 //工作环境
@@ -106,6 +106,7 @@ define('CUR_ACTION', $a);
 $c = ucfirst(strtolower($c));
 $c = new $c;
 
+//实例化的时候重执行数据库操作
 $c->$a();
 
 //关闭 session

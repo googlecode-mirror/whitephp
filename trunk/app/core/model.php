@@ -88,6 +88,8 @@ class Model {
 		$sql .= ' `' . self::$tb_name . '`';
 		$sql .= ' (' . $fields . ') ';
 		$sql .= ' VALUES (' . $values . ')';
+		
+		echo $sql;die;
 
 		$q = $this->db->query($sql);
 
@@ -217,7 +219,7 @@ class Model {
 	 * @param unknown_type $sql
 	 */
 	public function query($sql) {
-		if (preg_match('/^select /i', $sql)) {
+		if (preg_match('/^select /i', $sql) && $this->dbS) {
 			return $this->dbS->query($sql);
 		} else {
 			return $this->db->query($sql);
@@ -248,46 +250,3 @@ class Model {
 		}
 	}
 }
-
-//end
-
-/*---------------- 使用说明 -----------------*/
-/*
-1，可以直接实例化，并为参数提供表名即可返回一个数据库资源。
-控制器某个方法中
-$user = new Model('user');
-$user_info = $user->get();
-var_dump($user_info);
-
-2，在模型文件夹建立模型文件，在书写 __construct() 函数时提供默认参数为表名，用 load_model() 函数加载之后，可以自由使用。
-muser.php
-class Muser extends Model {
-	public function __construct($tb_name = 'user') {
-		parent::__construct($tb_name);
-	}
-}
-
-控制器某个方法中
-$user = new Model('user');//如若不传递第二个参数，获取的是 default 组的数据库配置文件
-
-//或者
-//$user = new Muser();
-
-//或者
-//$user = new Muser('user');
-
-$user_info = $user->get();
-$info = $user->db->query();//利用原生资源
-$info = $user->query();//利用封装好的直接执行sql语句的函数
-var_dump($user_info);
-
-// // $user = new Model('user');
-// $user = new Muser();
-// $user_info = $user->get_line('*', '1 order by id asc');
-// var_dump($user_info);
-
-//如果需要解决主从延时的问题时，可以直接调用主数据库资源。。。受不了了，赶集问这样的问题，竟然这样回应
-$this->db->query();
-
- * /
- */

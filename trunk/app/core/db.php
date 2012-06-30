@@ -7,8 +7,6 @@
  * charset:		UTF-8
  * create date: 2012-5-25
  * 
- * @todo 设置字符集
- * 
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
  * @link http://yungbo.com
@@ -43,12 +41,8 @@ function db_init($db_group = 'default') {
 		if ($db->connect_errno) {
 			show_error('database established error - error code: ' . $db->connect_errno . " | " . ' error msg: ' . $db->connect_error);
 		} else {
-			// 		更改数据库字符集
+			$db->query("set names " . CHARSET);
 		}
 	}
-	return $db;	
+	return $db;
 }
-
-//usage
-// $muser = db_init('default');
-// $muser->query();
