@@ -78,10 +78,17 @@ if (IS_PATH_URL) {
 	}
 	unset($url);
 } else {
-	// $c controller
-	$c = null != v('c') ? v('c') : CONTROLLER;
-	// $a action
-	$a = null != v('a') ? v('a') : ACTION;
+	//虽然没有声明为path url，默认仍然支持
+	if (false === strpos($query_string, 'c=')) {
+		$url = p2q($query_string);
+		extract($url);
+		unset($url);
+	} else {
+		// $c controller
+		$c = null != v('c') ? v('c') : CONTROLLER;
+		// $a action
+		$a = null != v('a') ? v('a') : ACTION;
+	}
 }
 
 //加载控制器和方法
