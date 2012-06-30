@@ -201,14 +201,54 @@ function v($k) {
 	return isset($_REQUEST[$k]) ? $_REQUEST[$k] : null;
 }
 
+//根据 ca 加载控制器
+function _load_ca($ca) {
+	
+	$spilt = explode('/', $ca);
+	$count = count($spilt);
+	$n = 1;//控制器位于第几层，从零开始。后面方法用n时，只需传递n即可获取方法所在索引。
+	$con = $spilt[0];
+	$c = CONTROLLER;
+	$a = ACTION;
+	while (!file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
+		if ($n < $count) {
+			$n++;
+		} else {
+			//如果不存在文件直接终止
+			show_404();
+			break;
+		}
+		$con = '';
+		for ($i = 0; $i < $n; $i++) {
+			$con .= $spilt[$i] . '/';
+		}
+		$con = trim($con, '/');
+	}
+// 	echo $n;
+	if (file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
+		$c = $con;
+		if (isset($spilt[$n])) {
+			$a = $spilt[$n];
+		}
+	}
+	unset($spilt);
+	unset($count);
+	unset($con);
+	return array('c' => $c, 'a' => $a, 'n'=>$n);
+}
+
 /**
  * path2query 路径转url查询函数
+ * 
+ * @todo 如果有传递参数怎么办。。。
  * 
  * 将控制器字符串转换成网址
  * @param unknown_type $string
  * @return multitype:Ambigous <string, unknown> Ambigous <string, mixed> Ambigous <string, multitype:>
  */
 function p2q($ca = null) {
+	
+	$ca = trim($ca, '/');
 	$rewrite_rules = get_conf('rewrite_rules');
 	$a = $c = $spilt = $extra = '';
 	if (!$ca) {
@@ -226,16 +266,14 @@ function p2q($ca = null) {
 		if ($count == 1) {
 			$c = $ca;
 			$a = ACTION;
-		} else if ($count == 2) {
-			$c = $spilt[0];
-			$a = $spilt[1];
 		} else {
-			$c = array_shift($spilt);
-			$a = array_shift($spilt);
 			
-// 			foreach ($spilt as $k => $v) {
+			//处理不在控制器不在根目录的情况
+			$ret_tmp = _load_ca($ca);
+			extract($ret_tmp);
+			foreach ($spilt as $k => $v) {
 // 				$extra .= "&globalparam{$k}={$v}";
-// 			}
+			}
 		}
 	}
 	$url_query = "c={$c}&a={$a}".$extra;

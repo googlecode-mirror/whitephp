@@ -15,12 +15,8 @@
 
 class Controller {
 	
-	public function __construct() {
-		
-	}
-	
-	public function test($data = '') {
-		echo 'test data : ' . $data;
+	public function index() {
+		echo 'I am here to ensure it works well, man!';
 	}
 	
 	public function __destruct() {

@@ -61,11 +61,12 @@ define('QUERY_STRING', $query_string);
 
 //如果启用 path 网址
 if (IS_PATH_URL) {
+	//如果符合匹配规则
 	if (key_exists($query_string, $rewrite_rules)) {
 		$url = $rewrite_rules[$query_string];
 		$url = p2q($url);
 		extract($url);
-	//如果还是  url 类型的
+	//如果还是传统url类型的
 	} else if (false !== strpos($query_string, 'c=')) {
 		// $c controller
 		$c = null != v('c') ? v('c') : CONTROLLER;
@@ -85,7 +86,12 @@ if (IS_PATH_URL) {
 
 //加载控制器和方法
 if (file_exists(APP_PATH . '/controller/' . strtolower($c) . '.php')) {
+
 	require APP_PATH . '/controller/' . strtolower($c) . '.php';
+	
+	//支持多层次目录,先放到一个数组中，取最后一个为控制器
+	$c_array = explode('/', $c);
+	$c = array_pop($c_array);
 	if (!class_exists($c)) show_404('未知的控制器' . $c);
 	if (!method_exists($c, $a)) show_404('未知的方法' . $c . '/' . $a);
 } else {
