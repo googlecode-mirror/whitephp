@@ -1,11 +1,11 @@
 <?php
 /**
- * 测试控制器
+ * 系统函数
  * 
  * 用来测试各项功能是否可用以及是否完整
- * 请不要删除此文件，否则一些功能可能无法使用，如可视化的验证码
+ * 请【不要删除此文件】，否则一些功能可能无法使用，如可视化的验证码
  * 
- * filename:	test.php
+ * filename:	syscommon.php
  * charset:		UTF-8
  * create date: 2012-5-25
  * 
@@ -15,7 +15,7 @@
  * @link http://weibo.com/itbudaoweng
  */
 
-class Test {
+class Syscommon {
 	
 	public function index() {
 		$title = '测试';
@@ -24,7 +24,7 @@ class Test {
 	}
 
 	/**
-	 * 测试验证码，并给出使用示例
+	 * 测试验证码
 	 */
 	public function vcode() {
 		if (isset($_SESSION['verify_code'])) {
@@ -34,7 +34,9 @@ class Test {
 		echo_code();
 	}
 	
-	//生成验证码
+	/**
+	 * 和系统函数有关，勿删除
+	 */
 	public function verify_code() {
 		//验证码函数参数
 		$array = array(

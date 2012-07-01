@@ -556,8 +556,8 @@ function verify_code($array = array()) {
 function echo_code($array = array(), $prompt='看不清？点击重新获取', $show_prompt = false) {
 	//session_start(); //在核心文件已经开启
 
-	//验证码代码段
-	$verify = 'test/verify_code';
+	//外部访问验证码的接口（控制器方法对）
+	$verify = 'syscommon/verify_code';
 
 	if (IS_PATH_URL) {
 		echo '<img id="code" src="' . href($verify).'" onclick="this.src=\'' . href($verify) . '\'+ \'/\' + Math.random();" style="cursor:pointer" title=' . $prompt . '>';
