@@ -99,13 +99,13 @@ function log_error($message = '') {
 		
 		$error = date('Y-m-d H:i:s');
 		$error .= ' ' . $message;
-		$error .= "\r\n";
+		$error = trim($error) . "\r\n";
 		
 		//error_log 函数需要启用完整路径
 		//其实这个完全可以直接 a+ 方式写文件，没必要非得用 error_log 函数
 		$log_path = SYS_PATH . '/' . APP_PATH . '/' . LOG_PATH . '/' . date('Y-m') . '.txt';
 		
-		if (function_exists('errpr_log') ) {
+		if (function_exists('error_log') ) {
 			error_log($error, 3, $log_path);
 		} else {
 			_wphp_log_error($error, $log_path);
@@ -181,7 +181,6 @@ function _sae_show_error($message = '') {
  */
 function show_404($message = '') {
 	global $theme_package;
-	header('HTTP/1.1 404 Not Found');
 	if (!file_exists(APP_PATH . '/view/' . $theme_package . '/404.php')) {
 		require APP_PATH . '/error/404.php';
 	} else {
@@ -403,18 +402,69 @@ function load_static($file = 'jquery.js') {
 
 /**
  * 将未知编码的字符串转换为期望的编码（配置文件中设置的编码）
- * @param unknown_type $str
+ * @param string $str
  * @return string|unknown
  */
 function convert_str($str) {
-	$strEncoding = mb_detect_encoding($str);
-	$toEncoding = CHATSET;
+	//加此字符集列表数组，解决误将 改变 2312 识别为 utf-8 的情况
+	$charset_list = array('ascii', 'gb2312', 'gbk', 'utf-8');
+	$strEncoding = mb_detect_encoding($str, $charset_list);
+	$toEncoding = CHARSET;
 	
 	if (strtolower($strEncoding) != strtolower($toEncoding)) {
 		$str = iconv($strEncoding, $toEncoding, $str);
 	}
 	return $str;
 }
+
+/**
+ * 自动转码函数和 convert_str 作用相同，网上找的，作者不明
+ * @param unknown_type $string
+ * @param unknown_type $outEncoding
+ */
+function safeEncoding($string,$outEncoding ='UTF-8')
+{
+	$encoding = "UTF-8";
+	for($i=0;$i<strlen($string);$i++)
+	{
+	if(ord($string{$i})<128)
+		continue;
+
+		if((ord($string{$i})&224)==224)
+		{
+		//第一个字节判断通过
+		$char = $string{++$i};
+			if((ord($char)&128)==128)
+			{
+			//第二个字节判断通过
+			$char = $string{++$i};
+			if((ord($char)&128)==128)
+			{
+			$encoding = "UTF-8";
+			break;
+		}
+		}
+		}
+
+		if((ord($string{$i})&192)==192)
+		{
+		//第一个字节判断通过
+		$char = $string{++$i};
+			if((ord($char)&128)==128)
+			{
+			// 第二个字节判断通过
+			$encoding = "GB2312";
+			break;
+}
+}
+}
+ 
+if(strtoupper($encoding) == strtoupper($outEncoding))
+	return $string;
+	else
+	return iconv($encoding,$outEncoding,$string);
+}
+
 
 /**
  * 查看字符长度

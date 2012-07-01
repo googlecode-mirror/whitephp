@@ -31,7 +31,7 @@ function db_init($db_group = 'default') {
 	$db_port = '3306';
 	$db_conf = get_conf('db_conf');
 	$charset = str_replace('-', '', CHARSET);//将 utf-8 切换为 utf8
-	
+
 	if (!$db_conf) {
 		show_error('none valid database configration!');
 	} else if (!array_key_exists($db_group, $db_conf)) {
@@ -40,9 +40,10 @@ function db_init($db_group = 'default') {
 		extract($db_conf[$db_group]);
 		$db = new mysqli($db_host, $db_username, $db_passwd, $db_database, $db_port);
 		if ($db->connect_errno) {
-			show_error('database established error - error code: ' . $db->connect_errno . " | " . ' error msg: ' . $db->connect_error);
+			$error_msg = convert_str('database established error - error code: ' . $db->connect_errno . " | " . 'error msg: ' . $db->connect_error);
+			show_error($error_msg);
 		} else {
-			$db->query("set names " . $charset);
+			$db->query("set names {$charset}");
 		}
 	}
 	return $db;

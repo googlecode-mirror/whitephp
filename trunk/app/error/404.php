@@ -11,6 +11,7 @@
  * @link http://yungbo.com
  * @link http://weibo.com/itbudaoweng
  */
+header('HTTP/1.1 404 Not Found');
 ?>
 <!DOCTYPE HTML>
 <html lang="en-US">
