@@ -8,7 +8,6 @@
  * create date: 2012-5-25
  * 
  * @todo define('IS_SECURITY', FALSE);
- * @todo sae 环境隐藏入口文件代码可参考（待验证）
  * 
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -64,12 +63,12 @@ define('IS_HIDE_INDEX_PAGE', FALSE);
  * 如果需要隐藏入口文件，请保证服务器开启了 rewrite 模块，并且在前端控制器目录存在文件 .htaccess
  * 并写好了跳转规则，apache服务器可参考下面的代码
  *
- RewriteEngine On
- RewriteCond %{REQUEST_FILENAME} !-f
- RewriteCond %{REQUEST_FILENAME} !-d
- RewriteRule ^(.*)$ index.php?$1 [L]
- * sae 环境隐藏入口文件代码可参考（待验证）
- handle:
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?$1 [L]
+ * sae 环境隐藏入口文件代码可参考
+handle:
  - rewrite: if( !is_file() && !is_dir()) goto "index.php?%{QUERY_STRING}"
  */
 
