@@ -30,6 +30,7 @@ function db_init($db_group = 'default') {
 	$db_host = 'localhost';
 	$db_port = '3306';
 	$db_conf = get_conf('db_conf');
+	$charset = str_replace('-', '', CHARSET);//将 utf-8 切换为 utf8
 	
 	if (!$db_conf) {
 		show_error('none valid database configration!');
@@ -41,7 +42,7 @@ function db_init($db_group = 'default') {
 		if ($db->connect_errno) {
 			show_error('database established error - error code: ' . $db->connect_errno . " | " . ' error msg: ' . $db->connect_error);
 		} else {
-			$db->query("set names " . CHARSET);
+			$db->query("set names " . $charset);
 		}
 	}
 	return $db;

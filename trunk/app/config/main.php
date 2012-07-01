@@ -43,8 +43,9 @@ define('IS_SECURITY', FALSE);
 //是否记录错误日志
 define('IS_LOG', TRUE);
 
-//设置字符集，utf-8, gbk, gb-2312 等
+//设置字符集，utf-8, gbk, gb2312 等
 //这将影响到网页的header信息以及和数据库交互，建议统一保持 utf-8 编码
+//直接使用 utf-8 即可，已自动在操作数据库那里转换为 utf8
 define('CHARSET', 'utf-8');
 
 //设置时区
