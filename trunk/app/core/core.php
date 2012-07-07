@@ -55,6 +55,8 @@ set_conf('rewrite_rules', $rewrite_rules);
 $query_string = '';
 $query_string = $_SERVER['QUERY_STRING'];
 
+$query_string = str_replace('..', '', $query_string);//filter '..'
+
 //分段，从零开始，如$segments = get_conf('segments');$segments['0'] 可以取得第一个参数
 set_conf('segments', explode('/', $query_string));
 define('QUERY_STRING', $query_string);
