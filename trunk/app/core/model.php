@@ -79,7 +79,7 @@ class Model {
 		}
 		
 		foreach ($array_values as $v) {
-			$values .= ', "' . $v . '"';
+			$values .= ", '" . $this->db->real_escape_string($v) . "'";
 		}
 		$fields = trim($fields, ', ');
 		$values = trim($values, ', ');
@@ -123,7 +123,7 @@ class Model {
 		$where = ' WHERE ' . trim($where);
 		if (is_array($data)) {
 			foreach ($data as $k => $v) {
-				$update_data .= ", `{$k}` = '{$v}'";
+				$update_data .= ", `{$k}` = '" . $this->db->real_escape_string($v) . "'";
 			}
 		} else {
 			$update_data = $data;
@@ -228,10 +228,11 @@ class Model {
 	
 	/**
 	 * 防注入攻击，替换 ?
+	 * @deprecated
 	 */
-	public function prepare() {
+// 	public function prepare() {
 		
-	}
+// 	}
 	
 	/**
 	 * 关闭数据库

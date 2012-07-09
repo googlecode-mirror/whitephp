@@ -403,7 +403,7 @@ function load_static($file = 'jquery.js') {
 /**
  * 将未知编码的字符串转换为期望的编码（配置文件中设置的编码）
  * @param string $str
- * @return string|unknown
+ * @return string
  */
 function convert_str($str) {
 	//加此字符集列表数组，解决误将 改变 2312 识别为 utf-8 的情况
@@ -422,42 +422,35 @@ function convert_str($str) {
  * @param unknown_type $string
  * @param unknown_type $outEncoding
  */
-function safeEncoding($string,$outEncoding ='UTF-8')
-{
+function safeEncoding($string, $outEncoding = 'UTF-8') {
 	$encoding = "UTF-8";
-	for($i=0;$i<strlen($string);$i++)
-	{
-	if(ord($string{$i})<128)
-		continue;
-
-		if((ord($string{$i})&224)==224)
-		{
-		//第一个字节判断通过
-		$char = $string{++$i};
-			if((ord($char)&128)==128)
-			{
-			//第二个字节判断通过
-			$char = $string{++$i};
-			if((ord($char)&128)==128)
-			{
-			$encoding = "UTF-8";
-			break;
+	for($i = 0; $i < strlen ( $string ); $i ++) {
+		if (ord ( $string {$i} ) < 128)
+			continue;
+		
+		if ((ord ( $string {$i} ) & 224) == 224) {
+			// 第一个字节判断通过
+			$char = $string {++ $i};
+			if ((ord ( $char ) & 128) == 128) {
+				// 第二个字节判断通过
+				$char = $string {++ $i};
+				if ((ord ( $char ) & 128) == 128) {
+					$encoding = "UTF-8";
+					break;
+				}
+			}
 		}
+		
+		if ((ord ( $string {$i} ) & 192) == 192) {
+			// 第一个字节判断通过
+			$char = $string {++ $i};
+			if ((ord ( $char ) & 128) == 128) {
+				// 第二个字节判断通过
+				$encoding = "GB2312";
+				break;
+			}
 		}
-		}
-
-		if((ord($string{$i})&192)==192)
-		{
-		//第一个字节判断通过
-		$char = $string{++$i};
-			if((ord($char)&128)==128)
-			{
-			// 第二个字节判断通过
-			$encoding = "GB2312";
-			break;
-}
-}
-}
+	}
  
 if(strtoupper($encoding) == strtoupper($outEncoding))
 	return $string;
