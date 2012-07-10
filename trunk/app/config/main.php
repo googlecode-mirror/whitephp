@@ -72,3 +72,5 @@ handle:
  - rewrite: if( !is_file() && !is_dir()) goto "index.php?%{QUERY_STRING}"
  */
 
+//加载扩展函数
+// require APP_PATH . '/func/xxx.php';

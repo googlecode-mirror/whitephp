@@ -403,61 +403,21 @@ function load_static($file = 'jquery.js') {
 /**
  * 将未知编码的字符串转换为期望的编码（配置文件中设置的编码）
  * @param string $str
+ * @param string $toEncoding
  * @return string
  */
-function convert_str($str) {
+function convert_str($str, $toEncoding = null) {
 	//加此字符集列表数组，解决误将 改变 2312 识别为 utf-8 的情况
 	$charset_list = array('ascii', 'gb2312', 'gbk', 'utf-8');
 	$strEncoding = mb_detect_encoding($str, $charset_list);
-	$toEncoding = CHARSET;
-	
+	//如果没有提供要转码的类型，使用系统设置的编码
+	if (!$toEncoding) $toEncoding = CHARSET;
+
 	if (strtolower($strEncoding) != strtolower($toEncoding)) {
 		$str = iconv($strEncoding, $toEncoding, $str);
 	}
 	return $str;
 }
-
-/**
- * 自动转码函数和 convert_str 作用相同，网上找的，作者不明
- * @param unknown_type $string
- * @param unknown_type $outEncoding
- */
-function safeEncoding($string, $outEncoding = 'UTF-8') {
-	$encoding = "UTF-8";
-	for($i = 0; $i < strlen ( $string ); $i ++) {
-		if (ord ( $string {$i} ) < 128)
-			continue;
-		
-		if ((ord ( $string {$i} ) & 224) == 224) {
-			// 第一个字节判断通过
-			$char = $string {++ $i};
-			if ((ord ( $char ) & 128) == 128) {
-				// 第二个字节判断通过
-				$char = $string {++ $i};
-				if ((ord ( $char ) & 128) == 128) {
-					$encoding = "UTF-8";
-					break;
-				}
-			}
-		}
-		
-		if ((ord ( $string {$i} ) & 192) == 192) {
-			// 第一个字节判断通过
-			$char = $string {++ $i};
-			if ((ord ( $char ) & 128) == 128) {
-				// 第二个字节判断通过
-				$encoding = "GB2312";
-				break;
-			}
-		}
-	}
- 
-if(strtoupper($encoding) == strtoupper($outEncoding))
-	return $string;
-	else
-	return iconv($encoding,$outEncoding,$string);
-}
-
 
 /**
  * 查看字符长度
@@ -619,7 +579,6 @@ function echo_code($array = array(), $prompt='看不清？点击重新获取', $
 // 	}
 }
 
-
 /**
  * 获得服务器端网址，即获取当前网址
  * @param boolean $with_query_string 是否附带 query_string 部分
@@ -639,3 +598,42 @@ function get_server_url($with_query_string = true) {
 	}
 	return $url;
 }
+
+/**
+ * 处理  json_encode() 不支持中文的情况
+ *
+ * @param array|object $data
+ * @return array|object
+ */
+function ch_json_encode($data) {
+	/**
+	 * 将中文编码
+	 * @param array $data
+	 * @return string
+	 */
+	function ch_urlencode($data) {
+		if (is_array($data) || is_object($data)) {
+			foreach ($data as $k => $v) {
+				if (is_scalar($v)) {
+					if (is_array($data)) {
+						//调用转码函数，以防止原字符串不是 utf-8
+						$data[$k] = urlencode(convert_str($v, 'utf-8'));
+					} else if (is_object($data)) {
+						//转码函数
+						$data->$k = urlencode(convert_str($v, 'utf-8'));
+					}
+				} else if (is_array($data)) {
+					$data[$k] = ch_urlencode($v);//递归调用该函数
+				} else if (is_object($data)) {
+					$data->$k = ch_urlencode($v);
+				}
+			}
+		}
+		return $data;
+	}
+
+	$ret = ch_urlencode($data);
+	$ret = json_encode($ret);
+	return urldecode($ret);
+}
+
