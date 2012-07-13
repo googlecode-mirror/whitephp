@@ -483,6 +483,8 @@ function verify_code($array = array()) {
 	//初始坐标
 	$x = $height*3/7;
 	$y = $height*5/7;
+	
+	if (!function_exists('imagecreate')) show_error('you must enable gd2 extension to use image functions');
 
 	$handle = imagecreate($width, $height);
 	$bgcolor = imagecolorallocate($handle, $bgred, $bggreen, $bgblue);

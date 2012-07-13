@@ -20,7 +20,7 @@ class Syscommon {
 	public function index() {
 		$title = '测试';
 		$content = '测试页面是否可用';
-		render('vtest', get_defined_vars());
+		render('vhello', get_defined_vars());
 	}
 
 	/**
@@ -48,6 +48,6 @@ class Syscommon {
 					'teight' => 9/10,
 					'angle' => 30,
 		);
-		verify_code($array, 'ss');
+		verify_code($array);
 	}
 }
