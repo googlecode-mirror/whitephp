@@ -90,18 +90,193 @@ rewrite_rules 			重定向规则
 segments				返回数组，索引从0开始，即网址中的参数
 db_conf 				返回数据库配置数据，索引是数据库组
 
-</pre>
+系统函数
 
-<?php ?>
-/*---------------- 数据库类使用说明 -----------------*/
-/*
+<?php
+/**
+ * 核心函数
+ * 常量私有前缀 WPHP_
+ * 函数私有前缀 wphp_
+ * 变量私有前缀 wphp_
+ */
+/**
+ * 添加配置项
+ * @param unknown_type $key
+ * @param unknown_type $value
+ */
+function set_conf($key = '', $value = '') {}
+
+/**
+ * 以数组形式添加配置
+ * @param unknown_type $data
+ * @return boolean
+ */
+function set_array_conf($data = array()) {}
+
+/**
+ * 获取配置
+ * @param unknown_type $key
+ */
+function get_conf($key = '') {}
+
+/**
+ * 获取数组形式配置
+ * @param unknown_type $keys
+ * @return multitype:NULL
+ */
+function get_array_conf($keys = array()) {}
+
+/**
+ * 获取所有配置
+ * @return unknown
+ */
+function get_all_conf() {}
+
+/*------------------------ 日志处理函数 ----------------------------*/
+
+/**
+ * 记录日志
+ * 写日志用绝对路径
+ * @param string $message
+ */
+function log_error($message = '') {}
+
+/**
+ * 记录日志的同时，显示到页面上
+ * @param string $message
+ */
+function show_error($message = '') {}
+
+/**
+ * 处理 404 页面
+ * @param unknown_type $message
+ */
+function show_404($message = '') {}
+
+/*------------------------ 其它函数 ----------------------------*/
+
+/**
+ * 获取 post 或者 get 的值
+ * @param string $k
+ * @param string $default 默认返回值
+ * @return Ambigous <NULL, unknown>
+ */
+function v($k, $defalut = '') {}
+
+/**
+ * 获取 get 的值
+ * @param string $k
+ * @param string $default 默认返回值
+ * @return Ambigous <NULL, unknown>
+ */
+function get($k, $defalut = '') {}
+
+/**
+ * 获取 post 的值
+ * @param string $k
+ * @param string $default 默认返回值
+ * @return Ambigous <NULL, unknown>
+ */
+function post($k, $defalut = '') {}
+
+/**
+ * 建立一个链接
+ * @param string $ca 如 hello/index
+ * @param array $extra 如 array('id'=5)
+ */
+function href($ca, $extra = array()) {}
+
+/**
+ * 建立带有协议的的包含完整路径超链接
+ * @param unknown_type $ca
+ * @param unknown_type $extra
+ */
+function hard_href($ca, $extra = array()) {}
+
+/**
+ * 跳转函数
+ * @param string $ca 控制器和方法 如 hello/test
+ * @param string $code
+ */
+function r($ca, $code = 302) {}
+
+/**
+ * 加载 model
+ */
+function load_model($file) {}
+
+/**
+ * 加载类库 lib
+ */
+function load_lib($file) {}
+
+/**
+ * 加载静态文件
+ * @param unknown_type $file
+ */
+function load_static($file = 'jquery.js') {}
+
+/**
+ * 将未知编码的字符串转换为期望的编码（配置文件中设置的编码）
+ * @param string $str
+ * @param string $toEncoding
+ * @return string
+ */
+function convert_str($str, $toEncoding = null) {}
+
+/**
+ * 查看字符长度
+ * @param unknown_type $str
+ */
+function real_strlen($str) {}
+
+/**
+ * 创建验证码
+ * @return string  向数组 $_SESSION[$verify_code] 写入一个字符串
+ */
+function verify_code($array = array()) {}
+
+/**
+ * 直接生成可视化的验证码和可点链接
+ * @param  string  $prompt      提示信息
+ * @param bool $show_prompt     是否显示提示文字
+ * @return [type]               [description]
+ */
+function echo_code($array = array(), $prompt='看不清？点击重新获取', $show_prompt = false) {}
+
+/**
+ * 获得服务器端网址，即获取当前网址
+ * @param boolean $with_query_string 是否附带 query_string 部分
+ * @return Ambigous <string, unknown>
+ */
+function get_server_url($with_query_string = true) {}
+
+/**
+ * 处理  json_encode() 不支持中文的情况
+ *
+ * @param array|object $data
+ * @return array|object
+ */
+function ch_json_encode($data) {}
+
+/**
+ * 书写mysql语句时的变量检查函数
+ * @param unknown_type $value
+ * @return string
+ */
+function check_input($value) {}
+
+?>
+/*---------------- 数据库使用说明 -----------------*/
+
 1，可以直接实例化，并为参数提供表名即可返回一个数据库资源。
-控制器某个方法中
-$user = new Model('user');
-$user_info = $user->get();
+在控制器的某个方法中
+$user = new Model('user');	//如若不传递第二个参数，获取的是 default 组的数据库配置文件
+$user_info = $user->select('*', '1 LIMIT 2');
 var_dump($user_info);
 
-2，在模型文件夹建立模型文件，在书写 __construct() 函数时提供默认参数为表名，用 load_model() 函数加载之后，可以自由使用。
+2，在模型文件夹建立模型文件
+在书写 __construct() 函数时提供默认参数为表名，用 load_model() 函数加载之后，可以使用该资源。
 muser.php
 class Muser extends Model {
 	public function __construct($tb_name = 'user') {
@@ -109,21 +284,25 @@ class Muser extends Model {
 	}
 }
 
-// $user = new Muser('user');
+//在控制器方法中
+load_model('muser');
+$user = new Muser('user');	//其实可以传递任意值，如果只是使用 query 而不使用框架函数就无所谓
+$user_info = $user->query('SELECT * FROM user');//也可以直接 $user->db->query() 或者 $user->dbS->query()使用原始资源
+var_dump($user_info->num_rows);
 
-//或者直接在控制器某个方法中
-// $user = new Model('user');//如若不传递第二个参数，获取的是 default 组的数据库配置文件
+//1，2情况下，如果需要解决主从延时的问题时，可以直接调用主数据库资源
+// $user->db->query(); 使用主数据库
+// $user->dbS->query(); 使用从数据库
 
-// $user_info = $user->query('SELECT * FROM user');//$user->db->query()
-// var_dump($user_info->num_rows);
+3，直接使用最原始的资源
+$user = db_init();	//默认获取的是 default 组的数据库配置文件
+$user_info = $user->query('SELECT * FROM user');
+var_dump($user_info->num_rows);
 
-// 直接使用最原始的资源
-// $user = db_init('default');
-// $user_info = $user->query('SELECT * FROM user');
-// var_dump($user_info->num_rows);
-
-//如果需要解决主从延时的问题时，可以直接调用主数据库资源。。。受不了了，赶集问这样的问题，竟然这样回应
-// $this->db->query();
+为解决安全问题，可使用系统函数 check_input 处理组成sql语句前的变量。
+即：
+$user = check_input(post('username'));
+$sql = "count(*) from user where username = $user";
 
  */
 

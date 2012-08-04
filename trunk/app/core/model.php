@@ -15,6 +15,16 @@
 /**
  * 模型基类
  * 
+ * 建议使用原生 sql 语句，配合 check_input() 函数保证变量的安全
+ * 
+ * 即 $user = new Model('user');//若不用框架模型函数 user 无所谓
+ * $user->query();
+ * $user->db->query();
+ * $user->dbS->query();
+ * 
+ * 或者直接不用此模型类
+ * $user = db_init();//默认使用主数据库
+ * $user->query();
  * @todo 完善prepare函数，防止注入攻击
  * @author Think
  *
@@ -39,11 +49,14 @@ class Model {
 	//数据库配置数组
 	private static $db_conf;
 	
+	//是否输出 sql 语句
+	private static $show_sql = false;
+	
 	/**
 	 * 连接数据库
 	 */
-	public function __construct($tb_name = null, $db_group = 'default') {
-		if (is_null($tb_name)) show_error('you must supply a table name when instant a model class!');
+	public function __construct($tb_name = 'sample_table_name', $db_group = 'default') {
+// 		if (is_null($tb_name)) show_error('you must supply a table name when instant a model class!');
 		self::$tb_name = $tb_name;
 		self::$db_group = $db_group;
 		$this->db = db_init(self::$db_group);
@@ -58,11 +71,13 @@ class Model {
 	
 	/**
 	 * 增加数据
+	 * $data
 	 * array('id'=>'3', 'username'=>'胡锦涛')
 	 * INSERT INTO `user` (`id`, `username`, `password`) 
 	 * VALUES (NULL, '胡锦涛', '123456abc');
+	 * $where WHERE 条件以及后续语句
 	 */
-	public function insert($data = array()) {
+	public function insert($data = array(), $where) {
 		//组合后的 sql 语句
 		$sql = '';
 		
@@ -75,11 +90,11 @@ class Model {
 		$array_values = array_values($data);
 		
 		foreach ($array_keys as $v) {
-			$fields .= ', `' . $v . '`';
+			$fields .= ", ` $v `";
 		}
 		
 		foreach ($array_values as $v) {
-			$values .= ", '" . $this->db->real_escape_string($v) . "'";
+			$values .= ", " . check_input($v);	//过滤下
 		}
 		$fields = trim($fields, ', ');
 		$values = trim($values, ', ');
@@ -89,8 +104,11 @@ class Model {
 		$sql .= ' (' . $fields . ') ';
 		$sql .= ' VALUES (' . $values . ')';
 		
-		echo $sql;die;
+		$where = ' WHERE ' . trim($where);
+		$sql .= $where;
 
+		self::show_mysql($sql);
+		
 		$q = $this->db->query($sql);
 
 		return $q;
@@ -98,7 +116,7 @@ class Model {
 	
 	/**
 	 * 删除数据，参数为必须
-	 * @param string $where
+	 * @param string $where WHERE 条件以及后续语句
 	 * @return bool $q 只要语句正常执行了就会是 true
 	 */
 	public function delete($where = null) {
@@ -107,6 +125,9 @@ class Model {
 		$where = ' WHERE ' . trim($where);
 		
 		$sql = 'DELETE FROM `' . self::$tb_name . '`' . $where;
+		
+		self::show_mysql($sql);
+		
 		$q = $this->db->query($sql);
 		return $q;
 	}
@@ -114,7 +135,7 @@ class Model {
 	/**
 	 * 修改数据
 	 * @param string|array $data
-	 * @param string $where
+	 * @param string $where WHERE 条件以及后续语句
 	 * @return bool $q 只有语句执行成功就返回 true
 	 */
 	public function update($data = array(), $where = null) {
@@ -133,6 +154,8 @@ class Model {
 		
 		$sql = 'UPDATE `' . self::$tb_name . '` SET ' . $update_data . $where;
 		
+		self::show_mysql($sql);
+		
 		$q = $this->db->query($sql);
 		return $q;
 	}
@@ -140,7 +163,7 @@ class Model {
 	/**
 	 * 查询数据
 	 * @param string|array $field
-	 * @param string $where
+	 * @param string $where WHERE 条件，及limit等片段
 	 * @return array $ret
 	 */
 	public function select($field = '*', $where = null) {
@@ -158,7 +181,9 @@ class Model {
 		if (!is_null($where)) $where = ' WHERE ' . trim($where);
 		
 		$sql = 'SELECT ' . $field_new . ' FROM `' . self::$tb_name . '`' . $where;
-
+		
+		self::show_mysql($sql);
+		
 		if ($this->dbS) {
 			$q = $this->dbS->query($sql);
 		} else {
@@ -197,7 +222,9 @@ class Model {
 		$sql = 'SELECT ' . $field_new . ' FROM `' . self::$tb_name . '`' . $where . ' LIMIT 1';
 		
 		//仅仅查询一条数据
-		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
+// 		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
+		
+		self::show_mysql($sql);
 	
 		if ($this->dbS) {
 			$q = $this->dbS->query($sql);
@@ -216,9 +243,11 @@ class Model {
 	
 	/**
 	 * 提供原生的查询接口，并且自动设置主从
+	 * 强烈建议使用该函数或者使用原生的 xxx->db->query()
 	 * @param unknown_type $sql
 	 */
 	public function query($sql) {
+		self::show_mysql($sql);
 		if (preg_match('/^select /i', $sql) && $this->dbS) {
 			return $this->dbS->query($sql);
 		} else {
@@ -234,10 +263,17 @@ class Model {
 		
 // 	}
 	
+	public static function show_mysql($sql) {
+		if (self::$show_sql) {
+			echo $sql . "\n";
+		}
+	}
+	
 	/**
 	 * 关闭数据库
 	 */
 	public function __destruct() {
+		
 		if ($this->db) {
 			if ($this->db->error) {
 				show_error($this->db->error);

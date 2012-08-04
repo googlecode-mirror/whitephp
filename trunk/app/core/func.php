@@ -106,6 +106,9 @@ function log_error($message = '') {
 		$log_path = SYS_PATH . '/' . APP_PATH . '/' . LOG_PATH . '/' . date('Y-m') . '.txt';
 		
 		if (function_exists('error_log') ) {
+			if (!is_writeable(SYS_PATH . '/' . APP_PATH . '/' . LOG_PATH . '/')) {
+				echo "\n", 'error log permition denied!';die;
+			}
 			error_log($error, 3, $log_path);
 		} else {
 			_wphp_log_error($error, $log_path);
@@ -193,11 +196,32 @@ function show_404($message = '') {
 
 /**
  * 获取 post 或者 get 的值
- * @param unknown_type $k
+ * @param string $k
+ * @param string $default 默认返回值
  * @return Ambigous <NULL, unknown>
  */
-function v($k) {
-	return isset($_REQUEST[$k]) ? $_REQUEST[$k] : null;
+function v($k, $defalut = '') {
+	return isset($_REQUEST[$k]) ? $_REQUEST[$k] : $defalut;
+}
+
+/**
+ * 获取 get 的值
+ * @param string $k
+ * @param string $default 默认返回值
+ * @return Ambigous <NULL, unknown>
+ */
+function get($k, $defalut = '') {
+	return isset($_GET[$k]) ? $_GET[$k] : $defalut;
+}
+
+/**
+ * 获取 post 的值
+ * @param string $k
+ * @param string $default 默认返回值
+ * @return Ambigous <NULL, unknown>
+ */
+function post($k, $defalut = '') {
+	return isset($_POST[$k]) ? $_POST[$k] : $defalut;
 }
 
 //根据 ca 加载控制器
@@ -639,3 +663,17 @@ function ch_json_encode($data) {
 	return urldecode($ret);
 }
 
+/**
+ * 书写mysql语句时的变量检查函数
+ * @param unknown_type $value
+ * @return string
+ */
+function check_input($value) {
+	if (get_magic_quotes_gpc()) {
+		$value = stripslashes($value);
+	}
+	if (!is_numeric($value)) {
+		$value = "'" . mysql_real_escape_string($value) . "'";
+	}
+	return $value;
+}
