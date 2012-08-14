@@ -50,6 +50,7 @@ if (IS_DB_ACTIVE) {
 
 //调用函数的时候可能会用到
 set_conf('rewrite_rules', $rewrite_rules);
+set_conf('theme_package', $theme_package);
 
 //路由开始，这里也可以配置成为分段路由模式
 $query_string = '';
