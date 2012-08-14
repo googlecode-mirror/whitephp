@@ -305,5 +305,10 @@ $user = check_input(post('username'));
 $sql = "count(*) from user where username = $user";
 
  */
-
+ * 于 2012-08-14 改用单例模式，调用方法发生变化
+ * $model = Model::singleton();
+ * $model->query();
+ * $model::$db->query();
+ * $model::$dbS->query();
+ 
 <?php ?>

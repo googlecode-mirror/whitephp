@@ -17,28 +17,30 @@
  * 
  * 建议使用原生 sql 语句，配合 check_input() 函数保证变量的安全
  * 
- * 即 $user = new Model('user');//若不用框架模型函数 user 无所谓
- * $user->query();
- * $user->db->query();
- * $user->dbS->query();
+ * 于 2012-08-14 改用单例模式，调用方法发生变化
+ * $model = Model::singleton();
+ * $model->query();
+ * $model::$db->query();
+ * $model::$dbS->query();
  * 
  * 或者直接不用此模型类
  * $user = db_init();//默认使用主数据库
  * $user->query();
+ * 
  * @todo 完善prepare函数，防止注入攻击
  * @author Think
  *
  */
 class Model {
-	//数据库资源，可以这样访问函数  xx->db->query();
-	//可以直接 xx->db-> 访问原生的  mysqli 对象
-	//通过 xx->get() 获取数据
+	//数据库资源，可以这样访问函数  xx::$db->query();
+	//可以直接 xx::$db-> 访问原生的  mysqli 对象
+	public static $singleton;
 	
 	//连接之后的数据库资源
-	public $db;
+	public static $db;
 	
 	//从数据库
-	public $dbS;
+	public static $dbS;
 	
 	//数据表名
 	private static $tb_name;
@@ -55,18 +57,30 @@ class Model {
 	/**
 	 * 连接数据库
 	 */
-	public function __construct($tb_name = 'sample_table_name', $db_group = 'default') {
-// 		if (is_null($tb_name)) show_error('you must supply a table name when instant a model class!');
-		self::$tb_name = $tb_name;
-		self::$db_group = $db_group;
-		$this->db = db_init(self::$db_group);
-		
-		self::$db_conf = get_conf('db_conf');
-		
-		//因为从数据库并不是必须连接的，所以先判断一下，如果没有配置则不进行尝试而不终止程序运行。
-		if (array_key_exists('slave', self::$db_conf)) {
-			$this->dbS = db_init('slave');			
+	private function __construct($tb_name = 'sample_table_name', $db_group = 'default') {
+		//return self::singleton();
+	}
+	
+	/**
+	 * 题外话，单例并不能保证一定单例。。。
+	 */
+	public static function singleton($tb_name = 'sample_table_name', $db_group = 'default') {
+		if (!isset(self::$singleton)) {
+			// if (is_null($tb_name)) show_error('you must supply a table name when instant a model class!');
+			self::$tb_name = $tb_name;
+			self::$db_group = $db_group;
+			self::$db = db_init(self::$db_group);
+			
+			self::$db_conf = get_conf('db_conf');
+			
+			//因为从数据库并不是必须连接的，所以先判断一下，如果没有配置则不进行尝试而不终止程序运行。
+			if (array_key_exists('slave', self::$db_conf)) {
+				self::$dbS = db_init('slave');
+			}
+			$c = __CLASS__;
+			self::$singleton = new $c;
 		}
+		return self::$singleton;
 	}
 	
 	/**
@@ -109,7 +123,7 @@ class Model {
 
 		self::show_mysql($sql);
 		
-		$q = $this->db->query($sql);
+		$q = self::$db->query($sql);
 
 		return $q;
 	}
@@ -128,7 +142,7 @@ class Model {
 		
 		self::show_mysql($sql);
 		
-		$q = $this->db->query($sql);
+		$q = self::$db->query($sql);
 		return $q;
 	}
 	
@@ -144,7 +158,7 @@ class Model {
 		$where = ' WHERE ' . trim($where);
 		if (is_array($data)) {
 			foreach ($data as $k => $v) {
-				$update_data .= ", `{$k}` = '" . $this->db->real_escape_string($v) . "'";
+				$update_data .= ", `{$k}` = '" . self::$db->real_escape_string($v) . "'";
 			}
 		} else {
 			$update_data = $data;
@@ -156,7 +170,7 @@ class Model {
 		
 		self::show_mysql($sql);
 		
-		$q = $this->db->query($sql);
+		$q = self::$db->query($sql);
 		return $q;
 	}
 	
@@ -184,10 +198,10 @@ class Model {
 		
 		self::show_mysql($sql);
 		
-		if ($this->dbS) {
-			$q = $this->dbS->query($sql);
+		if (self::$dbS) {
+			$q = self::$dbS->query($sql);
 		} else {
-			$q = $this->db->query($sql);
+			$q = self::$db->query($sql);
 		}
 		
 		if ($q && $q->num_rows > 0) {
@@ -226,10 +240,10 @@ class Model {
 		
 		self::show_mysql($sql);
 	
-		if ($this->dbS) {
-			$q = $this->dbS->query($sql);
+		if (self::$dbS) {
+			$q = self::$dbS->query($sql);
 		} else {
-			$q = $this->db->query($sql);
+			$q = self::$db->query($sql);
 		}
 	
 		if ($q && $q->num_rows > 0) {
@@ -248,10 +262,10 @@ class Model {
 	 */
 	public function query($sql) {
 		self::show_mysql($sql);
-		if (preg_match('/^select /i', $sql) && $this->dbS) {
-			return $this->dbS->query($sql);
+		if (preg_match('/^select /i', $sql) && self::$dbS) {
+			return self::$dbS->query($sql);
 		} else {
-			return $this->db->query($sql);
+			return self::$db->query($sql);
 		}
 	}
 	
@@ -274,16 +288,16 @@ class Model {
 	 */
 	public function __destruct() {
 		
-		if ($this->db) {
-			if ($this->db->error) {
-				show_error($this->db->error);
+		if (self::$db) {
+			if (self::$db->error) {
+				show_error(self::$db->error);
 			}
 			
-			$this->db->close();
+			self::$db->close();
 		}
 		
-		if ($this->dbS) {
-			$this->dbS->close();
+		if (self::$dbS) {
+			self::$dbS->close();
 		}
 	}
 }

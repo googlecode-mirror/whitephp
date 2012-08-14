@@ -55,8 +55,6 @@ set_conf('rewrite_rules', $rewrite_rules);
 $query_string = '';
 $query_string = $_SERVER['QUERY_STRING'];
 
-$query_string = str_replace('..', '', $query_string);//filter '..'
-
 //分段，从零开始，如$segments = get_conf('segments');$segments['0'] 可以取得第一个参数
 set_conf('segments', explode('/', $query_string));
 define('QUERY_STRING', $query_string);
@@ -93,6 +91,10 @@ if (IS_PATH_URL) {
 	}
 }
 
+//filter '..'
+$c = str_replace('..', '', $c);
+$a = str_replace('..', '', $a);
+
 //加载控制器和方法
 if (file_exists(APP_PATH . '/controller/' . strtolower($c) . '.php')) {
 
@@ -101,10 +103,10 @@ if (file_exists(APP_PATH . '/controller/' . strtolower($c) . '.php')) {
 	//支持多层次目录,先放到一个数组中，取最后一个为控制器
 	$c_array = explode('/', $c);
 	$c = array_pop($c_array);
-	if (!class_exists($c)) show_404('未知的控制器' . $c);
-	if (!method_exists($c, $a)) show_404('未知的方法' . $c . '/' . $a);
+	if (!class_exists($c)) show_404('Unkonw file!' . $c);
+	if (!method_exists($c, $a)) show_404('Unkown file!' . $c . '/' . $a);
 } else {
-	show_404('出现了一个错误，我们无法找到这个页面了');
+	show_404('Page not found!');
 }
 
 //设置当前控制器和方法名
