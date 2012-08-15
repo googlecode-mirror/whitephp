@@ -15,7 +15,7 @@
  */
 
 //版本号
-define('VERSION', '0.2');
+define('VERSION', '0.3');
 
 //定义日志目录，不必写尾部斜线
 define('LOG_PATH', 'log');

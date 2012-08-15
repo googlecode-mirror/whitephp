@@ -252,6 +252,12 @@ function echo_code($array = array(), $prompt='看不清？点击重新获取', $
 function get_server_url($with_query_string = true) {}
 
 /**
+ * 获取网址跟目录
+ * @return string
+ */
+function get_server_root() {}
+
+/**
  * 处理  json_encode() 不支持中文的情况
  *
  * @param array|object $data

@@ -342,19 +342,19 @@ function hard_href($ca, $extra = array()) {
 		if ($extra) {
 			$query_string .= '/' . implode('/', $extra);
 		}
-		$href = get_server_url() . $query_string;
+		$href = get_server_root() . $query_string;
 	} else {
 		$tmp = p2q($ca);
 		$query_string .= $tmp['url_query'];
 		foreach ($extra as $k => $v) {
 			$query_string .= "&{$k}={$v}";
 		}
-		$href = get_server_url() . $query_string;
+		$href = get_server_root() . $query_string;
 	}
 	
 	if (!IS_HIDE_INDEX_PAGE) {
 		$query_string = INDEX_PAGE . '?' . $query_string;
-		$href = get_server_url() . $query_string;
+		$href = get_server_root() . $query_string;
 	}
 // 	return $query_string;
 	return $href;
@@ -622,6 +622,23 @@ function get_server_url($with_query_string = true) {
 			$url .= $_SERVER['SCRIPT_NAME'];
 		}
 	}
+	return $url;
+}
+
+/**
+ * 获取网址跟目录
+ * @return string
+ */
+function get_server_root() {
+	$url = 'http://localhost';
+	
+	if (isset($_SERVER['HTTP_HOST'])) {
+		$url = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http';
+		$url .= '://' . $_SERVER['HTTP_HOST'];
+		$url .= dirname($_SERVER['SCRIPT_NAME']);
+	}
+	
+	$url = rtrim($url, '/') . '/';
 	return $url;
 }
 
