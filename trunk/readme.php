@@ -274,10 +274,15 @@ function check_input($value) {}
 
 ?>
 /*---------------- 数据库使用说明 -----------------*/
-
+ * 于 2012-08-14 改用单例模式，调用方法发生变化
+ * $model = Model::singleton();
+ * $model->query();
+ * $model::$db->query();
+ * $model::$dbS->query();
+ 
 1，可以直接实例化，并为参数提供表名即可返回一个数据库资源。
 在控制器的某个方法中
-$user = new Model('user');	//如若不传递第二个参数，获取的是 default 组的数据库配置文件
+$user = Model::singleton('user');	//如若不传递第二个参数，获取的是 default 组的数据库配置文件
 $user_info = $user->select('*', '1 LIMIT 2');
 var_dump($user_info);
 
@@ -285,20 +290,17 @@ var_dump($user_info);
 在书写 __construct() 函数时提供默认参数为表名，用 load_model() 函数加载之后，可以使用该资源。
 muser.php
 class Muser extends Model {
-	public function __construct($tb_name = 'user') {
-		parent::__construct($tb_name);
-	}
 }
 
 //在控制器方法中
 load_model('muser');
-$user = new Muser('user');	//其实可以传递任意值，如果只是使用 query 而不使用框架函数就无所谓
+$user = Model::singleton('user');	//其实可以传递任意值，如果只是使用 query 而不使用框架函数就无所谓
 $user_info = $user->query('SELECT * FROM user');//也可以直接 $user->db->query() 或者 $user->dbS->query()使用原始资源
 var_dump($user_info->num_rows);
 
 //1，2情况下，如果需要解决主从延时的问题时，可以直接调用主数据库资源
-// $user->db->query(); 使用主数据库
-// $user->dbS->query(); 使用从数据库
+// $user::$db->query(); 使用主数据库
+// $user::$dbS->query(); 使用从数据库
 
 3，直接使用最原始的资源
 $user = db_init();	//默认获取的是 default 组的数据库配置文件
@@ -308,13 +310,7 @@ var_dump($user_info->num_rows);
 为解决安全问题，可使用系统函数 check_input 处理组成sql语句前的变量。
 即：
 $user = check_input(post('username'));
-$sql = "count(*) from user where username = $user";
+$sql = "select count(*) from user where username = $user";
+...
 
- */
- * 于 2012-08-14 改用单例模式，调用方法发生变化
- * $model = Model::singleton();
- * $model->query();
- * $model::$db->query();
- * $model::$dbS->query();
- 
 <?php ?>
