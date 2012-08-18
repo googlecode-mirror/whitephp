@@ -34,11 +34,12 @@ require 'main.php';
  * 
 -----------------------------------
 v0.3
-2012-08-14
+2012-08-19
 UPDATE
 对数据库实行单例模式
 增加函数 get() 和 post()
 增加过滤函数 check_input()
+增加ip函数 wphp_ip2long()
 优化 readme.php 帮助文件
 
 BUG
