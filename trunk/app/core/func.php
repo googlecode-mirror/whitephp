@@ -694,3 +694,17 @@ function check_input($value) {
 	}
 	return $value;
 }
+
+/**
+ * Ip 地址转为数字地址
+ *
+ * php 的 ip2long 这个函数有问题
+ * 133.205.0.0 ==>> 2244804608
+ * @param string $ip 要转换的 ip 地址
+ * @return int    转换完成的数字
+ */
+function wphp_ip2long($ip) {
+	$ip_arr = explode('.',$ip);
+	$iplong = (16777216 * intval($ip_arr[0])) + (65536 * intval($ip_arr[1])) + (256 * intval($ip_arr[2])) + intval($ip_arr[3]);
+	return $iplong;
+}

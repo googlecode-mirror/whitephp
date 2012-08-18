@@ -272,6 +272,16 @@ function ch_json_encode($data) {}
  */
 function check_input($value) {}
 
+/**
+ * Ip 地址转为数字地址
+ *
+ * php 的 ip2long 这个函数有问题
+ * 133.205.0.0 ==>> 2244804608
+ * @param string $ip 要转换的 ip 地址
+ * @return int    转换完成的数字
+ */
+function wphp_ip2long($ip) {}
+
 ?>
 /*---------------- 数据库使用说明 -----------------*/
  * 于 2012-08-14 改用单例模式，调用方法发生变化
