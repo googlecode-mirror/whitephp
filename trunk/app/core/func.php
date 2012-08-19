@@ -688,7 +688,7 @@ function check_input($value) {
 		$value = stripslashes($value);
 	}
 	if (!is_numeric($value)) {
-		$value = "'" . mysql_real_escape_string($value) . "'";
+		$value = "'" . mysqli::real_escape_string($value) . "'";
 	}
 	return $value;
 }

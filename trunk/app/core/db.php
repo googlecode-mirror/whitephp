@@ -15,6 +15,9 @@
 
 /**
  * 数据库初始化，如果直接调用此函数记得关闭。
+ * $db = db_init('default');//配置名称
+ * $db->query();
+ * $db->close();
  */
 
 set_conf('db_conf', $db_conf);
@@ -42,7 +45,7 @@ function db_init($db_group = 'default') {
 			$error_msg = convert_str('database established error - error code: ' . $db->connect_errno . " | " . 'error msg: ' . $db->connect_error);
 			show_error($error_msg);
 		} else {
-			$db->query("set names {$charset}");
+			$db->set_charset($charset);//由 set names xxx 升级为该行
 		}
 	}
 	return $db;

@@ -38,17 +38,8 @@
 	<li>错误处理机制</li>
 	<li>兼容 SAE 环境</li>
 </ol>
-<p>WPHP 待完善的功能：</p>
-<ol>
-	<li>安全机制</li>
-	<li>缓存机制</li>
-	<li>增加模块设计（违背简单高效？）</li>
-	<li>增加钩子机制（违背简单高效？）</li>
-</ol>
 
 <p>更多特性请查看该框架内部说明。</p>
-<hr />
-<p>框架正在完善中，暂不提供下载……</p>
 <hr />
 <p>WPHP 官网 <a href="http://wphp.sinaapp.com" title="WPHP官网" target="_blank">http://wphp.sinaapp.com</a></p>
 <p>WPHP GOOGLE CODE <a href="http://code.google.com/p/whitephp/" title="WPHP GOOGLE CODE" target="_blank">http://code.google.com/p/whitephp/</a></p>

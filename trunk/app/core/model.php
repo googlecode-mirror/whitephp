@@ -205,7 +205,8 @@ class Model {
 		}
 		
 		if ($q && $q->num_rows > 0) {
-			while ($r = $q->fetch_array(MYSQLI_ASSOC)) {
+			//mysqli_result::fetch_assoc
+			while (null != ($r = $q->fetch_assoc())) {
 				$ret[] = $r;
 			}
 			$q->close();
@@ -247,7 +248,8 @@ class Model {
 		}
 	
 		if ($q && $q->num_rows > 0) {
-			while ($r = $q->fetch_array(MYSQLI_ASSOC)) {
+			//mysqli_result::fetch_assoc
+			while (null != ($r = $q->fetch_assoc())) {
 				$ret = $r;
 			}
 			$q->close();
@@ -279,7 +281,7 @@ class Model {
 	
 	public static function show_mysql($sql) {
 		if (self::$show_sql) {
-			echo $sql . "\n";
+			echo $sql . "<br>\n";
 		}
 	}
 	
