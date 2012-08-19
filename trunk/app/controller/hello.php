@@ -37,7 +37,7 @@ class Hello extends Controller {
 		$q = $model->query($sql);
 		
 		if ($q) {
-			while ($r = $q->fetch_array(MYSQLI_ASSOC)) {
+			while (null != ($r = $q->fetch_assoc())) {
 				$ret[] = $r;
 			}
 		}
