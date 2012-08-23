@@ -289,6 +289,12 @@ function wphp_escape($str) {
  */
 function wphp_ip2long($ip) {}
 
+/**
+ * 获取客户端 IP
+ */
+function get_ip() {}
+
+
 ?>
 /*---------------- 数据库使用说明 -----------------*/
  * 于 2012-08-14 改用单例模式，调用方法发生变化

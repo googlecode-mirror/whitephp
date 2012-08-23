@@ -732,3 +732,19 @@ function wphp_ip2long($ip) {
 	$iplong = (16777216 * intval($ip_arr[0])) + (65536 * intval($ip_arr[1])) + (256 * intval($ip_arr[2])) + intval($ip_arr[3]);
 	return $iplong;
 }
+
+/**
+ * 获取客户端 IP
+ */
+function get_ip() {
+	if (! empty ( $_SERVER ['HTTP_CLIENT_IP'] )) {
+		$ip = $_SERVER ['HTTP_CLIENT_IP'];
+	} elseif (! empty ( $_SERVER ['HTTP_X_FORWARDED_FOR'] )) 
+	// to check ip is pass from proxy
+	{
+		$ip = $_SERVER ['HTTP_X_FORWARDED_FOR'];
+	} else {
+		$ip = $_SERVER ['REMOTE_ADDR'];
+	}
+	return $ip;
+}
