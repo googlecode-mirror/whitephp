@@ -688,9 +688,35 @@ function check_input($value) {
 		$value = stripslashes($value);
 	}
 	if (!is_numeric($value)) {
-		$value = "'" . mysql_real_escape_string($value) . "'";
+		$value = "'" . wphp_escape($value) . "'";
 	}
 	return $value;
+}
+
+/**
+ * 转义函数，用来替代 mysql*_escape_* 函数
+ * @param unknown_type $str
+ */
+function wphp_escape($str) {
+	$search = array (
+			"\\",
+			"\0",
+			"\n",
+			"\r",
+			"\x1a",
+			"'",
+			'"' 
+	);
+	$replace = array (
+			"\\\\",
+			"\\0",
+			"\\n",
+			"\\r",
+			"\Z",
+			"\'",
+			'\"' 
+	);
+	return str_replace($search, $replace, $str);
 }
 
 /**
