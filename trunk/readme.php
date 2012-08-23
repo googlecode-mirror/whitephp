@@ -273,6 +273,13 @@ function ch_json_encode($data) {}
 function check_input($value) {}
 
 /**
+ * 转义函数，用来替代 mysql*_escape_* 函数
+ * @param unknown_type $str
+ */
+function wphp_escape($str) {
+}
+
+/**
  * Ip 地址转为数字地址
  *
  * php 的 ip2long 这个函数有问题
