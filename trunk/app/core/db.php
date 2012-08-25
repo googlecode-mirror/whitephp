@@ -1,7 +1,7 @@
 <?php
 /**
  * 数据库连接文件
- * 后期可能会支持多种连接方式，暂时仅采用 mysqli 
+ * 后期可能会支持多种连接方式，暂时仅采用 mysql 
  * 
  * filename:	db.php
  * charset:		UTF-8
