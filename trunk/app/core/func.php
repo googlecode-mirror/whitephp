@@ -514,6 +514,19 @@ function get_ip() {
 }
 
 /**
+ * 判断 ip 是否合法
+ * @param unknown_type $ip
+ */
+function is_valid_ip($ip) {
+	$preg = '/^(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])$/';
+	$is_matched = false;
+	if (preg_match($preg, $ip, $m)) {
+		$is_matched = true;
+	}
+	return $is_matched;
+}
+
+/**
  * json 编码
  * 
  * 解决 json_encode() 不支持中文的情况
