@@ -79,6 +79,144 @@ function get_all_conf() {
 	return $GLOBALS[WPHP_GLOBAL_CONFIG_NAME];
 }
 
+/*------------------------ 框架内部函数 ----------------------------*/
+
+//根据 ca 加载控制器
+function _load_ca($ca) {
+
+	$spilt = explode('/', $ca);
+	$count = count($spilt);
+	$n = 1;//控制器位于第几层，从零开始。后面方法用n时，只需传递n即可获取方法所在索引。
+	$con = $spilt[0];
+	$c = CONTROLLER;
+	$a = ACTION;
+	while (!file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
+		if ($n < $count) {
+			$n++;
+		} else {
+			//如果不存在文件直接终止
+			show_404();
+			break;
+		}
+		$con = '';
+		for ($i = 0; $i < $n; $i++) {
+			$con .= $spilt[$i] . '/';
+		}
+		$con = trim($con, '/');
+	}
+	// 	echo $n;
+	if (file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
+		$c = $con;
+		if (isset($spilt[$n])) {
+			$a = $spilt[$n];
+		}
+	}
+	unset($spilt);
+	unset($count);
+	unset($con);
+	return array('c' => $c, 'a' => $a, 'n'=>$n);
+}
+
+/**
+ * path2query 路径转url查询函数
+ *
+ * @todo 如果有传递参数怎么办。。。
+ *
+ * 将控制器字符串转换成网址
+ * @param unknown_type $string
+ * @return multitype:Ambigous <string, unknown> Ambigous <string, mixed> Ambigous <string, multitype:>
+ */
+function p2q($ca = null) {
+
+	$ca = trim($ca, '/');
+	$rewrite_rules = get_conf('rewrite_rules');
+	$a = $c = $spilt = $extra = '';
+	if (!$ca) {
+		$c = CONTROLLER;
+		$a = ACTION;
+	} else {
+		//如果有跳转
+		if (key_exists($ca, $rewrite_rules)) {
+			$ca = $rewrite_rules[$ca];
+		}
+
+		$spilt = explode('/', $ca);
+		$count = count($spilt);
+
+		if ($count == 1) {
+			$c = $ca;
+			$a = ACTION;
+		} else {
+				
+			//处理不在控制器不在根目录的情况
+			$ret_tmp = _load_ca($ca);
+			extract($ret_tmp);
+			foreach ($spilt as $k => $v) {
+				// 				$extra .= "&globalparam{$k}={$v}";
+			}
+		}
+	}
+	$url_query = "c={$c}&a={$a}".$extra;
+	return array('c'=>$c, 'a'=>$a, 'segment'=>$spilt, 'url_query'=>$url_query);
+}
+
+/**
+ * 建立一个链接
+ * @param string $ca 如 hello/index
+ * @param array $extra 如 array('id'=5)
+ */
+function href($ca, $extra = array()) {
+	$query_string = '';
+	if (IS_PATH_URL) {
+		$query_string .= $ca;
+		if ($extra) {
+			$query_string .= '/' . implode('/', $extra);
+		}
+	} else {
+		$tmp = p2q($ca);
+		$query_string .= $tmp['url_query'];
+		foreach ($extra as $k => $v) {
+			$query_string .= "&{$k}={$v}";
+		}
+	}
+
+	if (!IS_HIDE_INDEX_PAGE) {
+		$query_string = INDEX_PAGE . '?' . $query_string;
+	}
+	return $query_string;
+}
+
+/**
+ * 建立带有协议的的包含完整路径超链接
+ * @param unknown_type $ca
+ * @param unknown_type $extra
+ */
+function hard_href($ca, $extra = array()) {
+	$href = '';
+	$query_string = '';
+	if (IS_PATH_URL) {
+		$query_string .= $ca;
+		if ($extra) {
+			$query_string .= '/' . implode('/', $extra);
+		}
+		$href = get_server_root() . $query_string;
+	} else {
+		$tmp = p2q($ca);
+		$query_string .= $tmp['url_query'];
+		foreach ($extra as $k => $v) {
+			$query_string .= "&{$k}={$v}";
+		}
+		$href = get_server_root() . $query_string;
+	}
+
+	if (!IS_HIDE_INDEX_PAGE) {
+		$query_string = INDEX_PAGE . '?' . $query_string;
+		$href = get_server_root() . $query_string;
+	}
+	// 	return $query_string;
+	return $href;
+}
+
 /*------------------------ 日志处理函数 ----------------------------*/
 
 /**
@@ -192,188 +330,6 @@ function show_404($message = '') {
 	exit;
 }
 
-/*------------------------ 其它函数 ----------------------------*/
-
-/**
- * 获取 post 或者 get 的值
- * @param string $k
- * @param string $default 默认返回值
- * @return Ambigous <NULL, unknown>
- */
-function v($k, $defalut = '') {
-	return isset($_REQUEST[$k]) ? $_REQUEST[$k] : $defalut;
-}
-
-/**
- * 获取 get 的值
- * @param string $k
- * @param string $default 默认返回值
- * @return Ambigous <NULL, unknown>
- */
-function get($k, $defalut = '') {
-	return isset($_GET[$k]) ? $_GET[$k] : $defalut;
-}
-
-/**
- * 获取 post 的值
- * @param string $k
- * @param string $default 默认返回值
- * @return Ambigous <NULL, unknown>
- */
-function post($k, $defalut = '') {
-	return isset($_POST[$k]) ? $_POST[$k] : $defalut;
-}
-
-//根据 ca 加载控制器
-function _load_ca($ca) {
-	
-	$spilt = explode('/', $ca);
-	$count = count($spilt);
-	$n = 1;//控制器位于第几层，从零开始。后面方法用n时，只需传递n即可获取方法所在索引。
-	$con = $spilt[0];
-	$c = CONTROLLER;
-	$a = ACTION;
-	while (!file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
-		if ($n < $count) {
-			$n++;
-		} else {
-			//如果不存在文件直接终止
-			show_404();
-			break;
-		}
-		$con = '';
-		for ($i = 0; $i < $n; $i++) {
-			$con .= $spilt[$i] . '/';
-		}
-		$con = trim($con, '/');
-	}
-// 	echo $n;
-	if (file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
-		$c = $con;
-		if (isset($spilt[$n])) {
-			$a = $spilt[$n];
-		}
-	}
-	unset($spilt);
-	unset($count);
-	unset($con);
-	return array('c' => $c, 'a' => $a, 'n'=>$n);
-}
-
-/**
- * path2query 路径转url查询函数
- * 
- * @todo 如果有传递参数怎么办。。。
- * 
- * 将控制器字符串转换成网址
- * @param unknown_type $string
- * @return multitype:Ambigous <string, unknown> Ambigous <string, mixed> Ambigous <string, multitype:>
- */
-function p2q($ca = null) {
-	
-	$ca = trim($ca, '/');
-	$rewrite_rules = get_conf('rewrite_rules');
-	$a = $c = $spilt = $extra = '';
-	if (!$ca) {
-		$c = CONTROLLER;
-		$a = ACTION;
-	} else {
-		//如果有跳转
-		if (key_exists($ca, $rewrite_rules)) {
-			$ca = $rewrite_rules[$ca];
-		}
-		
-		$spilt = explode('/', $ca);
-		$count = count($spilt);
-		
-		if ($count == 1) {
-			$c = $ca;
-			$a = ACTION;
-		} else {
-			
-			//处理不在控制器不在根目录的情况
-			$ret_tmp = _load_ca($ca);
-			extract($ret_tmp);
-			foreach ($spilt as $k => $v) {
-// 				$extra .= "&globalparam{$k}={$v}";
-			}
-		}
-	}
-	$url_query = "c={$c}&a={$a}".$extra;
-	return array('c'=>$c, 'a'=>$a, 'segment'=>$spilt, 'url_query'=>$url_query);
-}
-
-/**
- * 建立一个链接
- * @param string $ca 如 hello/index
- * @param array $extra 如 array('id'=5)
- */
-function href($ca, $extra = array()) {
-	$query_string = '';
-	if (IS_PATH_URL) {
-		$query_string .= $ca;
-		if ($extra) {
-			$query_string .= '/' . implode('/', $extra);
-		}
-	} else {
-		$tmp = p2q($ca);
-		$query_string .= $tmp['url_query'];
-		foreach ($extra as $k => $v) {
-			$query_string .= "&{$k}={$v}";
-		}
-	}
-	
-	if (!IS_HIDE_INDEX_PAGE) {
-		$query_string = INDEX_PAGE . '?' . $query_string;
-	}
-	return $query_string;
-}
-
-/**
- * 建立带有协议的的包含完整路径超链接
- * @param unknown_type $ca
- * @param unknown_type $extra
- */
-function hard_href($ca, $extra = array()) {
-	$href = '';
-	$query_string = '';
-	if (IS_PATH_URL) {
-		$query_string .= $ca;
-		if ($extra) {
-			$query_string .= '/' . implode('/', $extra);
-		}
-		$href = get_server_root() . $query_string;
-	} else {
-		$tmp = p2q($ca);
-		$query_string .= $tmp['url_query'];
-		foreach ($extra as $k => $v) {
-			$query_string .= "&{$k}={$v}";
-		}
-		$href = get_server_root() . $query_string;
-	}
-	
-	if (!IS_HIDE_INDEX_PAGE) {
-		$query_string = INDEX_PAGE . '?' . $query_string;
-		$href = get_server_root() . $query_string;
-	}
-// 	return $query_string;
-	return $href;
-}
-
-/**
- * 跳转函数
- * @param string $ca 控制器和方法 如 hello/test
- * @param string $code
- */
-function r($ca, $code = 302) {
-	
-	if (FALSE !== strpos($ca, 'http://') || FALSE !== strpos($ca, 'https://')) {
-		header('Location: ' . $ca, TRUE, $code);
-	}
-
-	header('Location: ' . href($ca), TRUE, $code);
-}
-
 /**
  * 渲染页面
  * @param unknown_type $file
@@ -424,8 +380,57 @@ function load_static($file = 'jquery.js') {
 	}
 }
 
+/*------------------------ 通用函数，可以拿出去单独使用 --------------------------*/
+
+/**
+ * 获取 post 或者 get 的值
+ * @param string $k
+ * @param string $default 默认返回值
+ * @return Ambigous <NULL, unknown>
+ */
+function v($k, $defalut = '') {
+	return isset($_REQUEST[$k]) ? $_REQUEST[$k] : $defalut;
+}
+
+/**
+ * 获取 get 的值
+ * @param string $k
+ * @param string $default 默认返回值
+ * @return Ambigous <NULL, unknown>
+ */
+function get($k, $defalut = '') {
+	return isset($_GET[$k]) ? $_GET[$k] : $defalut;
+}
+
+/**
+ * 获取 post 的值
+ * @param string $k
+ * @param string $default 默认返回值
+ * @return Ambigous <NULL, unknown>
+ */
+function post($k, $defalut = '') {
+	return isset($_POST[$k]) ? $_POST[$k] : $defalut;
+}
+
+/**
+ * 跳转函数
+ * @param string $ca 控制器和方法 如 hello/test
+ * @param string $code
+ */
+function r($ca, $code = 302) {
+	
+	if (FALSE !== strpos($ca, 'http://') || FALSE !== strpos($ca, 'https://')) {
+		header('Location: ' . $ca, TRUE, $code);
+	}
+
+	header('Location: ' . href($ca), TRUE, $code);
+}
+
 /**
  * 将未知编码的字符串转换为期望的编码（配置文件中设置的编码）
+ * 
+ * 不建议使用，尽量统一编码，明确要转码的字符原来的编码
+ * @deprecated
  * @param string $str
  * @param string $toEncoding
  * @return string
@@ -450,159 +455,6 @@ function convert_str($str, $toEncoding = null) {
 function real_strlen($str) {
 	$charset = mb_detect_encoding($str);
 	return mb_strlen($str, $charset);
-}
-
-/**
- * 创建验证码
- * 
- * 
- * @param $array 一个数组
- * 
- * <code>
- * $array = array(
- * 		'width' => 200,					//验证码宽度
- * 		'height' => 40,					//验证码高度
- * 		'num' => 4,						//验证码数量
- * 		'verify_code' => 'verify_code', //验证码索引名
- * 		'ads' => array(),				//增加的额外验证码，一维数组
- * 		'teight' => 1,					//紧凑度
- * 		'angle' => 20,					//偏向角度
- * 		'fontfile' => 'carbon.ttf',		//字体文件，请放置于 static 文件夹内，默认不支持中文，如有需要请添加中文字体
- * 		'bgred'=>233,
- * 		'bggreen'=>233,
- * 		'bgblue'=>233,	//字体背景色
- * 		'fred'=>233,
- * 		'fgreen'=>233,
- * 		'fblue'=>233,	//字体前景色
- * );
- * </code>
- * 
- * @return string  向数组 $_SESSION[$verify_code] 写入一个字符串
- */
-function verify_code($array = array()) {
-	$width = 100;
-	$height = 30;
-	$num = 5;
-	$verify_code = 'verify_code';
-	$ads = array();
-	$teight = 1;
-	$angle = 20;
-	$fontfile = 'carbon.ttf';
-	
-	//背景色
-	$bgred = 244;
-	$bggreen = 244;
-	$bgblue = 244;
-
-	//前景色
-	$fred = 233;
-	$fgreen = 233;
-	$fblue = 233;
-	
-	//解压传入的数组参数
-	extract($array);
-	
-	$ret = '';		//结果
-
-	//初始坐标
-	$x = $height*3/7;
-	$y = $height*5/7;
-	
-	if (!function_exists('imagecreate')) show_error('you must enable gd2 extension to use image functions');
-
-	$handle = imagecreate($width, $height);
-	$bgcolor = imagecolorallocate($handle, $bgred, $bggreen, $bgblue);
-	
-	$words = 'abcdefghijklmnopqrstuvwxyz';
-	$wordsUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	$numbers = '0123456789';
-	$array = array();
-	$array = str_split($words . $wordsUpper . $numbers);
-// 	$ads = array('白纸', '框架', '你');
-	$array = array_merge($array, $ads);
-
-	for ($i = 0; $i < $num; $i++) {
-
-		$font = rand($y*2/3, $y*4/5);
-
-		$string = array_rand($array);
-		$string = $array[$string];
-
-		$red = rand(10, $fred);
-		$green = rand(10, $fgreen);
-		$blue = rand(10, $fblue);
-
-		$color = imagecolorallocate($handle, $red, $green, $blue);
-		$angle_real = rand(-$angle, $angle);
-		
-		$font_file = APP_PATH . '/static/' . $fontfile;
-		
-		file_exists($font_file) or show_error('字体文件不存在，请检查 ' . $font_file);
-
-		//注意全部以入口文件为参考，除非直接引入文件
-		imagettftext($handle, $font, $angle_real, $x, $y, $color, $font_file, $string);
-		
-		$x = $x + $font * real_strlen($string) * $teight;
-		
-		$ret .= $string;
-	}
-
-  //session_start(); //在核心文件已经开启
-	$_SESSION[$verify_code] = $ret;
-	header("Content-type: image/png");
-	imagepng($handle);
-	imagedestroy($handle);
-}
-
-/**
- * 直接生成可视化的验证码和可点链接
- * 
- * @param $array 一个数组
- * 
- * <code>
- * $array = array(
- * 		'width' => 200,					//验证码宽度
- * 		'height' => 40,					//验证码高度
- * 		'num' => 4,						//验证码数量
- * 		'verify_code' => 'verify_code', //验证码索引名
- * 		'ads' => array(),				//增加的额外验证码，一维数组
- * 		'teight' => 1,					//紧凑度
- * 		'angle' => 20,					//偏向角度
- * 		'fontfile' => 'carbon.ttf',		//字体文件，请放置于 static 文件夹内，默认不支持中文，如有需要请添加中文字体
- * 		'bgred'=>233,
- * 		'bggreen'=>233,
- * 		'bgblue'=>233,	//字体背景色
- * 		'fred'=>233,
- * 		'fgreen'=>233,
- * 		'fblue'=>233,	//字体前景色
- * );
- * </code>
- * 
- * @param  string  $prompt      提示信息
- * @param bool $show_prompt     是否显示提示文字
- * @return [type]               [description]
- */
-function echo_code($array = array(), $prompt='看不清？点击重新获取', $show_prompt = false) {
-	//session_start(); //在核心文件已经开启
-
-	//外部访问验证码的接口（控制器方法对）
-	$verify = 'syscommon/verify_code';
-
-	if (IS_PATH_URL) {
-		echo '<img id="code" src="' . href($verify).'" onclick="this.src=\'' . href($verify) . '\'+ \'/\' + Math.random();" style="cursor:pointer" title=' . $prompt . '>';
-		if ($show_prompt) {
-			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . href($verify) . '\'+ \'/\' + Math.random();">' . $prompt . '</a>';
-		}
-
-	} else {
-		echo '<img id="code" src="'.href($verify).'" onclick="this.src=\''.href($verify).'&r=\' + Math.random()" style="cursor:pointer" title=' . $prompt . '>';
-		if ($show_prompt) {
-			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\''.href($verify).'&r=\'+Math.random();">' . $prompt . '</a>';			
-		}
-	}
-// 	if (isset($_SESSION['verify_code'])) {
-// 		echo '<br />Pre Code: ', $_SESSION['verify_code'];
-// 	}
 }
 
 /**
@@ -643,8 +495,29 @@ function get_server_root() {
 }
 
 /**
- * 处理  json_encode() 不支持中文的情况
- *
+ * 获取客户端 IP
+ * 搜集自网络，原作者未知
+ */
+function get_ip() {
+	if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"), "unknown")) {
+		$ip = getenv("HTTP_CLIENT_IP");
+	} elseif (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown")) {
+		$ip = getenv("HTTP_X_FORWARDED_FOR");
+	} elseif (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown")) {
+		$ip = getenv("REMOTE_ADDR");
+	} elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown")) {
+		$ip = $_SERVER['REMOTE_ADDR'];
+	} else {
+		$ip = "0.0.0.0";
+	}
+	return $ip;
+}
+
+/**
+ * json 编码
+ * 
+ * 解决 json_encode() 不支持中文的情况
+ * 
  * @param array|object $data
  * @return array|object
  */
@@ -679,7 +552,10 @@ function ch_json_encode($data) {
 }
 
 /**
- * 书写mysql语句时的变量检查函数
+ * 转义特殊字符
+ * 
+ * 书写mysql语句时的可先对变量进行过滤
+ * 此函数会自动对字符串加引号
  * @param unknown_type $value
  * @return string
  */
@@ -734,18 +610,33 @@ function wphp_ip2long($ip) {
 }
 
 /**
- * 获取客户端 IP
+ * 对字符串、对象、数组进行转码
+ * 
+ * 和 iconv 参数使用方式相同
+ * @param string $in_charset
+ * @param string $out_charset
+ * @param array|string $data
+ * @return string|array
  */
-function get_ip() {
-	if (getenv ( "HTTP_CLIENT_IP" ) && strcasecmp ( getenv ( "HTTP_CLIENT_IP" ), "unknown" ))
-		$ip = getenv ( "HTTP_CLIENT_IP" );
-	elseif (getenv ( "HTTP_X_FORWARDED_FOR" ) && strcasecmp ( getenv ( "HTTP_X_FORWARDED_FOR" ), "unknown" ))
-		$ip = getenv ( "HTTP_X_FORWARDED_FOR" );
-	elseif (getenv ( "REMOTE_ADDR" ) && strcasecmp ( getenv ( "REMOTE_ADDR" ), "unknown" ))
-		$ip = getenv ( "REMOTE_ADDR" );
-	elseif (isset ( $_SERVER ['REMOTE_ADDR'] ) && $_SERVER ['REMOTE_ADDR'] && strcasecmp ( $_SERVER ['REMOTE_ADDR'], "unknown" ))
-		$ip = $_SERVER ['REMOTE_ADDR'];
-	else
-		$ip = "0.0.0.0";
-	return $ip;
+function wphp_iconv($in_charset, $out_charset, $data) {
+
+	if (is_array($data) || is_object($data)) {
+		foreach ($data as $k => $v) {
+			if (is_scalar($v)) {
+				if (is_array($data)) {
+					$data[$k] = iconv($in_charset, $out_charset, $v);
+				} else if (is_object($data)) {
+					$data->$k = iconv($in_charset, $out_charset, $v);
+				}
+			} else if (is_array($data)) {
+				$data[$k] = wphp_iconv($in_charset, $out_charset, $v);
+			} else if (is_object($data)) {
+				$data->$k = wphp_iconv($in_charset, $out_charset, $v);
+			}
+		}
+	} else if (is_scalar($data)) {
+		$data = iconv($in_charset, $out_charset, $data);
+	}
+	return $data;
 }
+

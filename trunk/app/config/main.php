@@ -74,3 +74,6 @@ handle:
 
 //加载扩展函数
 // require APP_PATH . '/func/xxx.php';
+
+require APP_PATH . '/func/verifycode.php';
+
