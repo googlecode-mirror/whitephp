@@ -104,8 +104,8 @@ if (file_exists(APP_PATH . '/controller/' . strtolower($c) . '.php')) {
 	//支持多层次目录,先放到一个数组中，取最后一个为控制器
 	$c_array = explode('/', $c);
 	$c = array_pop($c_array);
-	if (!class_exists($c)) show_404('Unkonw file!' . $c);
-	if (!method_exists($c, $a)) show_404('Unkown file!' . $c . '/' . $a);
+	if (!class_exists($c)) show_404('controller unexists !' . $c);
+	if (!method_exists($c, $a)) show_404('action unexists!' . $c . '/' . $a);
 } else {
 	show_404('Page not found!');
 }

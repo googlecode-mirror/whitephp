@@ -338,7 +338,7 @@ function show_404($message = '') {
 function render($file, $data = array()) {
 	global $theme_package;
 	if (!file_exists(APP_PATH . '/view/' . $theme_package . '/' . rtrim($file, '.php') . '.php')) {
-		show_404('文件 ' . $file . ' 不存在！');
+		show_404('view file ' . $file . ' unexists!');
 	} else {
 		extract($data);
 		unset($data);
