@@ -39,73 +39,73 @@
  * @return string  向数组 $_SESSION[$verify_code] 写入一个字符串
  */
 function verify_code($array = array()) {
-	$width = 100;
-	$height = 30;
-	$num = 5;
+	$width       = 100;
+	$height      = 30;
+	$num         = 5;
 	$verify_code = 'verify_code';
-	$ads = array();
-	$teight = 1;
-	$angle = 20;
-	$fontfile = 'carbon.ttf';
-
+	$ads         = array();
+	$teight      = 1;
+	$angle       = 20;
+	$fontfile    = 'carbon.ttf';
+	
 	//背景色
-	$bgred = 244;
+	$bgred   = 244;
 	$bggreen = 244;
-	$bgblue = 244;
-
+	$bgblue  = 244;
+	
 	//前景色
-	$fred = 233;
+	$fred   = 233;
 	$fgreen = 233;
-	$fblue = 233;
-
+	$fblue  = 233;
+	
 	//解压传入的数组参数
 	extract($array);
-
-	$ret = '';		//结果
-
+	
+	$ret = ''; //结果
+	
 	//初始坐标
-	$x = $height*3/7;
-	$y = $height*5/7;
-
-	if (!function_exists('imagecreate')) show_error('you must enable gd2 extension to use image functions');
-
-	$handle = imagecreate($width, $height);
+	$x = $height * 3 / 7;
+	$y = $height * 5 / 7;
+	
+	if (!function_exists('imagecreate'))
+		show_error('you must enable gd2 extension to use image functions');
+	
+	$handle  = imagecreate($width, $height);
 	$bgcolor = imagecolorallocate($handle, $bgred, $bggreen, $bgblue);
-
-	$words = 'abcdefghijklmnopqrstuvwxyz';
+	
+	$words      = 'abcdefghijklmnopqrstuvwxyz';
 	$wordsUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	$numbers = '0123456789';
-	$array = array();
-	$array = str_split($words . $wordsUpper . $numbers);
+	$numbers    = '0123456789';
+	$array      = array();
+	$array      = str_split($words . $wordsUpper . $numbers);
 	// 	$ads = array('白纸', '框架', '你');
-	$array = array_merge($array, $ads);
-
+	$array      = array_merge($array, $ads);
+	
 	for ($i = 0; $i < $num; $i++) {
-
-		$font = rand($y*2/3, $y*4/5);
-
+		$font = rand($y * 2 / 3, $y * 4 / 5);
+		
 		$string = array_rand($array);
 		$string = $array[$string];
-
-		$red = rand(10, $fred);
+		
+		$red   = rand(10, $fred);
 		$green = rand(10, $fgreen);
-		$blue = rand(10, $fblue);
-
-		$color = imagecolorallocate($handle, $red, $green, $blue);
+		$blue  = rand(10, $fblue);
+		
+		$color      = imagecolorallocate($handle, $red, $green, $blue);
 		$angle_real = rand(-$angle, $angle);
-
+		
 		$font_file = APP_PATH . '/static/' . $fontfile;
-
+		
 		file_exists($font_file) or show_error('字体文件不存在，请检查 ' . $font_file);
-
+		
 		//注意全部以入口文件为参考，除非直接引入文件
 		imagettftext($handle, $font, $angle_real, $x, $y, $color, $font_file, $string);
-
+		
 		$x = $x + $font * real_strlen($string) * $teight;
-
+		
 		$ret .= $string;
 	}
-
+	
 	//session_start(); //在核心文件已经开启
 	$_SESSION[$verify_code] = $ret;
 	header("Content-type: image/png");
@@ -141,22 +141,22 @@ function verify_code($array = array()) {
  * @param bool $show_prompt     是否显示提示文字
  * @return [type]               [description]
  */
-function echo_code($array = array(), $prompt='看不清？点击重新获取', $show_prompt = false) {
+function echo_code($array = array(), $prompt = '看不清？点击重新获取', $show_prompt = false) {
 	//session_start(); //在核心文件已经开启
-
+	
 	//外部访问验证码的接口（控制器方法对）
 	$verify = 'syscommon/verify_code';
-
+	
 	if (IS_PATH_URL) {
-		echo '<img id="code" src="' . href($verify).'" onclick="this.src=\'' . href($verify) . '\'+ \'/\' + Math.random();" style="cursor:pointer" title=' . $prompt . '>';
+		echo '<img id="code" src="' . href($verify) . '" onclick="this.src=\'' . href($verify) . '\'+ \'/\' + Math.random();" style="cursor:pointer" title=' . $prompt . '>';
 		if ($show_prompt) {
 			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . href($verify) . '\'+ \'/\' + Math.random();">' . $prompt . '</a>';
 		}
-
+		
 	} else {
-		echo '<img id="code" src="'.href($verify).'" onclick="this.src=\''.href($verify).'&r=\' + Math.random()" style="cursor:pointer" title=' . $prompt . '>';
+		echo '<img id="code" src="' . href($verify) . '" onclick="this.src=\'' . href($verify) . '&r=\' + Math.random()" style="cursor:pointer" title=' . $prompt . '>';
 		if ($show_prompt) {
-			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\''.href($verify).'&r=\'+Math.random();">' . $prompt . '</a>';
+			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . href($verify) . '&r=\'+Math.random();">' . $prompt . '</a>';
 		}
 	}
 	// 	if (isset($_SESSION['verify_code'])) {

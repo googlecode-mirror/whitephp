@@ -83,13 +83,12 @@ function get_all_conf() {
 
 //根据 ca 加载控制器
 function _load_ca($ca) {
-
 	$spilt = explode('/', $ca);
 	$count = count($spilt);
-	$n = 1;//控制器位于第几层，从零开始。后面方法用n时，只需传递n即可获取方法所在索引。
-	$con = $spilt[0];
-	$c = CONTROLLER;
-	$a = ACTION;
+	$n     = 1; //控制器位于第几层，从零开始。后面方法用n时，只需传递n即可获取方法所在索引。
+	$con   = $spilt[0];
+	$c     = CONTROLLER;
+	$a     = ACTION;
 	while (!file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
 		if ($n < $count) {
 			$n++;
@@ -114,7 +113,11 @@ function _load_ca($ca) {
 	unset($spilt);
 	unset($count);
 	unset($con);
-	return array('c' => $c, 'a' => $a, 'n'=>$n);
+	return array(
+		'c' => $c,
+		'a' => $a,
+		'n' => $n
+	);
 }
 
 /**
@@ -127,10 +130,9 @@ function _load_ca($ca) {
  * @return multitype:Ambigous <string, unknown> Ambigous <string, mixed> Ambigous <string, multitype:>
  */
 function p2q($ca = null) {
-
-	$ca = trim($ca, '/');
+	$ca            = trim($ca, '/');
 	$rewrite_rules = get_conf('rewrite_rules');
-	$a = $c = $spilt = $extra = '';
+	$a             = $c = $spilt = $extra = '';
 	if (!$ca) {
 		$c = CONTROLLER;
 		$a = ACTION;
@@ -139,15 +141,14 @@ function p2q($ca = null) {
 		if (key_exists($ca, $rewrite_rules)) {
 			$ca = $rewrite_rules[$ca];
 		}
-
+		
 		$spilt = explode('/', $ca);
 		$count = count($spilt);
-
+		
 		if ($count == 1) {
 			$c = $ca;
 			$a = ACTION;
 		} else {
-				
 			//处理不在控制器不在根目录的情况
 			$ret_tmp = _load_ca($ca);
 			extract($ret_tmp);
@@ -156,8 +157,13 @@ function p2q($ca = null) {
 			}
 		}
 	}
-	$url_query = "c={$c}&a={$a}".$extra;
-	return array('c'=>$c, 'a'=>$a, 'segment'=>$spilt, 'url_query'=>$url_query);
+	$url_query = "c={$c}&a={$a}" . $extra;
+	return array(
+		'c' => $c,
+		'a' => $a,
+		'segment' => $spilt,
+		'url_query' => $url_query
+	);
 }
 
 /**
@@ -179,7 +185,7 @@ function href($ca, $extra = array()) {
 			$query_string .= "&{$k}={$v}";
 		}
 	}
-
+	
 	if (!IS_HIDE_INDEX_PAGE) {
 		$query_string = INDEX_PAGE . '?' . $query_string;
 	}
@@ -192,7 +198,7 @@ function href($ca, $extra = array()) {
  * @param unknown_type $extra
  */
 function hard_href($ca, $extra = array()) {
-	$href = '';
+	$href         = '';
 	$query_string = '';
 	if (IS_PATH_URL) {
 		$query_string .= $ca;
@@ -208,10 +214,10 @@ function hard_href($ca, $extra = array()) {
 		}
 		$href = get_server_root() . $query_string;
 	}
-
+	
 	if (!IS_HIDE_INDEX_PAGE) {
 		$query_string = INDEX_PAGE . '?' . $query_string;
-		$href = get_server_root() . $query_string;
+		$href         = get_server_root() . $query_string;
 	}
 	// 	return $query_string;
 	return $href;
@@ -225,14 +231,13 @@ function hard_href($ca, $extra = array()) {
  * @param string $message
  */
 function log_error($message = '') {
-
 	//sae 环境未解决日志记录问题，不建议写到 storage里，可尝试sae_debug
 	if (defined('SAE_APPNAME')) {
 		_sae_log_error($message);
 	} else {
 		if (!IS_LOG) {
 			echo '未启用错误日志，错误信息为：' . $message;
-			return ;
+			return;
 		}
 		
 		$error = date('Y-m-d H:i:s');
@@ -243,9 +248,10 @@ function log_error($message = '') {
 		//其实这个完全可以直接 a+ 方式写文件，没必要非得用 error_log 函数
 		$log_path = SYS_PATH . '/' . APP_PATH . '/' . LOG_PATH . '/' . date('Y-m') . '.txt';
 		
-		if (function_exists('error_log') ) {
+		if (function_exists('error_log')) {
 			if (!is_writeable(SYS_PATH . '/' . APP_PATH . '/' . LOG_PATH . '/')) {
-				echo "\n", 'error log permition denied!';die;
+				echo "\n", 'error log permition denied!';
+				die;
 			}
 			error_log($error, 3, $log_path);
 		} else {
@@ -267,7 +273,7 @@ function show_error($message = '') {
 		echo $message;
 		log_error($message);
 	}
-// 	exit;
+	// 	exit;
 }
 
 /**
@@ -313,7 +319,7 @@ function _sae_show_error($message = '') {
 		sae_debug($message);
 		sae_set_display_errors(false);
 	}
-// 	exit;
+	// 	exit;
 }
 
 /**
@@ -325,7 +331,9 @@ function show_404($message = '') {
 	if (!file_exists(APP_PATH . '/view/' . $theme_package . '/404.php')) {
 		require APP_PATH . '/error/404.php';
 	} else {
-		render('404', array('message'=>$message));
+		render('404', array(
+			'message' => $message
+		));
 	}
 	exit;
 }
@@ -418,11 +426,10 @@ function post($k, $defalut = '') {
  * @param string $code
  */
 function r($ca, $code = 302) {
-	
 	if (FALSE !== strpos($ca, 'http://') || FALSE !== strpos($ca, 'https://')) {
 		header('Location: ' . $ca, TRUE, $code);
 	}
-
+	
 	header('Location: ' . href($ca), TRUE, $code);
 }
 
@@ -437,11 +444,17 @@ function r($ca, $code = 302) {
  */
 function convert_str($str, $toEncoding = null) {
 	//加此字符集列表数组，解决误将 改变 2312 识别为 utf-8 的情况
-	$charset_list = array('ascii', 'gb2312', 'gbk', 'utf-8');
-	$strEncoding = mb_detect_encoding($str, $charset_list);
+	$charset_list = array(
+		'ascii',
+		'gb2312',
+		'gbk',
+		'utf-8'
+	);
+	$strEncoding  = mb_detect_encoding($str, $charset_list);
 	//如果没有提供要转码的类型，使用系统设置的编码
-	if (!$toEncoding) $toEncoding = CHARSET;
-
+	if (!$toEncoding)
+		$toEncoding = CHARSET;
+	
 	if (strtolower($strEncoding) != strtolower($toEncoding)) {
 		$str = iconv($strEncoding, $toEncoding, $str);
 	}
@@ -464,7 +477,7 @@ function real_strlen($str) {
  */
 function get_server_url($with_query_string = true) {
 	$url = 'http://localhost';
-
+	
 	if (isset($_SERVER['HTTP_HOST'])) {
 		$url = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http';
 		$url .= '://' . $_SERVER['HTTP_HOST'];
@@ -499,19 +512,19 @@ function get_server_root() {
  * 搜集自网络，原作者未知
  */
 function get_ip() {
-    if ($_SERVER["HTTP_X_REAL_IP"])
-        $ip = $_SERVER["HTTP_X_REAL_IP"];
-    else if ($_SERVER["HTTP_CLIENT_IP"])
-        $ip = $_SERVER["HTTP_CLIENT_IP"];
-    else if ($_SERVER["REMOTE_ADDR"])
-        $ip = $_SERVER["REMOTE_ADDR"];
-    else if (getenv("HTTP_X_FORWARDED_FOR"))
-        $ip = getenv("HTTP_X_FORWARDED_FOR");
-    else if (getenv("HTTP_CLIENT_IP"))
-        $ip = getenv("HTTP_CLIENT_IP");
-    else if (getenv("REMOTE_ADDR"))
-        $ip = getenv("REMOTE_ADDR");
-    else
+	if ($_SERVER["HTTP_X_REAL_IP"])
+		$ip = $_SERVER["HTTP_X_REAL_IP"];
+	else if ($_SERVER["HTTP_CLIENT_IP"])
+		$ip = $_SERVER["HTTP_CLIENT_IP"];
+	else if ($_SERVER["REMOTE_ADDR"])
+		$ip = $_SERVER["REMOTE_ADDR"];
+	else if (getenv("HTTP_X_FORWARDED_FOR"))
+		$ip = getenv("HTTP_X_FORWARDED_FOR");
+	else if (getenv("HTTP_CLIENT_IP"))
+		$ip = getenv("HTTP_CLIENT_IP");
+	else if (getenv("REMOTE_ADDR"))
+		$ip = getenv("REMOTE_ADDR");
+	else
 		$ip = "0.0.0.0";
 	return $ip;
 }
@@ -521,7 +534,7 @@ function get_ip() {
  * @param unknown_type $ip
  */
 function is_valid_ip($ip) {
-	$preg = '/^(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])$/';
+	$preg       = '/^(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])$/';
 	$is_matched = false;
 	if (preg_match($preg, $ip, $m)) {
 		$is_matched = true;
@@ -553,7 +566,7 @@ function ch_json_encode($data) {
 						$data->$k = urlencode($v);
 					}
 				} else if (is_array($data)) {
-					$data[$k] = ch_urlencode($v);//递归调用该函数
+					$data[$k] = ch_urlencode($v); //递归调用该函数
 				} else if (is_object($data)) {
 					$data->$k = ch_urlencode($v);
 				}
@@ -561,7 +574,7 @@ function ch_json_encode($data) {
 		}
 		return $data;
 	}
-
+	
 	$ret = ch_urlencode($data);
 	$ret = json_encode($ret);
 	return urldecode($ret);
@@ -590,23 +603,23 @@ function check_input($value) {
  * @param unknown_type $str
  */
 function wphp_escape($str) {
-	$search = array (
-			"\\",
-			"\0",
-			"\n",
-			"\r",
-			"\x1a",
-			"'",
-			'"' 
+	$search  = array(
+		"\\",
+		"\0",
+		"\n",
+		"\r",
+		"\x1a",
+		"'",
+		'"'
 	);
-	$replace = array (
-			"\\\\",
-			"\\0",
-			"\\n",
-			"\\r",
-			"\Z",
-			"\'",
-			'\"' 
+	$replace = array(
+		"\\\\",
+		"\\0",
+		"\\n",
+		"\\r",
+		"\Z",
+		"\'",
+		'\"'
 	);
 	return str_replace($search, $replace, $str);
 }
@@ -620,7 +633,7 @@ function wphp_escape($str) {
  * @return int    转换完成的数字
  */
 function wphp_ip2long($ip) {
-	$ip_arr = explode('.',$ip);
+	$ip_arr = explode('.', $ip);
 	$iplong = (16777216 * intval($ip_arr[0])) + (65536 * intval($ip_arr[1])) + (256 * intval($ip_arr[2])) + intval($ip_arr[3]);
 	return $iplong;
 }
@@ -635,7 +648,6 @@ function wphp_ip2long($ip) {
  * @return string|array
  */
 function wphp_iconv($in_charset, $out_charset, $data) {
-
 	if (is_array($data) || is_object($data)) {
 		foreach ($data as $k => $v) {
 			if (is_scalar($v)) {
@@ -655,4 +667,3 @@ function wphp_iconv($in_charset, $out_charset, $data) {
 	}
 	return $data;
 }
-

@@ -14,29 +14,10 @@
  */
 
 class Controller {
-	
 	public function index() {
 		echo 'I am here to ensure it works well, man!';
 	}
 	
 	public function __destruct() {
-		
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

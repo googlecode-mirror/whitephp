@@ -67,9 +67,9 @@ class Model {
 	public static function singleton($tb_name = 'sample_table_name', $db_group = 'default') {
 		if (!isset(self::$singleton)) {
 			// if (is_null($tb_name)) show_error('you must supply a table name when instant a model class!');
-			self::$tb_name = $tb_name;
+			self::$tb_name  = $tb_name;
 			self::$db_group = $db_group;
-			self::$db = db_init(self::$db_group);
+			self::$db       = db_init(self::$db_group);
 			
 			self::$db_conf = get_conf('db_conf');
 			
@@ -77,7 +77,7 @@ class Model {
 			if (array_key_exists('slave', self::$db_conf)) {
 				self::$dbS = db_init('slave');
 			}
-			$c = __CLASS__;
+			$c               = __CLASS__;
 			self::$singleton = new $c;
 		}
 		return self::$singleton;
@@ -100,7 +100,7 @@ class Model {
 		//组合后的字段值
 		$values = '';
 		
-		$array_keys = array_keys($data);
+		$array_keys   = array_keys($data);
 		$array_values = array_values($data);
 		
 		foreach ($array_keys as $v) {
@@ -108,7 +108,7 @@ class Model {
 		}
 		
 		foreach ($array_values as $v) {
-			$values .= ", " . check_input($v);	//过滤下
+			$values .= ", " . check_input($v); //过滤下
 		}
 		$fields = trim($fields, ', ');
 		$values = trim($values, ', ');
@@ -120,11 +120,11 @@ class Model {
 		
 		$where = ' WHERE ' . trim($where);
 		$sql .= $where;
-
+		
 		self::show_mysql($sql);
 		
 		$q = self::$db->query($sql);
-
+		
 		return $q;
 	}
 	
@@ -134,8 +134,8 @@ class Model {
 	 * @return bool $q 只要语句正常执行了就会是 true
 	 */
 	public function delete($where = null) {
-		
-		if (is_null($where)) show_error('sql语句错误,条件不能为空 ');
+		if (is_null($where))
+			show_error('sql语句错误,条件不能为空 ');
 		$where = ' WHERE ' . trim($where);
 		
 		$sql = 'DELETE FROM `' . self::$tb_name . '`' . $where;
@@ -153,9 +153,10 @@ class Model {
 	 * @return bool $q 只有语句执行成功就返回 true
 	 */
 	public function update($data = array(), $where = null) {
-		if (is_null($where)) show_error('sql语句错误,条件不能为空');
+		if (is_null($where))
+			show_error('sql语句错误,条件不能为空');
 		$update_data = '';
-		$where = ' WHERE ' . trim($where);
+		$where       = ' WHERE ' . trim($where);
 		if (is_array($data)) {
 			foreach ($data as $k => $v) {
 				$update_data .= ", `{$k}` = '" . self::$db->real_escape_string($v) . "'";
@@ -181,7 +182,7 @@ class Model {
 	 * @return array $ret
 	 */
 	public function select($field = '*', $where = null) {
-		$ret = array();
+		$ret       = array();
 		$field_new = '';
 		if (is_array($field)) {
 			foreach ($field as $f) {
@@ -192,7 +193,8 @@ class Model {
 		}
 		$field_new = trim($field_new, ',');
 		
-		if (!is_null($where)) $where = ' WHERE ' . trim($where);
+		if (!is_null($where))
+			$where = ' WHERE ' . trim($where);
 		
 		$sql = 'SELECT ' . $field_new . ' FROM `' . self::$tb_name . '`' . $where;
 		
@@ -221,7 +223,7 @@ class Model {
 	 * @return array $ret
 	 */
 	public function select_line($field = '*', $where = null) {
-		$ret = array();
+		$ret       = array();
 		$field_new = '';
 		if (is_array($field)) {
 			foreach ($field as $f) {
@@ -231,22 +233,23 @@ class Model {
 			$field_new = $field;
 		}
 		$field_new = trim($field_new, ',');
-	
-		if (!is_null($where)) $where = ' WHERE ' . trim($where);
-	
+		
+		if (!is_null($where))
+			$where = ' WHERE ' . trim($where);
+		
 		$sql = 'SELECT ' . $field_new . ' FROM `' . self::$tb_name . '`' . $where . ' LIMIT 1';
 		
 		//仅仅查询一条数据
-// 		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
+		// 		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
 		
 		self::show_mysql($sql);
-	
+		
 		if (self::$dbS) {
 			$q = self::$dbS->query($sql);
 		} else {
 			$q = self::$db->query($sql);
 		}
-	
+		
 		if ($q && $q->num_rows > 0) {
 			//mysqli_result::fetch_assoc
 			while (null != ($r = $q->fetch_assoc())) {
@@ -275,9 +278,9 @@ class Model {
 	 * 防注入攻击，替换 ?
 	 * @deprecated
 	 */
-// 	public function prepare() {
-		
-// 	}
+	// 	public function prepare() {
+	
+	// 	}
 	
 	public static function show_mysql($sql) {
 		if (self::$show_sql) {
@@ -289,7 +292,6 @@ class Model {
 	 * 关闭数据库
 	 */
 	public function __destruct() {
-		
 		if (self::$db) {
 			if (self::$db->error) {
 				show_error(self::$db->error);

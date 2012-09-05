@@ -1,3 +1,4 @@
+
 <?php
 /**
  * 数据库配置文件
@@ -23,11 +24,11 @@ define('IS_DB_ACTIVE', TRUE);
 /*---------------- 主数据库 -----------------*/
 //每增加一个数据库，增加一条配置信息，索引为数据库分组，db.php 会用到,extract
 $db_conf['default'] = array(
-		'db_username' => 'root',
-		'db_passwd' => '123456',
-		'db_database' => 'testdata',
-// 		'db_host' => 'localhost',	//默认 localhost
-// 		'db_port' => '3306',		//默认 3306
+	'db_username' => 'root',
+	'db_passwd' => '123456',
+	'db_database' => 'testdata'
+	// 		'db_host' => 'localhost',	//默认 localhost
+	// 		'db_port' => '3306',		//默认 3306
 );
 
 //从数据库,此数据库仅作为 default 的从数据库
@@ -41,51 +42,50 @@ $db_conf['default'] = array(
 
 //如果是 SAE 环境
 if (defined('SAE_MYSQL_USER')) {
-
-/*---------------- 主数据库 -----------------*/
+	/*---------------- 主数据库 -----------------*/
 	//每增加一个数据库，增加一条配置信息，索引为数据库分组，db.php 会用到,extract
 	$db_conf['default'] = array(
-			'db_username' => SAE_MYSQL_USER,
-			'db_passwd' => SAE_MYSQL_PASS,
-			'db_database' => SAE_MYSQL_DB,
-			'db_host' => SAE_MYSQL_HOST_M,
-			'db_port' => SAE_MYSQL_PORT,
+		'db_username' => SAE_MYSQL_USER,
+		'db_passwd' => SAE_MYSQL_PASS,
+		'db_database' => SAE_MYSQL_DB,
+		'db_host' => SAE_MYSQL_HOST_M,
+		'db_port' => SAE_MYSQL_PORT
 	);
 	
 	//从数据库,此数据库仅作为 default 的从数据库
 	$db_conf['slave'] = array(
-			'db_username' => SAE_MYSQL_USER,
-			'db_passwd' => SAE_MYSQL_PASS,
-			'db_database' => SAE_MYSQL_DB,
-			'db_host' => SAE_MYSQL_HOST_S,
-			'db_port' => SAE_MYSQL_PORT,
+		'db_username' => SAE_MYSQL_USER,
+		'db_passwd' => SAE_MYSQL_PASS,
+		'db_database' => SAE_MYSQL_DB,
+		'db_host' => SAE_MYSQL_HOST_S,
+		'db_port' => SAE_MYSQL_PORT
 	);
 }
 
 /*
 //初始配置例子
 $db_conf['default'] = array(
-		'db_username' => 'root',
-		'db_passwd' => '123456',
-		'db_database' => 'testdata',
-		'db_host' => 'localhost',	//默认 localhost
- 		'db_port' => '3306',		//默认 3306
+'db_username' => 'root',
+'db_passwd' => '123456',
+'db_database' => 'testdata',
+'db_host' => 'localhost',	//默认 localhost
+'db_port' => '3306',		//默认 3306
 );
 
 //从数据库,此数据库仅作为 default 的从数据库
 $db_conf['slave'] = array(
-		'db_username' => 'root',
-		'db_passwd' => '123456',
-		'db_database' => 'testdata',
-		'db_host' => 'localhost',
+'db_username' => 'root',
+'db_passwd' => '123456',
+'db_database' => 'testdata',
+'db_host' => 'localhost',
 );
 
 //其它数据库
 $db_conf['yourownname'] = array(
-		'db_username' => 'root',
-		'db_passwd' => '123456',
-		'db_database' => 'testdata',
-		'db_host' => 'localhost',
+'db_username' => 'root',
+'db_passwd' => '123456',
+'db_database' => 'testdata',
+'db_host' => 'localhost',
 );
 
 */

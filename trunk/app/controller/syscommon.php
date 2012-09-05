@@ -16,13 +16,12 @@
  */
 
 class Syscommon {
-	
 	public function index() {
-		$title = '测试';
+		$title   = '测试';
 		$content = '测试页面是否可用';
 		render('vhello', get_defined_vars());
 	}
-
+	
 	/**
 	 * 测试验证码
 	 */
@@ -40,13 +39,13 @@ class Syscommon {
 	public function verify_code() {
 		//验证码函数参数
 		$array = array(
-					'width' => 100,
-					'height' => 30,
-					'num' => 5,
-					'verify_code' => 'verify_code',
-					'ads' => array(),
-					'teight' => 9/10,
-					'angle' => 30,
+			'width' => 100,
+			'height' => 30,
+			'num' => 5,
+			'verify_code' => 'verify_code',
+			'ads' => array(),
+			'teight' => 9 / 10,
+			'angle' => 30
 		);
 		verify_code($array);
 	}

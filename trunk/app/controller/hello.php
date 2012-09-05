@@ -13,9 +13,12 @@
  */
 class Hello extends Controller {
 	public function index() {
-		$title = 'WPHP 框架官网';
+		$title   = 'WPHP 框架官网';
 		$content = 'WPHP 是 WhitePHP 的缩写，它是一个简单高效的 PHP 框架。WhitePHP 极其简单，就像一张任你书写的白纸一样。';
-		render('vhello', array('title'=>$title, 'content'=>$content));
+		render('vhello', array(
+			'title' => $title,
+			'content' => $content
+		));
 	}
 	
 	//测试数据库
@@ -29,12 +32,12 @@ class Hello extends Controller {
 		$model = User::singleton('user');
 		
 		// 方法2
-// 		$model = Model::singleton();
-
+		// 		$model = Model::singleton();
+		
 		// 使用原始方法
 		$sql = 'select id, username from user group by username';
-// 		$q = $model::$db->query($sql);
-		$q = $model->query($sql);
+		// 		$q = $model::$db->query($sql);
+		$q   = $model->query($sql);
 		
 		if ($q) {
 			while (null != ($r = $q->fetch_assoc())) {
@@ -44,7 +47,7 @@ class Hello extends Controller {
 		var_dump($ret);
 		
 		// 使用系统提供的方法
-// 		var_dump($model->select());
-	
+		// 		var_dump($model->select());
+		
 	}
 }

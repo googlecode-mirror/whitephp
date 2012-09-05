@@ -25,9 +25,9 @@ define('SYS_MODE', 'development');
 
 //跳转规则，网址为索引部分，跳转到值部分
 $rewrite_rules = array(
-			'about'=>'hello/about',
-			'contact'=>'hello/content',
-		);
+	'about' => 'hello/about',
+	'contact' => 'hello/content'
+);
 
 //主题包
 // 可使用 get_conf['theme_package']访问
@@ -63,12 +63,12 @@ define('IS_HIDE_INDEX_PAGE', FALSE);
  * 如果需要隐藏入口文件，请保证服务器开启了 rewrite 模块，并且在前端控制器目录存在文件 .htaccess
  * 并写好了跳转规则，apache服务器可参考下面的代码
  *
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?$1 [L]
+ RewriteEngine On
+ RewriteCond %{REQUEST_FILENAME} !-f
+ RewriteCond %{REQUEST_FILENAME} !-d
+ RewriteRule ^(.*)$ index.php?$1 [L]
  * sae 环境隐藏入口文件代码可参考
-handle:
+ handle:
  - rewrite: if( !is_file() && !is_dir()) goto "index.php?%{QUERY_STRING}"
  */
 
@@ -76,4 +76,3 @@ handle:
 // require APP_PATH . '/func/xxx.php';
 
 require APP_PATH . '/func/verifycode.php';
-

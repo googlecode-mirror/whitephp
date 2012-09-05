@@ -17,7 +17,7 @@
 require APP_PATH . '/config/system.php';
 
 //设置时区，编码等信息
-header('Content-Type:text/html; charset="' . CHARSET . '"');	//可以覆写
+header('Content-Type:text/html; charset="' . CHARSET . '"'); //可以覆写
 date_default_timezone_set(TIME_ZONE);
 
 //工作环境
@@ -45,7 +45,7 @@ require APP_PATH . '/core/controller.php';
 
 if (IS_DB_ACTIVE) {
 	require APP_PATH . '/core/db.php';
-	require APP_PATH . '/core/model.php';	
+	require APP_PATH . '/core/model.php';
 }
 
 //调用函数的时候可能会用到
@@ -67,7 +67,7 @@ if (IS_PATH_URL) {
 		$url = $rewrite_rules[$query_string];
 		$url = p2q($url);
 		extract($url);
-	//如果还是传统url类型的
+		//如果还是传统url类型的
 	} else if (false !== strpos($query_string, 'c=')) {
 		// $c controller
 		$c = null != v('c') ? v('c') : CONTROLLER;
@@ -82,30 +82,38 @@ if (IS_PATH_URL) {
 	//虽然没有声明为path url，默认仍然支持
 	if (false === strpos($query_string, 'c=')) {
 		$url = p2q($query_string);
+		
 		extract($url);
+		
 		unset($url);
 	} else {
 		// $c controller
+		
 		$c = null != v('c') ? v('c') : CONTROLLER;
+		
 		// $a action
+		
 		$a = null != v('a') ? v('a') : ACTION;
+		
 	}
 }
 
 //filter '..'
+
 $c = str_replace('..', '', $c);
 $a = str_replace('..', '', $a);
 
 //加载控制器和方法
 if (file_exists(APP_PATH . '/controller/' . strtolower($c) . '.php')) {
-
 	require APP_PATH . '/controller/' . strtolower($c) . '.php';
 	
 	//支持多层次目录,先放到一个数组中，取最后一个为控制器
 	$c_array = explode('/', $c);
-	$c = array_pop($c_array);
-	if (!class_exists($c)) show_404('controller unexists !' . $c);
-	if (!method_exists($c, $a)) show_404('action unexists!' . $c . '/' . $a);
+	$c       = array_pop($c_array);
+	if (!class_exists($c))
+		show_404('controller unexists !' . $c);
+	if (!method_exists($c, $a))
+		show_404('action unexists!' . $c . '/' . $a);
 } else {
 	show_404('Page not found!');
 }
@@ -119,6 +127,7 @@ $c = ucfirst(strtolower($c));
 $c = new $c;
 
 //实例化的时候重执行数据库操作
+
 $c->$a();
 
 //关闭 session
