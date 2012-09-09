@@ -355,6 +355,19 @@ function render($file, $data = array()) {
 }
 
 /**
+ * 跳转函数
+ * @param string $ca 控制器和方法 如 hello/test
+ * @param string $code
+ */
+function r($ca, $code = 302) {
+	if (FALSE !== strpos($ca, 'http://') || FALSE !== strpos($ca, 'https://')) {
+		header('Location: ' . $ca, TRUE, $code);
+	}
+	
+	header('Location: ' . href($ca), TRUE, $code);
+}
+
+/**
  * 加载 model
  */
 function load_model($file) {
@@ -388,7 +401,7 @@ function load_static($file = 'jquery.js') {
 	}
 }
 
-/*------------------------ 通用函数，可以拿出去单独使用 --------------------------*/
+/*------------------------ 通用函数，可以拿出去单独使用或稍作修改 --------------------------*/
 
 /**
  * 获取 post 或者 get 的值
@@ -418,19 +431,6 @@ function get($k, $defalut = '') {
  */
 function post($k, $defalut = '') {
 	return isset($_POST[$k]) ? $_POST[$k] : $defalut;
-}
-
-/**
- * 跳转函数
- * @param string $ca 控制器和方法 如 hello/test
- * @param string $code
- */
-function r($ca, $code = 302) {
-	if (FALSE !== strpos($ca, 'http://') || FALSE !== strpos($ca, 'https://')) {
-		header('Location: ' . $ca, TRUE, $code);
-	}
-	
-	header('Location: ' . href($ca), TRUE, $code);
 }
 
 /**
