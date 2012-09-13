@@ -17,11 +17,11 @@
 //版本号
 define('VERSION', '0.3');
 
-//定义日志目录，不必写尾部斜线
+//定义日志目录，相对于APP_PATH，不必写尾部斜线
 define('LOG_PATH', 'log');
 
 //用来存储可变配置索引
-define('WPHP_GLOBAL_CONFIG_NAME', 'config');
+define('WPHP_GLOBAL_CONFIG_NAME', 'wphp_config');
 
 //加载数据库配置文件
 require 'database.php';
