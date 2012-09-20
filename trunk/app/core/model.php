@@ -5,7 +5,10 @@
  * filename:	model.php
  * charset:		UTF-8
  * create date: 2012-5-25
+ * update date: 2012-8-14 改用单例模式，调用方法发生变化，具体方式见类说明
+ * update date: 2012-9-20 更新单例模式，启用新数据库配置时重新链接
  * 
+ * XXX 增加数据库执行时间，当显示 sql 时显示执行时间
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
  * @link http://yungbo.com
@@ -17,33 +20,30 @@
  * 
  * 建议使用原生 sql 语句，配合 check_input() 函数保证变量的安全
  * 
- * 于 2012-08-14 改用单例模式，调用方法发生变化
  * $model = Model::singleton();
  * $model->query();
- * $model::$db->query();
- * $model::$dbS->query();
+ * Model::$db->query();
+ * Model::$dbS->query();
+ * 以下注释中，Model 也可以是其子类，不再赘述 
  * 
  * 或者直接不用此模型类
- * $user = db_init();//默认使用主数据库
- * $user->query();
+ * $model = db_init();//默认使用主数据库，db_init() 直接连库，返回一个数据库资源
  * 
- * @todo 完善prepare函数，防止注入攻击
  * @author Think
- *
  */
 class Model {
-	//数据库资源，可以这样访问函数  xx::$db->query();
-	//可以直接 xx::$db-> 访问原生的  mysqli 对象
-	public static $singleton;
-	
+
 	//连接之后的数据库资源
 	public static $db;
 	
-	//从数据库
+	//从数据库资源
 	public static $dbS;
 	
 	//数据表名
-	private static $tb_name;
+	public static $tb_name;
+		
+	//是否输出 sql 语句
+	public static $show_sql = false;
 	
 	//数据库组
 	private static $db_group;
@@ -51,23 +51,28 @@ class Model {
 	//数据库配置数组
 	private static $db_conf;
 	
-	//是否输出 sql 语句
-	private static $show_sql = false;
+	//实例的对象
+	private static $singleton;
 	
 	/**
 	 * 连接数据库
 	 */
 	private function __construct($tb_name = 'sample_table_name', $db_group = 'default') {
+		//echo 'please call Model::singleton() instead';die;
 		//return self::singleton();
 	}
 	
 	/**
-	 * 题外话，单例并不能保证一定单例。。。
+	 * 单例
+	 * Model::singleton()
+	 * @param string $tb_name 默认表名，使用过程中可以随时变更 Model::$tb_name = 'new_tb_name';
+	 * @param string $db_group 数据库配置文件
 	 */
 	public static function singleton($tb_name = 'sample_table_name', $db_group = 'default') {
-		if (!isset(self::$singleton)) {
-			// if (is_null($tb_name)) show_error('you must supply a table name when instant a model class!');
-			self::$tb_name  = $tb_name;
+		
+		//当不存在对象或者启用新的数据库时重新连库
+		if (!isset(self::$singleton) || (self::$singleton && $db_group != self::$db_group)) {
+			
 			self::$db_group = $db_group;
 			self::$db       = db_init(self::$db_group);
 			
@@ -77,9 +82,15 @@ class Model {
 			if (array_key_exists('slave', self::$db_conf)) {
 				self::$dbS = db_init('slave');
 			}
+			//self::$singleton = new self();
 			$c               = __CLASS__;
 			self::$singleton = new $c;
+			//echo "<br>\r\nmodel contructed!<br>\r\n";
 		}
+		
+		//总是保持表名最新
+		self::$tb_name = $tb_name;
+
 		return self::$singleton;
 	}
 	
@@ -262,7 +273,7 @@ class Model {
 	
 	/**
 	 * 提供原生的查询接口，并且自动设置主从
-	 * 强烈建议使用该函数或者使用原生的 xxx->db->query()
+	 * 建议使用该函数或者使用原生的 Model::$db->query()
 	 * @param unknown_type $sql
 	 */
 	public function query($sql) {
@@ -275,13 +286,9 @@ class Model {
 	}
 	
 	/**
-	 * 防注入攻击，替换 ?
-	 * @deprecated
+	 * 是否显示 sql
+	 * @param unknown_type $sql
 	 */
-	// 	public function prepare() {
-	
-	// 	}
-	
 	public static function show_mysql($sql) {
 		if (self::$show_sql) {
 			echo $sql . "<br>\n";
@@ -292,11 +299,12 @@ class Model {
 	 * 关闭数据库
 	 */
 	public function __destruct() {
-		if (self::$db) {
+		//echo "<br>\r\nmodel destructed!<br>\r\n";
+		if (self::$db->error) {
+			
 			if (self::$db->error) {
 				show_error(self::$db->error);
 			}
-			
 			self::$db->close();
 		}
 		
