@@ -21,6 +21,6 @@ class User extends Model {
 	 * @param unknown_type $db_group
 	 */
 	public static function singleton($tb_name = 'user', $db_group = 'default') {
-		parent::singleton($tb_name, $db_group);
+		return parent::singleton($tb_name, $db_group);
 	}
 }
