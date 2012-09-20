@@ -28,7 +28,7 @@ switch (SYS_MODE) {
 	case 'testing':
 		error_reporting(E_ALL & ~E_DEPRECATED);
 		break;
-	case 'pruduction':
+	case 'production':
 		error_reporting(0);
 		break;
 	default:
@@ -36,8 +36,8 @@ switch (SYS_MODE) {
 		show_error('bad SYS_MODE');
 }
 
-//开启 session ，全局无须再次开启 session
-session_start();
+//2012-09-21 关闭session
+//session_start();
 
 //核心函数、控制器、模型
 require APP_PATH . '/core/func.php';

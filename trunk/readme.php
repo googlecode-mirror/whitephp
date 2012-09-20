@@ -74,7 +74,7 @@ WPHP_GLOBAL_CONFIG_NAME 全局变量存储索引
 IS_DB_ACTIVE			是否启用数据库
 
 自定义配置常量
-SYS_MODE 				开发模式， development testing pruduction
+SYS_MODE 				开发模式， development testing production
 IS_PATH_URL 			是否使用 path url
 IS_SECURITY 			是否开启安全过滤，防止 xss和csf攻击
 IS_LOG 					是否记录错误日志

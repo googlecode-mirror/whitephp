@@ -22,20 +22,21 @@ class Hello extends Controller {
 	}
 	
 	//测试数据库
+	//使用 Model 的子类
 	public function testdb() {
 		/* 见 static/testdata.sql */
 		
 		$ret = array();
 		
-		// 方法1
 		load_model('user');
-		$model = User::singleton();
+
 // 		User::$tb_name = '';
-// 		User::$show_sql = '';
+ 		User::$show_sql = true;
+		$model = User::singleton();
 		
-		// 使用原始方法
+		// 1 使用原始方法
 		$sql = 'select id, username from user limit 10';
-		// $q = User::$db->query($sql);
+		//$q = User::$db->query($sql);
 		$q   = $model->query($sql);
 		
 		if ($q) {
@@ -45,38 +46,42 @@ class Hello extends Controller {
 		}
 		var_dump($ret);
 		
-		// 使用系统提供的方法
-		//var_dump($model->select('*', '1 limit 10'));
+		// 2 使用系统提供的方法
+		// var_dump($model->select('*', '1 limit 10'));
 	}
 	
-	//测试数据库2
-	public function testdb2() {
+	//测试数据库1
+	//使用 Model 类
+	public function testdb1() {
 		/* 见 static/testdata.sql */
 	
 		$ret = array();
-		$model = Model::singleton();//可写上表名和数据库配置名
-// 		Model::$tb_name = '';
-// 		Model::$show_sql = '';
+		// Model::$show_sql = true;
+		$model = Model::singleton('user');//表名
 	
-		// 使用原始方法
-		$sql = 'select id, username from user limit 10';
+		// 1 使用原始方法
+		// $sql = 'select id, username from user wherelimit 10';
 		// $q = Model::$db->query($sql);
-		$q   = $model->query($sql);
+		// $q   = $model->query($sql);
+		// if ($q) {
+		// 	while (null != ($r = $q->fetch_assoc())) {
+		// 		$ret[] = $r;
+		// 	}
+		// }
+		// var_dump($ret);
 	
-		if ($q) {
-			while (null != ($r = $q->fetch_assoc())) {
-				$ret[] = $r;
-			}
-		}
-		var_dump($ret);
-	
-		//使用系统提供的方法，若使用系统函数（如insert,delete,update,select,select_line）
-		//必须保证正确设置了表名即 $model = Model::singleton('user');
-		//var_dump($model->select('*', '1 limit 10'));
+		// 2 使用系统提供的方法
+		// 若使用系统函数（如insert,delete,update,select,select_line）
+		// 必须保证正确设置了表名即 $model = Model::singleton('user');
+		// $model->insert(array('username'=>'hhh', 'password'=>'sss'));
+		// $model->update("username='google', password='abc'", 'id=1');		
+		// $model->delete('id=2');
+		var_dump($model->select('*', '1 limit 10'));
 	}
-	
-	//测试数据库3
-	public function testdb3() {
+
+	//测试数据库2
+	//使用原始 mysql 资源链接
+	public function testdb2() {
 		/* 见 static/testdata.sql */
 	
 		$ret = array();

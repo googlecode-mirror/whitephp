@@ -19,7 +19,7 @@
  * 共有三种环境，分别为开发环境、测试环境、生产环境
  * development
  * testing
- * pruduction
+ * production
  */
 define('SYS_MODE', 'development');
 
@@ -76,3 +76,4 @@ define('IS_HIDE_INDEX_PAGE', FALSE);
 // require APP_PATH . '/func/xxx.php';
 
 require APP_PATH . '/func/verifycode.php';
+require APP_PATH . '/func/url.php';

@@ -1,6 +1,8 @@
 <?php
 /**
  * 验证码生成文件
+ *
+ * 若需要使用验证码中的$_SESSION，需要在调用函数前开启 session
  * 
  * filename:	verifycode.php
  * charset:		UTF-8
@@ -106,7 +108,7 @@ function verify_code($array = array()) {
 		$ret .= $string;
 	}
 	
-	//session_start(); //在核心文件已经开启
+	//session_start(); //改为在核心文件开启
 	$_SESSION[$verify_code] = $ret;
 	header("Content-type: image/png");
 	imagepng($handle);

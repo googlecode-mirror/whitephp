@@ -6,7 +6,7 @@
  * charset:		UTF-8
  * create date: 2012-5-25
  * update date: 2012-8-14 改用单例模式，调用方法发生变化，具体方式见类说明
- * update date: 2012-9-20 更新单例模式，启用新数据库配置时重新链接
+ * update date: 2012-9-20 更新单例模式，启用新数据库配置时重新链接，增加数据库时间检测
  * 
  * XXX 增加数据库执行时间，当显示 sql 时显示执行时间
  * @author Zhao Binyan <itbudaoweng@gmail.com>
@@ -20,6 +20,7 @@
  * 
  * 建议使用原生 sql 语句，配合 check_input() 函数保证变量的安全
  * 
+ * 如需显示sql请提前设置 xxx::$show_sql 为 true
  * $model = Model::singleton();
  * $model->query();
  * Model::$db->query();
@@ -72,7 +73,7 @@ class Model {
 		
 		//当不存在对象或者启用新的数据库时重新连库
 		if (!isset(self::$singleton) || (self::$singleton && $db_group != self::$db_group)) {
-			
+			$t1 = microtime(true);
 			self::$db_group = $db_group;
 			self::$db       = db_init(self::$db_group);
 			
@@ -82,10 +83,22 @@ class Model {
 			if (array_key_exists('slave', self::$db_conf)) {
 				self::$dbS = db_init('slave');
 			}
-			//self::$singleton = new self();
-			$c               = __CLASS__;
-			self::$singleton = new $c;
-			//echo "<br>\r\nmodel contructed!<br>\r\n";
+			$t2 = microtime(true);
+
+			self::$singleton = new self();
+			
+			//$c               = __CLASS__;
+			//self::$singleton = new $c;
+			
+			$t3 = microtime(true);
+
+			//echo "model contructed!<br>\r\n";
+			if (self::$show_sql) {
+				$time = self::timer($t1, $t2);
+				//$time2 = self::timer($t2, $t3);
+				echo "db connection: $time<br>\n";
+				//echo "instance: $time2<br>\n";
+			}
 		}
 		
 		//总是保持表名最新
@@ -100,9 +113,10 @@ class Model {
 	 * array('id'=>'3', 'username'=>'胡锦涛')
 	 * INSERT INTO `user` (`id`, `username`, `password`) 
 	 * VALUES (NULL, '胡锦涛', '123456abc');
-	 * $where WHERE 条件以及后续语句
 	 */
-	public function insert($data = array(), $where) {
+	public function insert($data = array()) {
+		$t1 = microtime(true);
+		
 		//组合后的 sql 语句
 		$sql = '';
 		
@@ -115,7 +129,7 @@ class Model {
 		$array_values = array_values($data);
 		
 		foreach ($array_keys as $v) {
-			$fields .= ", ` $v `";
+			$fields .= ", `$v`";//whatch out the space bettwen `
 		}
 		
 		foreach ($array_values as $v) {
@@ -128,14 +142,13 @@ class Model {
 		$sql .= ' `' . self::$tb_name . '`';
 		$sql .= ' (' . $fields . ') ';
 		$sql .= ' VALUES (' . $values . ')';
-		
-		$where = ' WHERE ' . trim($where);
-		$sql .= $where;
-		
-		self::show_mysql($sql);
-		
+				
 		$q = self::$db->query($sql);
-		
+
+		$t2 = microtime(true);
+
+		self::show_mysql($sql, $t1, $t2);
+
 		return $q;
 	}
 	
@@ -145,32 +158,44 @@ class Model {
 	 * @return bool $q 只要语句正常执行了就会是 true
 	 */
 	public function delete($where = null) {
-		if (is_null($where))
-			show_error('sql语句错误,条件不能为空 ');
-		$where = ' WHERE ' . trim($where);
-		
-		$sql = 'DELETE FROM `' . self::$tb_name . '`' . $where;
-		
-		self::show_mysql($sql);
-		
-		$q = self::$db->query($sql);
+		$t1 = microtime(true);
+		$sql = '';
+		$q = false;
+
+		$sqlwhere = ' WHERE ' . trim($where);
+
+		$sql = 'DELETE FROM `' . self::$tb_name . '`' . $sqlwhere;
+		if (!is_null($where)) {
+			$q = self::$db->query($sql);
+		} else {
+			show_error("sql error: $sql");
+		}
+			
+		$t2 = microtime(true);
+
+		self::show_mysql($sql, $t1, $t2);
+
 		return $q;
 	}
 	
 	/**
-	 * 修改数据
+	 * 修改数据，参数为必须
 	 * @param string|array $data
 	 * @param string $where WHERE 条件以及后续语句
 	 * @return bool $q 只有语句执行成功就返回 true
 	 */
 	public function update($data = array(), $where = null) {
-		if (is_null($where))
-			show_error('sql语句错误,条件不能为空');
+		$t1 = microtime(true);
+		$sql = '';
+		$q = false;
+		
+		$sqlwhere       = ' WHERE ' . trim($where);
+
 		$update_data = '';
-		$where       = ' WHERE ' . trim($where);
+		
 		if (is_array($data)) {
 			foreach ($data as $k => $v) {
-				$update_data .= ", `{$k}` = '" . self::$db->real_escape_string($v) . "'";
+				$update_data .= ", `{$k}` = " . check_input($v);
 			}
 		} else {
 			$update_data = $data;
@@ -178,11 +203,18 @@ class Model {
 		
 		$update_data = trim($update_data, ', ');
 		
-		$sql = 'UPDATE `' . self::$tb_name . '` SET ' . $update_data . $where;
+		$sql = 'UPDATE `' . self::$tb_name . '` SET ' . $update_data . $sqlwhere;
+
+		if (!is_null($where)) {
+			$q = self::$db->query($sql);
+		} else {
+			show_error("sql error: $sql");
+		}
 		
-		self::show_mysql($sql);
+		$t2 = microtime(true);
 		
-		$q = self::$db->query($sql);
+		self::show_mysql($sql, $t1, $t2);
+
 		return $q;
 	}
 	
@@ -193,6 +225,8 @@ class Model {
 	 * @return array $ret
 	 */
 	public function select($field = '*', $where = null) {
+		$t1 = microtime(true);
+		
 		$ret       = array();
 		$field_new = '';
 		if (is_array($field)) {
@@ -204,12 +238,9 @@ class Model {
 		}
 		$field_new = trim($field_new, ',');
 		
-		if (!is_null($where))
-			$where = ' WHERE ' . trim($where);
+		is_null($where) or $where = ' WHERE ' . trim($where);
 		
 		$sql = 'SELECT ' . $field_new . ' FROM `' . self::$tb_name . '`' . $where;
-		
-		self::show_mysql($sql);
 		
 		if (self::$dbS) {
 			$q = self::$dbS->query($sql);
@@ -224,6 +255,11 @@ class Model {
 			}
 			$q->close();
 		}
+
+		$t2 = microtime(true);
+		
+		self::show_mysql($sql, $t1, $t2);
+
 		return $ret;
 	}
 	
@@ -234,6 +270,8 @@ class Model {
 	 * @return array $ret
 	 */
 	public function select_line($field = '*', $where = null) {
+		$t1 = microtime(true);
+		
 		$ret       = array();
 		$field_new = '';
 		if (is_array($field)) {
@@ -245,8 +283,7 @@ class Model {
 		}
 		$field_new = trim($field_new, ',');
 		
-		if (!is_null($where))
-			$where = ' WHERE ' . trim($where);
+		is_null($where) or $where = ' WHERE ' . trim($where);
 		
 		$sql = 'SELECT ' . $field_new . ' FROM `' . self::$tb_name . '`' . $where . ' LIMIT 1';
 		
@@ -268,38 +305,67 @@ class Model {
 			}
 			$q->close();
 		}
+		
+		$t2 = microtime(true);
+		
+		self::show_mysql($sql, $t1, $t2);
+
 		return $ret;
 	}
 	
 	/**
 	 * 提供原生的查询接口，并且自动设置主从
 	 * 建议使用该函数或者使用原生的 Model::$db->query()
-	 * @param unknown_type $sql
+	 * @param string $sql
 	 */
 	public function query($sql) {
-		self::show_mysql($sql);
-		if (preg_match('/^select /i', $sql) && self::$dbS) {
-			return self::$dbS->query($sql);
-		} else {
-			return self::$db->query($sql);
+		$t1 = microtime(true);
+
+		$ret = array();
+
+		if (preg_match('/^select /i', $sql)) {
+			if (self::$dbS) {
+				$ret = self::$dbS->query($sql);
+			} else {
+				$ret = self::$db->query($sql);
+			}
 		}
+
+		$t2 = microtime(true);
+
+		self::show_mysql($sql, $t1, $t2);
+		return $ret;
 	}
 	
 	/**
 	 * 是否显示 sql
-	 * @param unknown_type $sql
+	 * @param string $sql
 	 */
-	public static function show_mysql($sql) {
+	public static function show_mysql($sql, $t1 = 0, $t2 = 0) {
 		if (self::$show_sql) {
-			echo $sql . "<br>\n";
+			$time = self::timer($t1, $t2);
+			echo "$sql<br>\n$time<br>\n";
 		}
+	}
+
+	/**
+	 * 计时器，从 $t1 到 $t2 消耗的时间
+	 */
+	public static function timer($t1 = 0, $t2 = 0) {
+		$t = $t2 - $t1;
+		if ($t > 1) {
+			$t = "<span style='color:red'>$t seconds</span>";
+		} else {
+			$t = "<span style='color:green'>$t seconds</span>";
+		}
+		return $t;
 	}
 	
 	/**
 	 * 关闭数据库
 	 */
 	public function __destruct() {
-		//echo "<br>\r\nmodel destructed!<br>\r\n";
+		//echo "model destructed!<br>\r\n";
 		if (self::$db->error) {
 			
 			if (self::$db->error) {
