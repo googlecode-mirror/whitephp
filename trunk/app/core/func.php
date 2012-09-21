@@ -345,12 +345,19 @@ function show_404($message = '') {
  */
 function render($file, $data = array()) {
 	global $theme_package;
-	if (!file_exists(APP_PATH . '/view/' . $theme_package . '/' . rtrim($file, '.php') . '.php')) {
+
+	$realfile = APP_PATH . '/view/' . $theme_package . '/' . $file;
+	$lastchar = substr($file, -5, 5);
+	if (false === strpos($file, '.')) {
+		$realfile = $realfile . '.php';
+	}
+
+	if (!file_exists($realfile)) {
 		show_404('view file ' . $file . ' unexists!');
 	} else {
 		extract($data);
-		unset($data);
-		require APP_PATH . '/view/' . $theme_package . '/' . rtrim($file, '.php') . '.php';
+		//unset($data);
+		require $realfile;
 	}
 }
 
@@ -374,7 +381,7 @@ function load_model($file) {
 	$realfile = APP_PATH . '/model/' . $file;
 	$lastchar = substr($file, -5, 5);
 	if (false === strpos($file, '.')) {
-		$realfile = APP_PATH . '/model/' . $file . '.php';
+		$realfile = $realfile . '.php';
 	}
 
 	if (!file_exists($realfile)) {
@@ -391,7 +398,7 @@ function load_lib($file) {
 	$realfile = APP_PATH . '/lib/' . $file;
 	$lastchar = substr($file, -5, 5);
 	if (false === strpos($file, '.')) {
-		$realfile = APP_PATH . '/lib/' . $file . '.php';
+		$realfile = $realfile . '.php';
 	}
 
 	if (!file_exists($realfile)) {
