@@ -371,10 +371,16 @@ function r($ca, $code = 302) {
  * 加载 model
  */
 function load_model($file) {
-	if (!file_exists(APP_PATH . '/model/' . rtrim($file, '.php') . '.php')) {
-		show_404('模型文件 ' . $file . ' 不存在！');
+	$realfile = APP_PATH . '/model/' . $file;
+	$lastchar = substr($file, -5, 5);
+	if (false === strpos($file, '.') {
+		$realfile = APP_PATH . '/model/' . rtrim($file, '.php') . '.php')
+	}
+
+	if (!file_exists($realfile) {
+		show_404('class model ' . $file . ' unexists');
 	} else {
-		require APP_PATH . '/model/' . rtrim($file, '.php') . '.php';
+		require $realfile;
 	}
 }
 
@@ -382,10 +388,16 @@ function load_model($file) {
  * 加载类库 lib
  */
 function load_lib($file) {
-	if (!file_exists(APP_PATH . '/lib/' . rtrim($file, '.php') . '.php')) {
-		show_404('类库文件 ' . $file . ' 不存在！');
+	$realfile = APP_PATH . '/lib/' . $file;
+	$lastchar = substr($file, -5, 5);
+	if (false === strpos($file, '.') {
+		$realfile = APP_PATH . '/lib/' . $file . '.php') . '.php')
+	}
+
+	if (!file_exists($realfile) {
+		show_404('class ' . $file . ' unexists');
 	} else {
-		require APP_PATH . '/lib/' . rtrim($file, '.php') . '.php';
+		require $realfile;
 	}
 }
 
@@ -397,7 +409,7 @@ function load_static($file = 'jquery.js') {
 	$realfile = APP_PATH . '/static/' . $file;
 
 	if (!file_exists($realfile)) {
-		show_404('静态文件 ' . $file . ' 不存在！');
+		show_404('static file ' . $file . ' unexists');
 	} else {
 		if (strtolower(substr($file, -3, 3)) == '.js') {
 			echo "<script src=\"$realfile\"></script>\r\n";
