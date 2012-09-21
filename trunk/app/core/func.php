@@ -374,7 +374,7 @@ function load_model($file) {
 	$realfile = APP_PATH . '/model/' . $file;
 	$lastchar = substr($file, -5, 5);
 	if (false === strpos($file, '.') {
-		$realfile = APP_PATH . '/model/' . rtrim($file, '.php') . '.php')
+		$realfile = APP_PATH . '/model/' . rtrim($file, '.php') . '.php');
 	}
 
 	if (!file_exists($realfile) {
@@ -391,7 +391,7 @@ function load_lib($file) {
 	$realfile = APP_PATH . '/lib/' . $file;
 	$lastchar = substr($file, -5, 5);
 	if (false === strpos($file, '.') {
-		$realfile = APP_PATH . '/lib/' . $file . '.php') . '.php')
+		$realfile = APP_PATH . '/lib/' . $file . '.php') . '.php');
 	}
 
 	if (!file_exists($realfile) {
