@@ -1,10 +1,12 @@
 <?php
 /**
- * 这个文件是框架的核心
+ * WPHP 框架的核心
+ * note:不建议开启 pathurl
  * 
  * filename:	core.php
  * charset:		UTF-8
  * create date: 2012-5-25
+ * update date: 2012-9-21 取消 未启用 pathurl 时对 pathurl 的支持
  * 
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -36,7 +38,7 @@ switch (SYS_MODE) {
 		show_error('bad SYS_MODE');
 }
 
-//2012-09-21 关闭session
+//关闭默认开启session
 //session_start();
 
 //核心函数、控制器、模型
@@ -61,45 +63,48 @@ set_conf('segments', explode('/', $query_string));
 define('QUERY_STRING', $query_string);
 
 //如果启用 path 网址
+
 if (IS_PATH_URL) {
-	//如果符合匹配规则
+
+	//这一段用来设置类似 xxx.com/about 的跳转
+	$query_string = ltrim($query_string, '/');
 	if (key_exists($query_string, $rewrite_rules)) {
 		$url = $rewrite_rules[$query_string];
 		$url = p2q($url);
 		extract($url);
-		//如果还是传统url类型的
-	} else if (false !== strpos($query_string, 'c=')) {
+		unset($url);
+	//如果还是传统url类型的
+	} else if (false !== strpos($query_string, 'c=') || false !== strpos($query_string, 'a=')) {
 		// $c controller
-		$c = null != v('c') ? v('c') : CONTROLLER;
+		$c = get('c') ? get('c') : CONTROLLER;
+
 		// $a action
-		$a = null != v('a') ? v('a') : ACTION;
+		$a = get('a') ? get('a') : ACTION;
 	} else {
 		$url = p2q($query_string);
 		extract($url);
+		unset($url);
 	}
-	unset($url);
+	
 } else {
-	//虽然没有声明为path url，默认仍然支持
-	if (false === strpos($query_string, 'c=')) {
-		$url = p2q($query_string);
-		
+	//这一段用来设置类似 xxx.com/about 的跳转
+	$query_string = ltrim($query_string, '/');
+	if (key_exists($query_string, $rewrite_rules)) {
+		$url = $rewrite_rules[$query_string];
+		$url = p2q($url);
 		extract($url);
-		
 		unset($url);
 	} else {
+		
 		// $c controller
-		
-		$c = null != v('c') ? v('c') : CONTROLLER;
-		
+		$c = get('c') ? get('c') : CONTROLLER;
+
 		// $a action
-		
-		$a = null != v('a') ? v('a') : ACTION;
-		
+		$a = get('a') ? get('a') : ACTION;
 	}
 }
 
 //filter '..'
-
 $c = str_replace('..', '', $c);
 $a = str_replace('..', '', $a);
 
@@ -110,12 +115,16 @@ if (file_exists(APP_PATH . '/controller/' . strtolower($c) . '.php')) {
 	//支持多层次目录,先放到一个数组中，取最后一个为控制器
 	$c_array = explode('/', $c);
 	$c       = array_pop($c_array);
-	if (!class_exists($c))
-		show_404('controller unexists !' . $c);
-	if (!method_exists($c, $a))
-		show_404('action unexists!' . $c . '/' . $a);
+	if (!class_exists($c)) {
+		show_error('controller unexists');
+		exit;
+	}
+	if (!method_exists($c, $a)) {
+		show_error('action unexists');
+		exit;
+	}
 } else {
-	show_404('Page not found!');
+	show_404('page not found!');
 }
 
 //设置当前控制器和方法名
@@ -125,8 +134,6 @@ define('CUR_ACTION', $a);
 //实例化类
 $c = ucfirst(strtolower($c));
 $c = new $c;
-
-//实例化的时候重执行数据库操作
 
 $c->$a();
 
