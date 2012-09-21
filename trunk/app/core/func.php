@@ -394,10 +394,18 @@ function load_lib($file) {
  * @param unknown_type $file
  */
 function load_static($file = 'jquery.js') {
-	if (!file_exists(APP_PATH . '/static/' . $file)) {
+	$realfile = APP_PATH . '/static/' . $file;
+
+	if (!file_exists($realfile)) {
 		show_404('静态文件 ' . $file . ' 不存在！');
 	} else {
-		require APP_PATH . '/static/' . $file;
+		if (strtolower(substr($file, -3, 3)) == '.js') {
+			echo "<script src=\"$realfile\"></script>\r\n";
+		} else if (strtolower(substr($file, -4, 4)) == '.css') {
+			echo "<link rel=\"stylesheet\" href=\"$realfile\" />\r\n";
+		} else {
+			require $realfile;
+		}
 	}
 }
 
