@@ -7,6 +7,7 @@
  * charset:		UTF-8
  * create date: 2012-5-25
  * update date: 2012-9-21 取消 未启用 pathurl 时对 pathurl 的支持
+ * update date: 2012-9-24 分拆原 core/func.php 为 common.php 和 func.php
  * 
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -42,6 +43,7 @@ switch (SYS_MODE) {
 //session_start();
 
 //核心函数、控制器、模型
+require APP_PATH . '/core/common.php';
 require APP_PATH . '/core/func.php';
 require APP_PATH . '/core/controller.php';
 
