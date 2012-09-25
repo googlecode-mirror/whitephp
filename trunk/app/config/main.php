@@ -77,3 +77,7 @@ define('IS_HIDE_INDEX_PAGE', FALSE);
 
 require APP_PATH . '/func/verifycode.php';
 require APP_PATH . '/func/url.php';
+
+//加载扩展类
+// require APP_PATH . '/lib/yyy.php';
+require APP_PATH . '/lib/timer.php';
