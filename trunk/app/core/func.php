@@ -54,7 +54,7 @@ function post($k, $defalut = '') {
  * @param  array  $header header数组
  * @return all    返回服务器返回的结果
  */
-function post_data($url, $data, $header) {
+function post_data($url, $data = array(), $header = array()) {
 	$ch = curl_init($url);
 	ob_start();
 	curl_setopt($ch, CURLOPT_POST, 1);
