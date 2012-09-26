@@ -74,9 +74,9 @@ define('IS_HIDE_INDEX_PAGE', FALSE);
 
 //加载扩展函数
 // require APP_PATH . '/func/xxx.php';
-
 require APP_PATH . '/func/verifycode.php';
 require APP_PATH . '/func/url.php';
+require APP_PATH . '/func/cookie.php';
 
 //加载扩展类
 // require APP_PATH . '/lib/yyy.php';

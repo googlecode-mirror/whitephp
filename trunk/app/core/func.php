@@ -173,7 +173,8 @@ function is_valid_ip($ip) {
 /**
  * json 编码
  * 
- * 解决 json_encode() 不支持中文的情况
+ * 解决中文经过 json_encode() 处理后显示不直观的情况
+ * json_encode() 的参数编码格式为 UTF-8 时方可正常工作
  * 
  * @param array|object $data
  * @return array|object
