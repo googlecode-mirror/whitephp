@@ -31,7 +31,7 @@ $rewrite_rules = array(
 
 //主题包
 // 可使用 get_conf['theme_package']访问
-$theme_package = 'bootstrap';
+$theme_package = 'default';
 
 //是否使用 path 类型的网址，即 xxx/yyy/zzz
 define('IS_PATH_URL', FALSE);
