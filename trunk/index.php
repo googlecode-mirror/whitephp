@@ -22,17 +22,19 @@ define('INDEX_PAGE', basename(__FILE__));
 // APP_NAME 和 CORE_NAME 可自己定义
 /* ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ */
 
-define('APP_NAME', 'app');
+//存在尾部斜线，这个要注意，尤其是用到比较的时候
+define('APP_NAME', 'app/');
 
-define('CORE_NAME', 'core');
+//存在尾部斜线，这个要注意，尤其是用到比较的时候
+define('CORE_NAME', 'core/');
 
 /* ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ */
 
-//定义应用的路径，如无特殊情况，均使用绝对路径，框架内同
-define('APP_PATH', SYS_PATH . APP_NAME . '/');
+//定义应用的绝对路径
+define('APP_PATH', SYS_PATH . APP_NAME);
 
-//定义核心目录
-define('CORE_PATH', SYS_PATH . CORE_NAME . '/');
+//定义核心目录的绝对路径
+define('CORE_PATH', SYS_PATH . CORE_NAME);
 
 //载入核心文件
-require CORE_PATH . 'core.php';
+require CORE_NAME . 'core.php';
