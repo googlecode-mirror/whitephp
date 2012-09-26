@@ -19,7 +19,7 @@
 define('VERSION', '0.4');
 
 //加载主配置文件
-require APP_PATH . 'config/main.php';
+require APP_NAME . 'config/main.php';
 
 //设置时区，编码等信息
 header('Content-Type:text/html; charset=' . CHARSET);
@@ -45,13 +45,13 @@ switch (SYS_MODE) {
 //session_start();
 
 //核心函数、控制器、模型
-require CORE_PATH . 'func_inner.php';
-require CORE_PATH . 'func.php';
-require CORE_PATH . 'controller.php';
+require CORE_NAME . 'func_inner.php';
+require CORE_NAME . 'func.php';
+require CORE_NAME . 'controller.php';
 
 if (IS_DB_ACTIVE) {
-	require CORE_PATH . 'db.php';
-	require CORE_PATH . 'model.php';
+	require CORE_NAME . 'db.php';
+	require CORE_NAME . 'model.php';
 }
 
 //调用函数的时候可能会用到
@@ -113,8 +113,8 @@ $c = str_replace('..', '', $c);
 $a = str_replace('..', '', $a);
 
 //加载控制器和方法
-if (file_exists(APP_PATH . '/controller/' . strtolower($c) . '.php')) {
-	require APP_PATH . '/controller/' . strtolower($c) . '.php';
+if (file_exists(APP_NAME . 'controller/' . strtolower($c) . '.php')) {
+	require APP_NAME . 'controller/' . strtolower($c) . '.php';
 	
 	//支持多层次目录,先放到一个数组中，取最后一个为控制器
 	$c_array = explode('/', $c);

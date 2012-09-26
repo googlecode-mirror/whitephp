@@ -31,7 +31,7 @@ $rewrite_rules = array(
 
 //主题包
 // 可使用 get_conf['theme_package']访问
-$theme_package = 'default';
+$theme_package = 'bootstrap';
 
 //是否使用 path 类型的网址，即 xxx/yyy/zzz
 define('IS_PATH_URL', FALSE);
@@ -79,14 +79,14 @@ define('IS_HIDE_INDEX_PAGE', FALSE);
  */
 
 //加载扩展函数
-// require APP_PATH . 'func/xxx.php';
-require APP_PATH . 'func/verifycode.php';
+// require APP_NAME . 'func/xxx.php';
+require APP_NAME . 'func/verifycode.php';
 
 //加载扩展类
-// require APP_PATH . 'lib/yyy.php';
-require APP_PATH . 'lib/timer.php';
+// require APP_NAME . 'lib/yyy.php';
+require APP_NAME . 'lib/timer.php';
 
 //加载其它配置文件
-// require APP_PATH . 'config/yyy.php';
-require APP_PATH . 'config/database.php';
+// require APP_NAME . 'config/yyy.php';
+require APP_NAME . 'config/database.php';
 

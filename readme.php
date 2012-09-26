@@ -52,9 +52,9 @@ WPHP 有以下特点：
 系统级别常量表
 SYS_PATH				入口文件所在目录
 INDEX_PAGE				入口文件文件名
-APP_NAME				应用文件夹名称
+APP_NAME				应用文件夹名称，带结尾斜线
 APP_PATH				APP_NAME 的绝对路径
-CORE_NAME				核心文件夹名称
+CORE_NAME				核心文件夹名称，带结尾斜线
 CORE_PATH				CORE_NAME 的绝对路径
 QUERY_STRING			网址中的查询字符串
 CUR_CONTROLLER			当前控制器名称

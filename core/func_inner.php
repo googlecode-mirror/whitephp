@@ -89,7 +89,7 @@ function _load_ca($ca) {
 	$con   = $spilt[0];
 	$c     = CONTROLLER;
 	$a     = ACTION;
-	while (!file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
+	while (!file_exists(APP_NAME . 'controller/' . strtolower($con) . '.php')) {
 		if ($n < $count) {
 			$n++;
 		} else {
@@ -104,7 +104,7 @@ function _load_ca($ca) {
 		$con = trim($con, '/');
 	}
 	// 	echo $n;
-	if (file_exists(APP_PATH . '/controller/' . strtolower($con) . '.php')) {
+	if (file_exists(APP_NAME . 'controller/' . strtolower($con) . '.php')) {
 		$c = $con;
 		if (isset($spilt[$n])) {
 			$a = $spilt[$n];
@@ -246,10 +246,10 @@ function log_error($message = '') {
 		
 		//error_log 函数需要启用完整路径
 		//其实这个完全可以直接 a+ 方式写文件，没必要非得用 error_log 函数
-		$log_path = SYS_PATH . '/' . APP_PATH . '/' . LOG_PATH . '/' . date('Y-m') . '.txt';
+		$log_path = SYS_PATH . '/' . APP_NAME . '' . LOG_PATH . '/' . date('Y-m') . '.txt';
 		
 		if (function_exists('error_log')) {
-			if (!is_writeable(SYS_PATH . '/' . APP_PATH . '/' . LOG_PATH . '/')) {
+			if (!is_writeable(SYS_PATH . '/' . APP_NAME . '' . LOG_PATH . '/')) {
 				echo "\n", 'error log permition denied!';
 				die;
 			}
@@ -328,8 +328,8 @@ function _sae_show_error($message = '') {
  */
 function show_404($message = '') {
 	global $theme_package;
-	if (!file_exists(APP_PATH . '/view/' . $theme_package . '/404.php')) {
-		require APP_PATH . '/error/404.php';
+	if (!file_exists(APP_NAME . 'view/' . $theme_package . '/404.php')) {
+		require APP_NAME . 'error/404.php';
 	} else {
 		render('404', array(
 			'message' => $message
@@ -346,7 +346,7 @@ function show_404($message = '') {
 function render($file, $data = array()) {
 	global $theme_package;
 
-	$realfile = APP_PATH . '/view/' . $theme_package . '/' . $file;
+	$realfile = APP_NAME . 'view/' . $theme_package . '/' . $file;
 	$lastchar = substr($file, -5, 5);
 	if (false === strpos($file, '.')) {
 		$realfile = $realfile . '.php';
@@ -378,7 +378,7 @@ function r($ca, $code = 302) {
  * 加载 model
  */
 function load_model($file) {
-	$realfile = APP_PATH . '/model/' . $file;
+	$realfile = APP_NAME . 'model/' . $file;
 	$lastchar = substr($file, -5, 5);
 	if (false === strpos($file, '.')) {
 		$realfile = $realfile . '.php';
@@ -395,7 +395,7 @@ function load_model($file) {
  * 加载类库 lib
  */
 function load_lib($file) {
-	$realfile = APP_PATH . '/lib/' . $file;
+	$realfile = APP_NAME . 'lib/' . $file;
 	$lastchar = substr($file, -5, 5);
 	if (false === strpos($file, '.')) {
 		$realfile = $realfile . '.php';
@@ -413,7 +413,7 @@ function load_lib($file) {
  * @param unknown_type $file
  */
 function load_static($file = 'jquery.js') {
-	$realfile = APP_PATH . '/static/' . $file;
+	$realfile = APP_NAME . 'static/' . $file;
 
 	if (!file_exists($realfile)) {
 		show_404('static file ' . $file . ' unexists');
