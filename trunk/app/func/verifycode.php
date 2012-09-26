@@ -97,7 +97,7 @@ function verify_code($array = array()) {
 		$color      = imagecolorallocate($handle, $red, $green, $blue);
 		$angle_real = rand(-$angle, $angle);
 		
-		$font_file = APP_PATH . 'static/' . $fontfile;
+		$font_file = APP_NAME . 'static/' . $fontfile;
 		
 		file_exists($font_file) or show_error('字体文件不存在，请检查 ' . $font_file);
 		
@@ -109,7 +109,6 @@ function verify_code($array = array()) {
 		$ret .= $string;
 	}
 	
-	//session_start(); //改为在核心文件开启
 	$_SESSION[$verify_code] = $ret;
 	header("Content-type: image/png");
 	imagepng($handle);
