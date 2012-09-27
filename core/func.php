@@ -216,7 +216,7 @@ function query_string_replace($url, $name, $replacement) {
  */
 function convert_str($str, $out_charset = null) {
 	$in_charset = strtolower(mb_detect_encoding($str, array('utf-8', 'gbk', 'gb2312')));
-	echo $in_charset;
+
 	! defined('CHARSET') && define('CHARSET', 'utf-8');
 	! strtolower($out_charset) && $out_charset = strtolower(CHARSET);
 	
