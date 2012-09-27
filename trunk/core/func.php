@@ -206,30 +206,23 @@ function query_string_replace($url, $name, $replacement) {
 
 /*-- string --*/
 /**
- * 将未知编码的字符串转换为期望的编码（配置文件中设置的编码）
+ * 将字符串转码
  * 
- * 不建议使用，尽量统一编码，明确要转码的字符原来的编码
- * @deprecated
+ * 建议编码格式尽量统一为 utf-8
+ * 若引用外部文件造成编码格式未知可使用该函数
  * @param string $str
- * @param string $toEncoding
+ * @param string $out_charset
  * @return string
  */
-function convert_str($str, $toEncoding = null) {
-	//加此字符集列表数组，解决误将 改变 2312 识别为 utf-8 的情况
-	$charset_list = array(
-		'ascii',
-		'gb2312',
-		'gbk',
-		'utf-8'
-	);
-	$strEncoding  = mb_detect_encoding($str, $charset_list);
-	//如果没有提供要转码的类型，使用系统设置的编码
-	if (!$toEncoding) {
-		$toEncoding = CHARSET;
-	}
+function convert_str($str, $out_charset = null) {
+	$in_charset = strtolower(mb_detect_encoding($str, array('utf-8', 'gbk', 'gb2312')));
+	echo $in_charset;
+	! defined('CHARSET') && define('CHARSET', 'utf-8');
+	! strtolower($out_charset) && $out_charset = strtolower(CHARSET);
 	
-	if (strtolower($strEncoding) != strtolower($toEncoding)) {
-		$str = iconv($strEncoding, $toEncoding, $str);
+	if ($in_charset != $out_charset) {
+		'cp936' == $in_charset && $in_charset = 'gbk';
+		$str = iconv($in_charset, $out_charset, $str);
 	}
 	return $str;
 }
