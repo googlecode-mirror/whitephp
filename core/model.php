@@ -7,8 +7,8 @@
  * create date: 2012-5-25
  * update date: 2012-8-14 改用单例模式，调用方法发生变化，具体方式见类说明
  * update date: 2012-9-20 更新单例模式，启用新数据库配置时重新链接，增加数据库时间检测
+ * update data: 2012-9-27 增加 __clone() 方法，防止复制对象 
  * 
- * XXX 增加数据库执行时间，当显示 sql 时显示执行时间
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
  * @link http://yungbo.com
@@ -16,7 +16,7 @@
  */
 
 /**
- * 模型基类
+ * Model 基类
  * 
  * 建议使用原生 sql 语句，配合 check_input() 函数保证变量的安全
  * 
@@ -47,7 +47,7 @@ class Model {
 	public static $show_sql = false;
 	
 	//数据库组
-	private static $db_group;
+	public static $db_group;
 	
 	//数据库配置数组
 	private static $db_conf;
@@ -59,8 +59,7 @@ class Model {
 	 * 连接数据库
 	 */
 	private function __construct($tb_name = 'sample_table_name', $db_group = 'default') {
-		//echo 'please call Model::singleton() instead';die;
-		//return self::singleton();
+		//echo "$tb_name construct.<br>\r\n";
 	}
 	
 	/**
@@ -86,9 +85,6 @@ class Model {
 			$t2 = microtime(true);
 
 			self::$singleton = new self();
-			
-			//$c               = __CLASS__;
-			//self::$singleton = new $c;
 			
 			$t3 = microtime(true);
 
@@ -361,6 +357,13 @@ class Model {
 		return $t;
 	}
 	
+	/**
+	 * Preserve clone a instance
+	 */
+	public function __clone() {
+		trigger_error('clone is not allowed. try use singleton instead.', E_USER_ERROR);
+	}
+		
 	/**
 	 * 关闭数据库
 	 */
