@@ -327,7 +327,7 @@ function _sae_show_error($message = '') {
  * @param unknown_type $message
  */
 function show_404($message = '') {
-	global $theme_package;
+	$theme_package = get_conf('theme_package');
 	if (!file_exists(APP_NAME . 'view/' . $theme_package . '/404.php')) {
 		require APP_NAME . 'error/404.php';
 	} else {
@@ -344,8 +344,7 @@ function show_404($message = '') {
  * @param unknown_type $data
  */
 function render($file, $data = array()) {
-	global $theme_package;
-
+	$theme_package = get_conf('theme_package');
 	$realfile = APP_NAME . 'view/' . $theme_package . '/' . $file;
 	$lastchar = substr($file, -5, 5);
 	if (false === strpos($file, '.')) {
