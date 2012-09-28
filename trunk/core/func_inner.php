@@ -122,8 +122,9 @@ function _load_ca($ca) {
 
 /**
  * path2query 路径转url查询函数
+ * 不对用户使用，不可传参
  *
- * @todo 如果有传递参数怎么办。。。
+ *  
  *
  * 将控制器字符串转换成网址
  * @param unknown_type $string
@@ -152,16 +153,16 @@ function p2q($ca = null) {
 			//处理不在控制器不在根目录的情况
 			$ret_tmp = _load_ca($ca);
 			extract($ret_tmp);
-			foreach ($spilt as $k => $v) {
+			//foreach ($spilt as $k => $v) {
 				// 				$extra .= "&globalparam{$k}={$v}";
-			}
+			//}
 		}
 	}
 	$url_query = "c={$c}&a={$a}" . $extra;
 	return array(
 		'c' => $c,
 		'a' => $a,
-		'segment' => $spilt,
+		//'segment' => $spilt,
 		'url_query' => $url_query
 	);
 }
@@ -172,6 +173,7 @@ function p2q($ca = null) {
  * @param array $extra 如 array('id'=5)
  */
 function href($ca, $extra = array()) {
+	$ca = ltrim($ca, '/');
 	$query_string = '';
 	if (IS_PATH_URL) {
 		$query_string .= $ca;
@@ -189,6 +191,7 @@ function href($ca, $extra = array()) {
 	if (!IS_HIDE_INDEX_PAGE) {
 		$query_string = INDEX_PAGE . '?' . $query_string;
 	}
+
 	return $query_string;
 }
 
@@ -198,6 +201,7 @@ function href($ca, $extra = array()) {
  * @param unknown_type $extra
  */
 function hard_href($ca, $extra = array()) {
+	$ca = ltrim($ca, '/');
 	$href         = '';
 	$query_string = '';
 	if (IS_PATH_URL) {
@@ -219,7 +223,7 @@ function hard_href($ca, $extra = array()) {
 		$query_string = INDEX_PAGE . '?' . $query_string;
 		$href         = get_server_root() . $query_string;
 	}
-	// 	return $query_string;
+
 	return $href;
 }
 

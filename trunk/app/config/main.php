@@ -66,8 +66,11 @@ define('WPHP_GLOBAL_CONFIG_NAME', 'wphp_config');
 define('IS_HIDE_INDEX_PAGE', FALSE);
 /**
  * 注意，仅可以隐藏一个入口文件
- * 如果需要隐藏入口文件，请保证服务器开启了 rewrite 模块，并且在前端控制器目录存在文件 .htaccess
- * 并写好了跳转规则，apache服务器可参考下面的代码
+ * 如果需要隐藏入口文件，请保证服务器开启了 rewrite 模块
+ * 并且将环境配置好，方选方式有
+ * 1，直接在环境配置处写好规则
+ * 2，将规则写入前端控制器目录中的 .htaccess
+ * 相关规则可参考下面的代码【注意：index.php 代表入口文件】
  *
  RewriteEngine On
  RewriteCond %{REQUEST_FILENAME} !-f

@@ -15,7 +15,21 @@
 class Inner extends Controller {
 	
 	public function index() {
-		echo 'hello';
+		// echo __FILE__;
+		echo "<br>\r\n";
 		echo_code();
+		echo "<br>\r\n";
+		//echo "<a href=" . hard_href('/hello/index') . ">首页</a>";
+		echo "<br>\r\n";
+		echo "<a href=" . hard_href('/folder/inner/index', array('param1'=>'value1')) . ">inner 文件夹内</a>";
+		echo "<br>\r\n";
+		echo "<a href=" . hard_href('/folder/f2/inner/index', array('param1'=>'value1')) . ">folder/f2 文件夹内</a>";
+		
+		echo "<br>\r\n";
+		echo '$_GET=';
+		var_export($_GET);
+		echo "<br>\r\n";
+		echo '$segments=';
+		var_export(get_conf('segments'));
 	}
 }
