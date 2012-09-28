@@ -1,7 +1,7 @@
 <?php
 /**
  * WPHP 框架的核心
- * note:不建议开启 pathurl
+ * note:不建议使用 pathurl 模式
  * 
  * filename:	core.php
  * charset:		UTF-8
@@ -58,32 +58,39 @@ if (IS_DB_ACTIVE) {
 set_conf('rewrite_rules', $rewrite_rules);
 set_conf('theme_package', $theme_package);
 
-//路由开始，这里也可以配置成为分段路由模式
-$query_string = '';
-$query_string = $_SERVER['QUERY_STRING'];
+//取消使用 $_SERVER['QUERY_STRING'],以免未添加问号的情况下不能使用
+$_tmp_script_name = $_SERVER['SCRIPT_NAME'];
 
-//分段，从零开始，如$segments = get_conf('segments');$segments['0'] 可以取得第一个参数
+//如果启用 pathurl 链接路径发生改变
+if (IS_HIDE_INDEX_PAGE) {
+	$_tmp_script_name = dirname($_SERVER['SCRIPT_NAME']);
+}
+
+$query_string = str_replace($_tmp_script_name, '', $_SERVER['REQUEST_URI']);
+$query_string = ltrim($query_string, '?/');
+
+//若 / 访问
+if (strlen($_SERVER['REQUEST_URI']) < strlen($_tmp_script_name)) {
+	$query_string = '';
+}
+
+// echo $query_string;die;
+// print_r($_SERVER);die;
+
+//分段，从零开始，如$segments = get_conf('segments');$segments['0'] 可以取得第一个段
+//该变量在 pathurl 启用的情况下使用
 set_conf('segments', explode('/', $query_string));
 define('QUERY_STRING', $query_string);
 
 //如果启用 path 网址
-
 if (IS_PATH_URL) {
 
-	//这一段用来设置类似 xxx.com/about 的跳转
-	$query_string = ltrim($query_string, '/');
+	//执行 main.php 配置文件中的跳转规则，简单跳转，不涉及正则
 	if (key_exists($query_string, $rewrite_rules)) {
 		$url = $rewrite_rules[$query_string];
 		$url = p2q($url);
 		extract($url);
 		unset($url);
-	//如果还是传统url类型的
-	} else if (false !== strpos($query_string, 'c=') || false !== strpos($query_string, 'a=')) {
-		// $c controller
-		$c = get('c') ? get('c') : CONTROLLER;
-
-		// $a action
-		$a = get('a') ? get('a') : ACTION;
 	} else {
 		$url = p2q($query_string);
 		extract($url);
@@ -91,7 +98,7 @@ if (IS_PATH_URL) {
 	}
 	
 } else {
-	//这一段用来设置类似 xxx.com/about 的跳转
+	//执行 main.php 配置文件中的跳转规则，简单跳转，不涉及正则
 	$query_string = ltrim($query_string, '/');
 	if (key_exists($query_string, $rewrite_rules)) {
 		$url = $rewrite_rules[$query_string];
@@ -99,7 +106,6 @@ if (IS_PATH_URL) {
 		extract($url);
 		unset($url);
 	} else {
-		
 		// $c controller
 		$c = get('c') ? get('c') : CONTROLLER;
 

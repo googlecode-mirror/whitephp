@@ -45,24 +45,24 @@ WPHP 有以下特点：
 0，方法不能和类名同名，文件不能和文件夹同名
 1，文件名全部小写，类名首字母大写
 2，系统函数均为下划线分割，类首字母大写，方法和函数命名保持一致
-2，set_conf() 等函数的保留索引为 controller, action 
 3，单入口文件，所有相对路径都是相对于前端控制器的
 4，低耦合，高聚合
+5，尽量使用完整链接，即使用 hard_href() 而不是 href()
+
 
 系统级别常量表
+VERSION					框架版本号
 SYS_PATH				入口文件所在目录
 INDEX_PAGE				入口文件文件名
+
 APP_NAME				应用文件夹名称，带结尾斜线
 APP_PATH				APP_NAME 的绝对路径
 CORE_NAME				核心文件夹名称，带结尾斜线
 CORE_PATH				CORE_NAME 的绝对路径
+
 QUERY_STRING			网址中的查询字符串
 CUR_CONTROLLER			当前控制器名称
 CUR_ACTION				当前方法名称
-
-VERSION					框架版本号
-LOG_PATH 				日志路径
-WPHP_GLOBAL_CONFIG_NAME 全局变量存储索引
 
 数据库配置常量
 IS_DB_ACTIVE			是否启用数据库
@@ -77,6 +77,9 @@ CHARSET 				字符集设计，建议保持 utf-8，默认即可
 TIME_ZONE 				时区设置，东八区使用 PRC 即可，默认即可
 CONTROLLER 				默认控制器，hello
 ACTION 					默认方法，index
+
+LOG_PATH 				日志路径
+WPHP_GLOBAL_CONFIG_NAME 全局变量存储索引
 
 全局变量
 可以通过 get_conf('变量名')访问
