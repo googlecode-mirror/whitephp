@@ -1,3 +1,4 @@
+<?php defined('INDEX_PAGE') or die('no entrance'); ?>
 <?php
 /**
  * 验证码生成文件
@@ -97,9 +98,9 @@ function verify_code($array = array()) {
 		$color      = imagecolorallocate($handle, $red, $green, $blue);
 		$angle_real = rand(-$angle, $angle);
 		
-		$font_file = APP_NAME . 'static/' . $fontfile;
+		$font_file = load_static($fontfile);
 		
-		file_exists($font_file) or show_error('字体文件不存在，请检查 ' . $font_file);
+		file_exists($font_file) or show_error('unexists static file ' . $font_file);
 		
 		//注意全部以入口文件为参考，除非直接引入文件
 		imagettftext($handle, $font, $angle_real, $x, $y, $color, $font_file, $string);
@@ -151,15 +152,15 @@ function echo_code($array = array(), $prompt = '看不清？点击重新获取',
 	$verify = 'syscommon/verify_code';
 	
 	if (IS_PATH_URL) {
-		echo '<img id="code" src="' . hard_href($verify) . '" onclick="this.src=\'' . hard_href($verify) . '\'+ \'/\' + Math.random();" style="cursor:pointer" title=' . $prompt . '>';
+		echo '<img id="code" src="' . href($verify) . '" onclick="this.src=\'' . href($verify) . '\'+ \'/\' + Math.random();" style="cursor:pointer" title=' . $prompt . '>';
 		if ($show_prompt) {
-			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . hard_href($verify) . '\'+ \'/\' + Math.random();">' . $prompt . '</a>';
+			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . href($verify) . '\'+ \'/\' + Math.random();">' . $prompt . '</a>';
 		}
 		
 	} else {
-		echo '<img id="code" src="' . hard_href($verify) . '" onclick="this.src=\'' . hard_href($verify) . '&r=\' + Math.random()" style="cursor:pointer" title=' . $prompt . '>';
+		echo '<img id="code" src="' . href($verify) . '" onclick="this.src=\'' . href($verify) . '&r=\' + Math.random()" style="cursor:pointer" title=' . $prompt . '>';
 		if ($show_prompt) {
-			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . hard_href($verify) . '&r=\'+Math.random();">' . $prompt . '</a>';
+			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . href($verify) . '&r=\'+Math.random();">' . $prompt . '</a>';
 		}
 	}
 	// 	if (isset($_SESSION['verify_code'])) {

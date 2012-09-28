@@ -1,3 +1,4 @@
+<?php defined('INDEX_PAGE') or die('no entrance'); ?>
 <?php
 /**
  * 配置文件
@@ -34,6 +35,7 @@ $rewrite_rules = array(
 $theme_package = 'default';
 
 //是否使用 path 类型的网址，即 xxx/yyy/zzz
+//非常不建议启用该功能，准备砍掉此功能
 define('IS_PATH_URL', FALSE);
 
 //是否进行安全过滤，暂未实现

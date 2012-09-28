@@ -1,3 +1,4 @@
+<?php defined('INDEX_PAGE') or die('no entrance'); ?>
 <?php
 /**
  * WPHP 框架的核心
@@ -13,7 +14,6 @@
  * @link http://yungbo.com
  * @link http://weibo.com/itbudaoweng
  */
-//start
 
 //版本号
 define('VERSION', '0.4');
