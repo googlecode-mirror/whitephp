@@ -1,3 +1,4 @@
+<?php defined('INDEX_PAGE') or die('no entrance'); ?>
 <?php
 /**
  * 框架私有核心函数
@@ -94,7 +95,7 @@ function _load_ca($ca) {
 			$n++;
 		} else {
 			//如果不存在文件直接终止
-			show_404();
+			show_404($ca);
 			break;
 		}
 		$con = '';
@@ -123,8 +124,6 @@ function _load_ca($ca) {
 /**
  * path2query 路径转url查询函数
  * 不对用户使用，不可传参
- *
- *  
  *
  * 将控制器字符串转换成网址
  * @param unknown_type $string
@@ -168,39 +167,15 @@ function p2q($ca = null) {
 }
 
 /**
- * 建立一个链接
- * @param string $ca 如 hello/index
- * @param array $extra 如 array('id'=5)
+ * 建立完整超链接，对用户开放
+ * $ca 为 控制器方法，中间使用 / 分隔
+ * $extra 为其它 url 参数
+ * 
+ * @param string $ca controller/action
+ * @param array $extra array('param1' => 'value1')
+ * @return string $href http://xxx/xxx.php?c=controller&a=action&param1=value1
  */
 function href($ca, $extra = array()) {
-	$ca = ltrim($ca, '/');
-	$query_string = '';
-	if (IS_PATH_URL) {
-		$query_string .= $ca;
-		if ($extra) {
-			$query_string .= '/' . implode('/', $extra);
-		}
-	} else {
-		$tmp = p2q($ca);
-		$query_string .= $tmp['url_query'];
-		foreach ($extra as $k => $v) {
-			$query_string .= "&{$k}={$v}";
-		}
-	}
-	
-	if (!IS_HIDE_INDEX_PAGE) {
-		$query_string = INDEX_PAGE . '?' . $query_string;
-	}
-
-	return $query_string;
-}
-
-/**
- * 建立带有协议的的包含完整路径超链接
- * @param unknown_type $ca
- * @param unknown_type $extra
- */
-function hard_href($ca, $extra = array()) {
 	$ca = ltrim($ca, '/');
 	$href         = '';
 	$query_string = '';
@@ -359,7 +334,6 @@ function render($file, $data = array()) {
 		show_404('view file ' . $file . ' unexists!');
 	} else {
 		extract($data);
-		//unset($data);
 		require $realfile;
 	}
 }
@@ -413,6 +387,8 @@ function load_lib($file) {
 
 /**
  * 加载静态文件
+ * 若是 css 或者 js 生成完整的代码
+ * 否则返回文件名
  * @param unknown_type $file
  */
 function load_static($file = 'jquery.js') {
@@ -422,11 +398,12 @@ function load_static($file = 'jquery.js') {
 		show_404('static file ' . $file . ' unexists');
 	} else {
 		if (strtolower(substr($file, -3, 3)) == '.js') {
-			echo "<script src=\"$realfile\"></script>\r\n";
+			return "<script src=\"$realfile\"></script>\r\n";
 		} else if (strtolower(substr($file, -4, 4)) == '.css') {
-			echo "<link rel=\"stylesheet\" href=\"$realfile\" />\r\n";
+			return "<link rel=\"stylesheet\" href=\"$realfile\" />\r\n";
 		} else {
-			require $realfile;
+			return $realfile;
+			//require $realfile;
 		}
 	}
 }

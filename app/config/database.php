@@ -1,3 +1,4 @@
+<?php defined('INDEX_PAGE') or die('no entrance'); ?>
 <?php
 /**
  * 数据库配置文件

@@ -1,3 +1,4 @@
+<?php defined('INDEX_PAGE') or die('no entrance'); ?>
 <?php
 /**
  * 数据库模型，建议继承此模型

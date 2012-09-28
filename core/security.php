@@ -1,3 +1,4 @@
+<?php defined('INDEX_PAGE') or die('no entrance'); ?>
 <?php
 /**
  * 进行安全过滤，如 xss,csf 攻击等

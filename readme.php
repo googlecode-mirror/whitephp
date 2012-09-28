@@ -46,9 +46,6 @@ WPHP 有以下特点：
 1，文件名全部小写，类名首字母大写
 2，系统函数均为下划线分割，类首字母大写，方法和函数命名保持一致
 3，单入口文件，所有相对路径都是相对于前端控制器的
-4，低耦合，高聚合
-5，尽量使用完整链接，即使用 hard_href() 而不是 href()
-
 
 系统级别常量表
 VERSION					框架版本号
@@ -69,7 +66,7 @@ IS_DB_ACTIVE			是否启用数据库
 
 自定义配置常量
 SYS_MODE 				开发模式， development testing production
-IS_PATH_URL 			是否使用 path url
+IS_PATH_URL 			是否使用 path url，严重不建议启用
 IS_SECURITY 			是否开启安全过滤，防止 xss和csf攻击
 IS_LOG 					是否记录错误日志
 IS_HIDE_INDEX_PAGE 		是否隐藏入口文件，需要配合 apche 的rewrite 模块或相关模块
