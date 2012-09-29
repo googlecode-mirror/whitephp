@@ -44,7 +44,7 @@ class Timer {
 
 	public function get($key, $dot = 4) {
 		if (array_key_exists($key, $this->data)) {
-			return $this->data[$key];
+			return sprintf("%.${dot}f", (float)($this->data[$key]));
 		}
 	}
 
