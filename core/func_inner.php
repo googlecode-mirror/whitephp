@@ -178,51 +178,61 @@ function p2q($ca = null) {
 	);
 }
 
-/**
- * 建立完整超链接，对用户开放
- * $ca 为 控制器方法，中间使用 / 分隔
- * $extra 为其它 url 参数
- * 
- * @param string $ca controller/action
- * @param array $extra array('param1' => 'value1')
- * @return string $href http://xxx/xxx.php?c=controller&a=action&param1=value1
- */
-function href($ca, $extra = array()) {
-	$ca = ltrim($ca, '/');
-	$href         = '';
-	$query_string = '';
 
-	$tmp = p2q($ca);
-	$query_string .= $tmp['url_query'];
-	foreach ($extra as $k => $v) {
-		$query_string .= "&{$k}={$v}";
-	}
-		
-	if (IS_HIDE_INDEX_PAGE) {
-		$href = get_server_root() . '?' . $query_string;
-	} else {
-		$href = get_server_root() . INDEX_PAGE . '?' . $query_string;
-	}
+if (!function_exists('href')) {
 
-	return $href;
+	/**
+	 * 建立完整超链接，对用户开放
+	 * $ca 为 控制器方法，中间使用 / 分隔
+	 * $extra 为其它 url 参数
+	 * 
+	 * @param string $ca controller/action
+	 * @param array $extra array('param1' => 'value1')
+	 * @return string $href http://xxx/xxx.php?c=controller&a=action&param1=value1
+	 */
+	function href($ca, $extra = array()) {
+		$ca = ltrim($ca, '/');
+		$href         = '';
+		$query_string = '';
+
+		$tmp = p2q($ca);
+		$query_string .= $tmp['url_query'];
+		foreach ($extra as $k => $v) {
+			$query_string .= "&{$k}={$v}";
+		}
+			
+		if (IS_HIDE_INDEX_PAGE) {
+			$href = get_server_root() . '?' . $query_string;
+		} else {
+			$href = get_server_root() . INDEX_PAGE . '?' . $query_string;
+		}
+
+		return $href;
+	}
+	
 }
 
-/**
- * 生成 url 链接
- * 
- * 此处使用的参数是常规参数 
- * @param string $query_string c=hello&a=index&t=1
- * @param unknown_type $server
- * @return string xxx.com/?c=hello&a=index&t=1
- */
-function make_href($query_string, $server = null) {
-	$server or $server = get_server_root();
-	if (IS_HIDE_INDEX_PAGE) {
-		$href = $server . '?' . $query_string;
-	} else {
-		$href = $server . INDEX_PAGE . '?' . $query_string;
+
+if (!function_exists('make_href')) {
+
+	/**
+	 * 生成 url 链接
+	 * 
+	 * 此处使用的参数是常规参数 
+	 * @param string $query_string c=hello&a=index&t=1
+	 * @param unknown_type $server
+	 * @return string xxx.com/?c=hello&a=index&t=1
+	 */
+	function make_href($query_string, $server = null) {
+		$server or $server = get_server_root();
+		if (IS_HIDE_INDEX_PAGE) {
+			$href = $server . '?' . $query_string;
+		} else {
+			$href = $server . INDEX_PAGE . '?' . $query_string;
+		}
+		return $href;
 	}
-	return $href;
+
 }
 
 /*------------------------ 日志处理函数 ----------------------------*/
