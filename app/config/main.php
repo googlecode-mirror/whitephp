@@ -74,7 +74,7 @@ define('IS_HIDE_INDEX_PAGE', true);
 
 //加载扩展函数
 // require APP_NAME . 'func/xxx.php';
-require APP_NAME . 'func/hook.php';
+require APP_NAME . 'func/custom.php';
 require APP_NAME . 'func/verifycode.php';
 
 //加载扩展类

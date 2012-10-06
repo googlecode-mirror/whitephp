@@ -75,7 +75,7 @@ if (strlen($_SERVER['REQUEST_URI']) < strlen($_tmp_script_name)) {
 	$query_string = '';
 }
 
-function_exists('wphp_hook_change_query_string') && $query_string = wphp_hook_change_query_string($query_string);
+function_exists('wphp_custom_change_query_string') && $query_string = wphp_custom_change_query_string($query_string);
 
 set_conf('query_string', $query_string);
 set_conf('theme_package', $theme_package);
@@ -94,7 +94,7 @@ $a = str_replace('..', '', $a);
 define('CUR_CONTROLLER', $c);
 define('CUR_ACTION', $a);
 
-function_exists('wphp_hook_before_instance') && wphp_hook_before_instance();
+function_exists('wphp_custom_before_instance') && wphp_custom_before_instance();
 
 //加载控制器和方法
 if (file_exists(APP_NAME . 'controller/' . strtolower($c) . '.php')) {
@@ -121,6 +121,6 @@ $c = new $c;
 
 $c->$a();
 
-function_exists('wphp_hook_after_instance') && wphp_hook_after_instance();
+function_exists('wphp_custom_after_instance') && wphp_custom_after_instance();
 
 //end
