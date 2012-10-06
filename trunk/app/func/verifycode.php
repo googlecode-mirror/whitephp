@@ -105,7 +105,7 @@ function verify_code($array = array()) {
 		//注意全部以入口文件为参考，除非直接引入文件
 		imagettftext($handle, $font, $angle_real, $x, $y, $color, $font_file, $string);
 		
-		$x = $x + $font * real_strlen($string) * $teight;
+		$x = $x + $font * wphp_strlen($string) * $teight;
 		
 		$ret .= $string;
 	}
@@ -151,18 +151,11 @@ function echo_code($array = array(), $prompt = '看不清？点击重新获取',
 	//外部访问验证码的接口（控制器方法对）
 	$verify = 'syscommon/verify_code';
 	
-	if (IS_PATH_URL) {
-		echo '<img id="code" src="' . href($verify) . '" onclick="this.src=\'' . href($verify) . '\'+ \'/\' + Math.random();" style="cursor:pointer" title=' . $prompt . '>';
-		if ($show_prompt) {
-			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . href($verify) . '\'+ \'/\' + Math.random();">' . $prompt . '</a>';
-		}
-		
-	} else {
-		echo '<img id="code" src="' . href($verify) . '" onclick="this.src=\'' . href($verify) . '&r=\' + Math.random()" style="cursor:pointer" title=' . $prompt . '>';
-		if ($show_prompt) {
-			echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . href($verify) . '&r=\'+Math.random();">' . $prompt . '</a>';
-		}
+	echo '<img id="code" src="' . href($verify) . '" onclick="this.src=\'' . href($verify) . '&r=\' + Math.random()" style="cursor:pointer" title=' . $prompt . '>';
+	if ($show_prompt) {
+		echo '<a href="javascript:void(0);" onclick="document.getElementById(\'code\').src=\'' . href($verify) . '&r=\'+Math.random();">' . $prompt . '</a>';
 	}
+
 	// 	if (isset($_SESSION['verify_code'])) {
 	// 		echo '<br />Pre Code: ', $_SESSION['verify_code'];
 	// 	}

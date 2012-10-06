@@ -83,7 +83,10 @@ function get_all_conf() {
 /*------------------------ 框架内部函数 ----------------------------*/
 
 //根据 ca 加载控制器
+//为 p2q 函数准备数据
+//仅用来将 /controller/action 转换成 $c=controller&a=action
 function _load_ca($ca) {
+	$ca = trim($ca, '/');
 	$spilt = explode('/', $ca);
 	$count = count($spilt);
 	$n     = 1; //控制器位于第几层，从零开始。后面方法用n时，只需传递n即可获取方法所在索引。
@@ -93,17 +96,20 @@ function _load_ca($ca) {
 	while (!file_exists(APP_NAME . 'controller/' . strtolower($con) . '.php')) {
 		if ($n < $count) {
 			$n++;
+			
+			$con = '';
+			for ($i = 0; $i < $n; $i++) {
+				$con .= $spilt[$i] . '/';
+			}
+			$con = trim($con, '/');
+			
 		} else {
 			//如果不存在文件直接终止
-			show_404($ca);
+			show_404($ca . ' error presreve pathurl');
 			break;
 		}
-		$con = '';
-		for ($i = 0; $i < $n; $i++) {
-			$con .= $spilt[$i] . '/';
-		}
-		$con = trim($con, '/');
 	}
+
 	// 	echo $n;
 	if (file_exists(APP_NAME . 'controller/' . strtolower($con) . '.php')) {
 		$c = $con;
@@ -122,7 +128,13 @@ function _load_ca($ca) {
 }
 
 /**
- * path2query 路径转url查询函数
+ * path2query
+ * 
+ * 路径转url函数
+ * 为了 href 函数做准备
+ * 将 /controller/action 转换成 $c=controller&a=action
+ * 不涉及参数
+ * 
  * 不对用户使用，不可传参
  *
  * 将控制器字符串转换成网址
@@ -130,17 +142,12 @@ function _load_ca($ca) {
  * @return multitype:Ambigous <string, unknown> Ambigous <string, mixed> Ambigous <string, multitype:>
  */
 function p2q($ca = null) {
-	$ca            = trim($ca, '/');
-	$rewrite_rules = get_conf('rewrite_rules');
-	$a             = $c = $spilt = $extra = '';
+	$ca = ltrim($ca, '/');
+	$a = $c = $extra = '';
 	if (!$ca) {
 		$c = CONTROLLER;
 		$a = ACTION;
 	} else {
-		//如果有跳转
-		if (key_exists($ca, $rewrite_rules)) {
-			$ca = $rewrite_rules[$ca];
-		}
 		
 		$spilt = explode('/', $ca);
 		$count = count($spilt);
@@ -152,9 +159,14 @@ function p2q($ca = null) {
 			//处理不在控制器不在根目录的情况
 			$ret_tmp = _load_ca($ca);
 			extract($ret_tmp);
-			//foreach ($spilt as $k => $v) {
-				// 				$extra .= "&globalparam{$k}={$v}";
-			//}
+			for ($i = 1; $i < $n + 2; $i++) {
+				array_shift($spilt);
+			}
+			
+			foreach ($spilt as $k => $v) {
+				$_k = $k + 1;
+				$extra .= "&wphp_param{$_k}={$v}";
+			}
 		}
 	}
 	$url_query = "c={$c}&a={$a}" . $extra;
@@ -179,26 +191,37 @@ function href($ca, $extra = array()) {
 	$ca = ltrim($ca, '/');
 	$href         = '';
 	$query_string = '';
-	if (IS_PATH_URL) {
-		$query_string .= $ca;
-		if ($extra) {
-			$query_string .= '/' . implode('/', $extra);
-		}
-		$href = get_server_root() . $query_string;
-	} else {
-		$tmp = p2q($ca);
-		$query_string .= $tmp['url_query'];
-		foreach ($extra as $k => $v) {
-			$query_string .= "&{$k}={$v}";
-		}
-		$href = get_server_root() . $query_string;
+
+	$tmp = p2q($ca);
+	$query_string .= $tmp['url_query'];
+	foreach ($extra as $k => $v) {
+		$query_string .= "&{$k}={$v}";
 	}
-	
-	if (!IS_HIDE_INDEX_PAGE) {
-		$query_string = INDEX_PAGE . '?' . $query_string;
-		$href         = get_server_root() . $query_string;
+		
+	if (IS_HIDE_INDEX_PAGE) {
+		$href = get_server_root() . '?' . $query_string;
+	} else {
+		$href = get_server_root() . INDEX_PAGE . '?' . $query_string;
 	}
 
+	return $href;
+}
+
+/**
+ * 生成 url 链接
+ * 
+ * 此处使用的参数是常规参数 
+ * @param string $query_string c=hello&a=index&t=1
+ * @param unknown_type $server
+ * @return string xxx.com/?c=hello&a=index&t=1
+ */
+function make_href($query_string, $server = null) {
+	$server or $server = get_server_root();
+	if (IS_HIDE_INDEX_PAGE) {
+		$href = $server . '?' . $query_string;
+	} else {
+		$href = $server . INDEX_PAGE . '?' . $query_string;
+	}
 	return $href;
 }
 
@@ -326,7 +349,7 @@ function render($file, $data = array()) {
 	$theme_package = get_conf('theme_package');
 	$realfile = APP_NAME . 'view/' . $theme_package . '/' . $file;
 	$lastchar = substr($file, -5, 5);
-	if (false === strpos($file, '.')) {
+	if (false === strpos($lastchar, '.')) {
 		$realfile = $realfile . '.php';
 	}
 
@@ -343,12 +366,12 @@ function render($file, $data = array()) {
  * @param string $ca 控制器和方法 如 hello/test
  * @param string $code
  */
-function r($ca, $code = 302) {
+function r($ca, $extra = array(), $code = 302) {
 	if (FALSE !== strpos($ca, 'http://') || FALSE !== strpos($ca, 'https://')) {
 		header('Location: ' . $ca, TRUE, $code);
 	}
 	
-	header('Location: ' . href($ca), TRUE, $code);
+	header('Location: ' . href($ca, $extra), TRUE, $code);
 }
 
 /**
@@ -364,7 +387,7 @@ function load_model($file) {
 	if (!file_exists($realfile)) {
 		show_404('class model ' . $file . ' unexists');
 	} else {
-		require $realfile;
+		require_once $realfile;
 	}
 }
 
@@ -381,7 +404,7 @@ function load_lib($file) {
 	if (!file_exists($realfile)) {
 		show_404('class ' . $file . ' unexists');
 	} else {
-		require $realfile;
+		require_once $realfile;
 	}
 }
 
@@ -403,7 +426,6 @@ function load_static($file = 'jquery.js') {
 			return "<link rel=\"stylesheet\" href=\"$realfile\" />\r\n";
 		} else {
 			return $realfile;
-			//require $realfile;
 		}
 	}
 }

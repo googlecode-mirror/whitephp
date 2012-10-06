@@ -57,7 +57,6 @@ APP_PATH				APP_NAME 的绝对路径
 CORE_NAME				核心文件夹名称，带结尾斜线
 CORE_PATH				CORE_NAME 的绝对路径
 
-QUERY_STRING			网址中的查询字符串
 CUR_CONTROLLER			当前控制器名称
 CUR_ACTION				当前方法名称
 
@@ -67,7 +66,7 @@ IS_DB_ACTIVE			是否启用数据库
 自定义配置常量
 SYS_MODE 				开发模式， development testing production
 IS_PATH_URL 			是否使用 path url，严重不建议启用
-IS_SECURITY 			是否开启安全过滤，防止 xss和csf攻击
+
 IS_LOG 					是否记录错误日志
 IS_HIDE_INDEX_PAGE 		是否隐藏入口文件，需要配合 apche 的rewrite 模块或相关模块
 CHARSET 				字符集设计，建议保持 utf-8，默认即可
@@ -81,8 +80,7 @@ WPHP_GLOBAL_CONFIG_NAME 全局变量存储索引
 全局变量
 可以通过 get_conf('变量名')访问
 theme_package			主题包名
-rewrite_rules 			重定向规则
-segments				返回数组，索引从0开始，即网址中的参数
+query_string			
 db_conf 				返回数据库配置数据，索引是数据库组
 
 系统函数
@@ -95,8 +93,8 @@ db_conf 				返回数据库配置数据，索引是数据库组
  * 详见控制器示例文件
  * $model = Model::singleton();
  * $model->query();
- * Model::$db->query();
- * Model::$dbS->query();
+ * $model->db->query();
+ * $model->dbS->query();
  
 1，可以直接实例化，并为参数提供表名即可返回一个数据库资源。
 在控制器的某个方法中
@@ -113,12 +111,13 @@ class Muser extends Model {
 //在控制器方法中
 load_model('muser');
 $user = Muser::singleton();	//其实可以传递任意值，如果只是使用 query 而不使用框架函数就无所谓
-$user_info = $user->query('SELECT * FROM user');//也可以直接 $user->db->query() 或者 $user->dbS->query()使用原始资源
+$user_info = $user->query('SELECT * FROM user');
+//也可以直接 $user->db->query() 或者 $user->dbS->query()使用原始资源
 var_dump($user_info->num_rows);
 
 //1，2情况下，如果需要解决主从延时的问题时，可以直接调用主数据库资源
-// User::$db->query(); 使用主数据库
-// User::$dbS->query(); 使用从数据库
+// $user->db->query(); 使用主数据库
+// $user->dbS->query(); 使用从数据库
 
 3，直接使用最原始的资源
 $user = db_init();	//默认获取的是 default 组的数据库配置文件

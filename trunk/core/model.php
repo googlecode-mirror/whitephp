@@ -24,8 +24,8 @@
  * 如需显示sql请提前设置 xxx::$show_sql 为 true
  * $model = Model::singleton();
  * $model->query();
- * Model::$db->query();
- * Model::$dbS->query();
+ * $model->db->query();
+ * $model->dbS->query();
  * 以下注释中，Model 也可以是其子类，不再赘述 
  * 
  * 或者直接不用此模型类
@@ -36,13 +36,13 @@
 class Model {
 
 	//连接之后的数据库资源
-	public static $db;
+	public $db;
 	
 	//从数据库资源
-	public static $dbS;
+	public $dbS;
 	
 	//数据表名
-	public static $tb_name;
+	public $tb_name;
 		
 	//是否输出 sql 语句
 	public static $show_sql = false;
@@ -59,9 +59,16 @@ class Model {
 	/**
 	 * 连接数据库
 	 */
-	private function __construct() {
-		//echo 'please call Model::singleton() instead';die;
-		//return self::singleton();
+	private function __construct($db_group = 'default') {
+		self::$db_group = $db_group;
+		$this->db       = db_init(self::$db_group);
+			
+		self::$db_conf = get_conf('db_conf');
+			
+			//因为从数据库并不是必须连接的，所以先判断一下，如果没有配置则不进行尝试而不终止程序运行。
+		if (array_key_exists('slave', self::$db_conf)) {
+				$this->$dbS = db_init('slave');
+		}
 	}
 	
 	/**
@@ -75,35 +82,18 @@ class Model {
 		//当不存在对象或者启用新的数据库时重新连库
 		if (!(self::$singleton instanceof self) || (self::$singleton instanceof self && $db_group != self::$db_group)) {
 			$t1 = microtime(true);
-			self::$db_group = $db_group;
-			self::$db       = db_init(self::$db_group);
-			
-			self::$db_conf = get_conf('db_conf');
-			
-			//因为从数据库并不是必须连接的，所以先判断一下，如果没有配置则不进行尝试而不终止程序运行。
-			if (array_key_exists('slave', self::$db_conf)) {
-				self::$dbS = db_init('slave');
-			}
+			self::$singleton = new self($db_group);
 			$t2 = microtime(true);
 
-			self::$singleton = new self();
-			
-			//$c               = __CLASS__;
-			//self::$singleton = new $c;
-			
-			$t3 = microtime(true);
-
 			if (self::$show_sql) {
-				echo "db group ${db_group} contructed!<br>\r\n";
-				$time = self::timer($t1, $t2);
-				//$time2 = self::timer($t2, $t3);
-				echo "db connection: $time<br>\n";
-				//echo "instance: $time2<br>\n";
+				$time = self::$singleton->timer($t1, $t2);
+				echo "db group ${db_group} contructed!<br>\r\n",
+					 "db connection: $time<br>\n";
 			}
 		}
 		
 		//总是保持表名最新
-		self::$tb_name = $tb_name;
+		self::$singleton->tb_name = $tb_name;
 
 		return self::$singleton;
 	}
@@ -140,11 +130,11 @@ class Model {
 		$values = trim($values, ', ');
 		
 		$sql .= 'INSERT INTO';
-		$sql .= ' `' . self::$tb_name . '`';
+		$sql .= ' `' . $this->tb_name . '`';
 		$sql .= ' (' . $fields . ') ';
 		$sql .= ' VALUES (' . $values . ')';
 				
-		$q = self::$db->query($sql);
+		$q = $this->db->query($sql);
 
 		$t2 = microtime(true);
 
@@ -165,9 +155,9 @@ class Model {
 
 		$sqlwhere = ' WHERE ' . trim($where);
 
-		$sql = 'DELETE FROM `' . self::$tb_name . '`' . $sqlwhere;
+		$sql = 'DELETE FROM `' . $this->tb_name . '`' . $sqlwhere;
 		if (!is_null($where)) {
-			$q = self::$db->query($sql);
+			$q = $this->db->query($sql);
 		} else {
 			show_error("sql error: $sql");
 		}
@@ -204,10 +194,10 @@ class Model {
 		
 		$update_data = trim($update_data, ', ');
 		
-		$sql = 'UPDATE `' . self::$tb_name . '` SET ' . $update_data . $sqlwhere;
+		$sql = 'UPDATE `' . $this->tb_name . '` SET ' . $update_data . $sqlwhere;
 
 		if (!is_null($where)) {
-			$q = self::$db->query($sql);
+			$q = $this->db->query($sql);
 		} else {
 			show_error("sql error: $sql");
 		}
@@ -241,12 +231,12 @@ class Model {
 		
 		is_null($where) or $where = ' WHERE ' . trim($where);
 		
-		$sql = 'SELECT ' . $field_new . ' FROM `' . self::$tb_name . '`' . $where;
+		$sql = 'SELECT ' . $field_new . ' FROM `' . $this->tb_name . '`' . $where;
 		
-		if (self::$dbS) {
-			$q = self::$dbS->query($sql);
+		if ($this->dbS) {
+			$q = $this->dbS->query($sql);
 		} else {
-			$q = self::$db->query($sql);
+			$q = $this->db->query($sql);
 		}
 		
 		if ($q && $q->num_rows > 0) {
@@ -286,17 +276,17 @@ class Model {
 		
 		is_null($where) or $where = ' WHERE ' . trim($where);
 		
-		$sql = 'SELECT ' . $field_new . ' FROM `' . self::$tb_name . '`' . $where . ' LIMIT 1';
+		$sql = 'SELECT ' . $field_new . ' FROM `' . $this->tb_name . '`' . $where . ' LIMIT 1';
 		
 		//仅仅查询一条数据
 		// 		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
 		
 		self::show_mysql($sql);
 		
-		if (self::$dbS) {
-			$q = self::$dbS->query($sql);
+		if ($this->dbS) {
+			$q = $this->dbS->query($sql);
 		} else {
-			$q = self::$db->query($sql);
+			$q = $this->db->query($sql);
 		}
 		
 		if ($q && $q->num_rows > 0) {
@@ -325,10 +315,10 @@ class Model {
 		$ret = array();
 
 		if (preg_match('/^select /i', $sql)) {
-			if (self::$dbS) {
-				$ret = self::$dbS->query($sql);
+			if ($this->dbS) {
+				$ret = $this->dbS->query($sql);
 			} else {
-				$ret = self::$db->query($sql);
+				$ret = $this->db->query($sql);
 			}
 		}
 
@@ -344,7 +334,7 @@ class Model {
 	 */
 	public static function show_mysql($sql, $t1 = 0, $t2 = 0) {
 		if (self::$show_sql) {
-			$time = self::timer($t1, $t2);
+			$time = $this->timer($t1, $t2);
 			echo "$sql<br>\n$time<br>\n";
 		}
 	}
@@ -352,7 +342,7 @@ class Model {
 	/**
 	 * 计时器，从 $t1 到 $t2 消耗的时间
 	 */
-	public static function timer($t1 = 0, $t2 = 0) {
+	public function timer($t1 = 0, $t2 = 0) {
 		$t = $t2 - $t1;
 		if ($t > 1) {
 			$t = "<span style='color:red'>$t seconds</span>";
@@ -367,16 +357,16 @@ class Model {
 	 */
 	public function __destruct() {
 		//echo "model destructed!<br>\r\n";
-		if (self::$db->error) {
+		if ($this->db->error) {
 			
-			if (self::$db->error) {
-				show_error(self::$db->error);
+			if ($this->db->error) {
+				show_error($this->db->error);
 			}
-			self::$db->close();
+			$this->db->close();
 		}
 		
-		if (self::$dbS) {
-			self::$dbS->close();
+		if ($this->dbS) {
+			$this->dbS->close();
 		}
 	}
 }

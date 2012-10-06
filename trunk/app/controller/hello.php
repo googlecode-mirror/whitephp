@@ -31,14 +31,13 @@ class Hello extends Controller {
 		
 		load_model('user');
 
-// 		User::$tb_name = '';
  		User::$show_sql = true;
 		$model = User::singleton();
-		
+
 		// 1 使用原始方法
 		$sql = 'select id, username from user limit 10';
-		//$q = User::$db->query($sql);
-		$q   = $model->query($sql);
+		$q = $model->db->query($sql);
+// 		$q   = $model->query($sql);
 		
 		if ($q) {
 			while (null != ($r = $q->fetch_assoc())) {
@@ -62,7 +61,7 @@ class Hello extends Controller {
 	
 		// 1 使用原始方法
 		// $sql = 'select id, username from user wherelimit 10';
-		// $q = Model::$db->query($sql);
+		// $q =  $model->db->query($sql);
 		// $q   = $model->query($sql);
 		// if ($q) {
 		// 	while (null != ($r = $q->fetch_assoc())) {
