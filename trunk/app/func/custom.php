@@ -13,16 +13,16 @@
  * @link http://weibo.com/itbudaoweng
  */
 
-function wphp_hook_change_query_string($query_string) {
+function wphp_custom_change_query_string($query_string) {
 	return $query_string;
 }
 
-function wphp_hook_before_instance() {
+function wphp_custom_before_instance() {
 	
 }
 
-function wphp_hook_after_instance() {
-	return;
+function wphp_custom_after_instance() {
+	//return;
 	
 	echo '<div style="display:none"><pre>';
 	
