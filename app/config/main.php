@@ -24,22 +24,9 @@
  */
 define('SYS_MODE', 'development');
 
-//跳转规则，网址为索引部分，跳转到值部分
-$rewrite_rules = array(
-	'about' => 'hello/index',
-	'contact' => 'hello/index'
-);
-
 //主题包
 // 可使用 get_conf['theme_package']访问
 $theme_package = 'default';
-
-//是否使用 path 类型的网址，即 xxx/yyy/zzz
-//非常不建议启用该功能，准备砍掉此功能
-define('IS_PATH_URL', FALSE);
-
-//是否进行安全过滤，暂未实现
-define('IS_SECURITY', FALSE);
 
 //是否记录错误日志
 define('IS_LOG', TRUE);
@@ -64,8 +51,10 @@ define('LOG_PATH', 'log');
 //用来存储可变配置索引
 define('WPHP_GLOBAL_CONFIG_NAME', 'wphp_config');
 
-//是否隐藏前端控制器，需要配合 apache 的 rewrite 模块
-define('IS_HIDE_INDEX_PAGE', FALSE);
+//是否隐藏前端控制器，同时注意修改服务器配置
+define('IS_HIDE_INDEX_PAGE', true);
+
+//参考
 /**
  * 注意，仅可以隐藏一个入口文件
  * 如果需要隐藏入口文件，请保证服务器开启了 rewrite 模块
@@ -85,6 +74,7 @@ define('IS_HIDE_INDEX_PAGE', FALSE);
 
 //加载扩展函数
 // require APP_NAME . 'func/xxx.php';
+require APP_NAME . 'func/hook.php';
 require APP_NAME . 'func/verifycode.php';
 
 //加载扩展类

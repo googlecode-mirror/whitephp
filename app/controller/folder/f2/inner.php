@@ -22,7 +22,7 @@ class Inner extends Controller {
 		echo "<br>\r\n";
 		//echo "<a href=" . href('/hello/index') . ">首页</a>";
 		echo "<br>\r\n";
-		echo "<a href=" . href('/folder/inner/index', array('param1'=>'value1')) . ">inner 文件夹内</a>";
+		echo "<a href=" . href('/folder/inner/index/v1/v2', array('param1'=>'value1')) . ">inner 文件夹内</a>";
 		echo "<br>\r\n";
 		echo "<a href=" . href('/folder/f2/inner/index', array('param1'=>'value1')) . ">folder/f2 文件夹内</a>";
 		

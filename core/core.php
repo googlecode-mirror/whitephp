@@ -2,12 +2,12 @@
 <?php
 /**
  * WPHP 框架的核心
- * note:不建议使用 pathurl 模式
  * 
  * filename:	core.php
  * charset:		UTF-8
  * create date: 2012-5-25
  * update date: 2012-9-26 代码重构，将 core 从应用层分离出来
+ * update date: 2012-10-6 删除 pathurl 模式
  * 
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -28,21 +28,22 @@ date_default_timezone_set(TIME_ZONE);
 //工作环境
 switch (SYS_MODE) {
 	case 'development':
+		ini_set('display_errors', 'On');
 		error_reporting(E_ALL | E_STRICT);
 		break;
 	case 'testing':
-		error_reporting(E_ALL & ~E_DEPRECATED);
+		error_reporting(E_ALL & ~E_NOTICE | E_STRICT);
+		ini_set('display_errors', 'On');
 		break;
 	case 'production':
-		error_reporting(0);
+		error_reporting(E_ALL & ~E_NOTICE);
+		ini_set('display_errors', 'Off');
 		break;
 	default:
 		error_reporting(0);
+		ini_set('display_errors', 'On');
 		show_error('bad SYS_MODE');
 }
-
-//关闭默认开启session
-//session_start();
 
 //核心函数、控制器、模型
 require CORE_NAME . 'func_inner.php';
@@ -54,16 +55,16 @@ if (IS_DB_ACTIVE) {
 	require CORE_NAME . 'model.php';
 }
 
-//调用函数的时候可能会用到
-set_conf('rewrite_rules', $rewrite_rules);
-set_conf('theme_package', $theme_package);
+//取消使用 $_SERVER['QUERY_STRING']
+//改用 $_SERVER['REQUEST_URI'] - $_SERVER['SCRIPT_NAME']
+//目前可以再未添加问号的情况下获取到 $_SERVER['QUERY_STRING'] 的值
+//即使不设置服务器，默认也可以获取等值
+//即 index.php/a=3 和 index.php?a=3 在 $query_string 里是相同的，都是 a=3
 
-//取消使用 $_SERVER['QUERY_STRING'],以免未添加问号的情况下不能使用
-$_tmp_script_name = $_SERVER['SCRIPT_NAME'];
-
-//如果启用 pathurl 链接路径发生改变
 if (IS_HIDE_INDEX_PAGE) {
 	$_tmp_script_name = dirname($_SERVER['SCRIPT_NAME']);
+} else {
+	$_tmp_script_name = $_SERVER['SCRIPT_NAME'];
 }
 
 $query_string = str_replace($_tmp_script_name, '', $_SERVER['REQUEST_URI']);
@@ -74,49 +75,26 @@ if (strlen($_SERVER['REQUEST_URI']) < strlen($_tmp_script_name)) {
 	$query_string = '';
 }
 
-// echo $query_string;die;
-// print_r($_SERVER);die;
+function_exists('wphp_hook_change_query_string') && $query_string = wphp_hook_change_query_string($query_string);
 
-//分段，从零开始，如$segments = get_conf('segments');$segments['0'] 可以取得第一个段
-//该变量在 pathurl 启用的情况下使用
-set_conf('segments', explode('/', $query_string));
-define('QUERY_STRING', $query_string);
+set_conf('query_string', $query_string);
+set_conf('theme_package', $theme_package);
 
-//如果启用 path 网址
-if (IS_PATH_URL) {
+// $c controller
+$c = get_param('c') ? get_param('c') : CONTROLLER;
 
-	//执行 main.php 配置文件中的跳转规则，简单跳转，不涉及正则
-	if (key_exists($query_string, $rewrite_rules)) {
-		$url = $rewrite_rules[$query_string];
-		$url = p2q($url);
-		extract($url);
-		unset($url);
-	} else {
-		$url = p2q($query_string);
-		extract($url);
-		unset($url);
-	}
-	
-} else {
-	//执行 main.php 配置文件中的跳转规则，简单跳转，不涉及正则
-	$query_string = ltrim($query_string, '/');
-	if (key_exists($query_string, $rewrite_rules)) {
-		$url = $rewrite_rules[$query_string];
-		$url = p2q($url);
-		extract($url);
-		unset($url);
-	} else {
-		// $c controller
-		$c = get('c') ? get('c') : CONTROLLER;
-
-		// $a action
-		$a = get('a') ? get('a') : ACTION;
-	}
-}
+// $a action
+$a = get_param('a') ? get_param('a') : ACTION;
 
 //filter '..'
 $c = str_replace('..', '', $c);
 $a = str_replace('..', '', $a);
+
+//设置当前控制器和方法名
+define('CUR_CONTROLLER', $c);
+define('CUR_ACTION', $a);
+
+function_exists('wphp_hook_before_instance') && wphp_hook_before_instance();
 
 //加载控制器和方法
 if (file_exists(APP_NAME . 'controller/' . strtolower($c) . '.php')) {
@@ -134,12 +112,8 @@ if (file_exists(APP_NAME . 'controller/' . strtolower($c) . '.php')) {
 		exit;
 	}
 } else {
-	show_404('page not found!');
+	show_404('page not found');
 }
-
-//设置当前控制器和方法名
-define('CUR_CONTROLLER', $c);
-define('CUR_ACTION', $a);
 
 //实例化类，类名暂不允许下划线分隔
 $c = ucfirst(strtolower($c));
@@ -147,8 +121,6 @@ $c = new $c;
 
 $c->$a();
 
-//关闭 session
-//$_SESSION = array();
-//session_destroy();
+function_exists('wphp_hook_after_instance') && wphp_hook_after_instance();
 
 //end

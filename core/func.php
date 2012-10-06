@@ -158,30 +158,72 @@ function get_ip() {
 	return $ip;
 }
 
+/*-- url & query_string --*/
 /**
- * 判断 ip 是否合法（仅限于IPV4）
- * @param string $ip
+ * 从 query_string 中获取参数值
+ * 
+ * @param string $param 参数名
+ * @param unknown_type $query_string query_string 如 c=h&a=index
+ * @param unknown_type $default
+ * @return Ambigous <unknown, multitype:string >
  */
-function is_valid_ip($ip) {
-	$preg       = '/^(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])$/';
-	$is_matched = false;
-	if (preg_match($preg, $ip, $m)) {
-		$is_matched = true;
+function get_param($param = null, $query_string = null, $default = '') {
+	$seperation = '&';
+	$ret = array();
+	$query_string or $query_string = get_conf('query_string');//wphp 外需要注释掉
+	
+	$arr = explode($seperation, $query_string);
+	foreach ($arr as $value) {
+		$_tmp = explode('=', $value);
+		$k = array_shift($_tmp);
+		$v = implode('=', $_tmp);
+		$ret[$k] = $v;
 	}
-	return $is_matched;
+	
+	if (isset($param)) {
+		if (array_key_exists($param, $ret)) {
+			$ret = $ret[$param];
+		} else {
+			$ret = $default;
+		}
+	}
+	
+	return $ret;
 }
 
-/*-- url --*/
+/**
+ * 向 url 增加参数，若存在，进行替换
+ * @param  string $name        参数名
+ * @param  string $replacement 参数值的替换结果
+ * @param  string $seperation  参数分隔符
+ * @return string              替换参数值之后的结果
+ */
+function add_param($url, $param, $replacement) {
+	$seperation = '&';
+
+	if (preg_match("/[?|$seperation|\|]$param=[^$seperation]*/", $url)) {
+		$url = preg_replace("/([?|$seperation|\|]$param=)[^$seperation]*/", '${1}'.$replacement, $url);
+	} else {
+		if (preg_match("/[?|$seperation|\|][^$seperation]*/", $url)) {
+			$url .= $seperation . $param . '=' . $replacement;
+		} else {
+			$url .= '?' . $param . '=' . $replacement;
+		}
+	}
+
+	return $url;
+}
+
 /**
  * 删除 url 中某个参数
  * @param  string $url        匹配url
- * @param  string $name       参数名
+ * @param  string $param       参数名
  * @param  string $seperation 参数分隔符
  * @return string             删除参数之后的结果
  */
-function query_string_delete($url, $name) {
+function delete_param($url, $param) {
 	$seperation = '&';
-	$url = preg_replace("/[?|&]$name=[^&]*/", '', $url);
+	$url = preg_replace("/[?|&]$param=[^&]*/", '', $url);
 
 	//找出第一个&，第一个?的位置，若?不存在（或者问号位于后面），将第一个&替换成?
 	$str_and = strpos($url, $seperation);
@@ -189,19 +231,6 @@ function query_string_delete($url, $name) {
 	if (false === $str_q || $str_q > $str_and) {
 		$url = preg_replace("/(^[^$seperation]*)&(.*)$/", '${1}?${2}', $url);
 	}
-	return $url;
-}
-
-/**
- * 替换 url 中的参数
- * @param  string $name        参数名
- * @param  string $replacement 参数值的替换结果
- * @param  string $seperation  参数分隔符
- * @return string              替换参数值之后的结果
- */
-function query_string_replace($url, $name, $replacement) {
-	$seperation = '&';
-	$url = preg_replace("/([?|&]$name=)[^&]*/", '${1}'.$replacement, $url);
 	return $url;
 }
 
@@ -216,13 +245,14 @@ function query_string_replace($url, $name, $replacement) {
  * @return string
  */
 function convert_str($str, $out_charset = null) {
+	$out_charset = strtolower($out_charset);
 	$in_charset = strtolower(mb_detect_encoding($str, array('utf-8', 'gbk', 'gb2312')));
-
+	'cp936' == $in_charset && $in_charset = 'gbk';
+	
 	! defined('CHARSET') && define('CHARSET', 'utf-8');
-	! strtolower($out_charset) && $out_charset = strtolower(CHARSET);
+	! $out_charset && $out_charset = strtolower(CHARSET);
 	
 	if ($in_charset != $out_charset) {
-		'cp936' == $in_charset && $in_charset = 'gbk';
 		$str = iconv($in_charset, $out_charset, $str);
 	}
 	return $str;
@@ -232,9 +262,28 @@ function convert_str($str, $out_charset = null) {
  * 查看字符长度
  * @param unknown_type $str
  */
-function real_strlen($str) {
-	$charset = mb_detect_encoding($str);
+function wphp_strlen($str, $charset = null) {
+	$charset = strtolower($charset);
+	$charset or $charset = strtolower(mb_detect_encoding($str, array('utf-8', 'gbk', 'gb2312')));
+	'cp936' == $charset && $charset = 'gbk';
+	
+	! defined('CHARSET') && define('CHARSET', 'utf-8');
+	! $charset && $charset = strtolower(CHARSET);
+
 	return mb_strlen($str, $charset);
+}
+
+/**
+ * 判断 ip 是否合法（仅限于IPV4）
+ * @param string $ip
+ */
+function is_valid_ip($ip) {
+	$preg       = '/^(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d|\d{2}|1\d{2}|2[0-4]\d|25[0-5])$/';
+	$is_matched = false;
+	if (preg_match($preg, $ip, $m)) {
+		$is_matched = true;
+	}
+	return $is_matched;
 }
 
 /**
