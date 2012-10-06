@@ -22,6 +22,14 @@ function wphp_hook_before_instance() {
 }
 
 function wphp_hook_after_instance() {
-	echo '<br>';
+	return;
+	
+	echo '<div style="display:none"><pre>';
+	
 	var_dump($_GET);
+	var_dump($_POST);
+	var_dump($_COOKIE);
+	var_dump($_SERVER);
+	
+	echo '</pre></div>';
 }
