@@ -22,7 +22,7 @@ function wphp_custom_before_instance() {
 }
 
 function wphp_custom_after_instance() {
-	//return;
+	return;
 	
 	echo '<div style="display:none"><pre>';
 	
