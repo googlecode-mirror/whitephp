@@ -334,7 +334,7 @@ class Model {
 	 */
 	public static function show_mysql($sql, $t1 = 0, $t2 = 0) {
 		if (self::$show_sql) {
-			$time = $this->timer($t1, $t2);
+			$time = self::$singleton->timer($t1, $t2);
 			echo "$sql<br>\n$time<br>\n";
 		}
 	}
