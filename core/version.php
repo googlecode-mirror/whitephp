@@ -10,10 +10,19 @@
  重构
  将核心目录（入口文件定义的 CORE_PATH 目录）从应用中迁移出来
  方便升级，仅需覆盖核心目录即可，提高安全性
+
+ ADD
  增加常量 CORE_PATH APP_NAME 和 CORE_NAME
+ 增加用户自定义函数，方便不动核心目录的前提下变更框架处理细节
+ query_string 配置项
+
+ UPDATE
  约定框架中所有定义的目录尾部均包含斜线
- 链接使用完整链接即 使用 hard_href() 而不是 href()
+ query_string 改为 PATH_INFO 和 QUERY_STRING 配合使用
  
+ DELETE
+ QUERY_STRING 常量
+ 删除 PATHURL 支持
 
  -----------------------------------
  v0.3
