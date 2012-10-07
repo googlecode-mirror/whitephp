@@ -14,6 +14,7 @@
  */
 
 function wphp_custom_change_query_string($query_string) {
+	//echo $query_string;
 	return $query_string;
 }
 
@@ -26,10 +27,17 @@ function wphp_custom_after_instance() {
 	
 	echo '<div style="display:none"><pre>';
 	
-	var_dump($_GET);
-	var_dump($_POST);
-	var_dump($_COOKIE);
-	var_dump($_SERVER);
+	echo '<br><br>$_GET = ';
+	var_export($_GET);
+
+	echo '<br><br>$_POST = ';
+	var_export($_POST);
+
+	echo '<br><br>$_COOKIE = ';
+	var_export($_COOKIE);
+
+	echo '<br><br>$_SERVER = ';
+	var_export($_SERVER);
 	
 	echo '</pre></div>';
 }

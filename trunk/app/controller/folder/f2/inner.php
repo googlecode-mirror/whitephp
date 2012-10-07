@@ -26,11 +26,5 @@ class Inner extends Controller {
 		echo "<br>\r\n";
 		echo "<a href=" . href('/folder/f2/inner/index', array('param1'=>'value1')) . ">folder/f2 文件夹内</a>";
 		
-		echo "<br>\r\n";
-		echo '$_GET=';
-		var_export($_GET);
-		echo "<br>\r\n";
-		echo '$segments=';
-		var_export(get_conf('segments'));
 	}
 }

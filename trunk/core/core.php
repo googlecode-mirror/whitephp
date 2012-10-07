@@ -8,6 +8,7 @@
  * create date: 2012-5-25
  * update date: 2012-9-26 代码重构，将 core 从应用层分离出来
  * update date: 2012-10-6 删除 pathurl 模式
+ * update date: 2012-10-8 更新 query_string 获取方式，配合 PATH_INFO
  * 
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -55,25 +56,20 @@ if (IS_DB_ACTIVE) {
 	require CORE_NAME . 'model.php';
 }
 
-//取消使用 $_SERVER['QUERY_STRING']
-//改用 $_SERVER['REQUEST_URI'] - $_SERVER['SCRIPT_NAME']
-//目前可以再未添加问号的情况下获取到 $_SERVER['QUERY_STRING'] 的值
-//即使不设置服务器，默认也可以获取等值
-//即 index.php/a=3 和 index.php?a=3 在 $query_string 里是相同的，都是 a=3
+//将 PATH_INFO 和 QUERY_STRING 统一起来
+//为支持直接使用 /c=x&a=y 和 ?c=x&a=y
+//配合 $_SERVER['PATH_INFO'] 和 $_SERVER['QUERY_STRING']
+$query_string = '';
 
-if (IS_HIDE_INDEX_PAGE) {
-	$_tmp_script_name = dirname($_SERVER['SCRIPT_NAME']);
-} else {
-	$_tmp_script_name = $_SERVER['SCRIPT_NAME'];
+if (isset($_SERVER['PATH_INFO'])) {
+	$query_string .= $_SERVER['PATH_INFO'];
+	if ($_SERVER['QUERY_STRING']) {
+		$query_string .= '&';
+	}
 }
+$query_string .= $_SERVER['QUERY_STRING'];
 
-$query_string = str_replace($_tmp_script_name, '', $_SERVER['REQUEST_URI']);
 $query_string = ltrim($query_string, '?/');
-
-//若 / 访问
-if (strlen($_SERVER['REQUEST_URI']) < strlen($_tmp_script_name)) {
-	$query_string = '';
-}
 
 function_exists('wphp_custom_change_query_string') && $query_string = wphp_custom_change_query_string($query_string);
 
