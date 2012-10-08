@@ -46,6 +46,7 @@ define('CONTROLLER', 'hello');
 define('ACTION', 'index');
 
 //定义日志目录，相对于APP_PATH，不必写尾部斜线
+//请使用 ../../ 方式将目录置于框架内不能访问的位置
 define('LOG_PATH', 'log');
 
 //用来存储可变配置索引
