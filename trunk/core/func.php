@@ -274,6 +274,76 @@ function wphp_strlen($str, $charset = null) {
 }
 
 /**
+ * 过滤 xss 危险字符
+ * 
+ * 一定程度上阻止 xss 攻击
+ * @param string $str
+ * @param string $replacement
+ * @return string
+ */
+function stop_xss($str, $replacement = '*') {
+	$naughty = 'alert|applet|audio|basefont|base|behavior|bgsound|blink|body|embed|expression|form|frameset|frame|head|html|ilayer|iframe|input|isindex|layer|link|meta|object|plaintext|style|script|textarea|title|video|xml|xss';
+	$str = preg_replace('#<(/*\s*)('.$naughty.')([^><]*)([><]*)#is', $replacement, $str);
+	$str = preg_replace('#(alert|cmd|passthru|eval|exec|expression|system|fopen|fsockopen|file|file_get_contents|readfile|unlink)(\s*)\((.*?)\)#si', "\${1}\${2}{$replacement}\${3}{$replacement}", $str);
+
+	return $str;
+}
+
+/**
+ * 转化文件名过滤掉危险字符
+ * @param string $filename
+ * @return string
+ */
+function wphp_filename($filename) {
+	$search = array(
+		'/',
+		'\\',
+		':',
+		'*',
+		'"',
+		"'",
+		'<',
+		'>',
+		'|',
+		' ',
+		"\r",
+		"\n",
+		'?',
+		'&',
+		',',
+		'.',
+		"../",
+		"<!--",
+		"-->",
+		'$',
+		'#',
+		'{',
+		'}',
+		'[',
+		']',
+		'=',
+		';',
+		"%20",
+		"%22",
+		"%3c",      // <
+		"%253c",    // <
+		"%3e",      // >
+		"%0e",      // >
+		"%28",      // (
+		"%29",      // )
+		"%2528",    // (
+		"%26",      // &
+		"%24",      // $
+		"%3f",      // ?
+		"%3b",      // ;
+		"%3d"       // =
+	);
+
+	$filename = str_replace($search, '', $filename);
+	return $filename;
+}
+
+/**
  * 判断 ip 是否合法（仅限于IPV4）
  * @param string $ip
  */
