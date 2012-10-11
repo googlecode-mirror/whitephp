@@ -3,13 +3,11 @@
 /**
  * 配置文件
  * 这是你可以修改的文件
- * 
+ *
  * filename:	main.php
  * charset:		UTF-8
  * create date: 2012-5-25
- * 
- * @todo define('IS_SECURITY', FALSE);
- * 
+ *
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
  * @link http://yungbo.com
@@ -18,15 +16,11 @@
 
 /*
  * 共有三种环境，分别为开发环境、测试环境、生产环境
- * development
- * testing
- * production
- */
+* development
+* testing
+* production
+*/
 define('SYS_MODE', 'development');
-
-//主题包
-// 可使用 get_conf['theme_package']访问
-$theme_package = 'default';
 
 //是否记录错误日志
 define('IS_LOG', TRUE);
@@ -73,14 +67,33 @@ define('IS_HIDE_INDEX_PAGE', true);
  - rewrite: if( !is_file() && !is_dir()) goto "index.php?%{QUERY_STRING}"
  */
 
+// 定义，可在程序中随时变更
+// 可使用 get_conf['theme_package']访问
+$theme_package = 'default';
+
+//自动加载某文件夹下的以某种名称结尾的类
+//path 对于的为相对于 SYS_PATH 的路径
+//ext 表示 class+ext 中的文件后缀 ext
+$autoload_config = array(
+		array(
+				'path' => APP_NAME . 'lib/',
+				'ext' => '.php',
+		),
+		array(
+				'path' => APP_NAME . 'model/',
+				'ext' => '.php',
+		),
+);
+
 //加载扩展函数
 // require APP_NAME . 'func/xxx.php';
 require APP_NAME . 'func/custom.php';
 require APP_NAME . 'func/verifycode.php';
 
 //加载扩展类
+//请保持类名和文件名一致，文件名小写，可直接自动加载，无需手动包含
 // require APP_NAME . 'lib/yyy.php';
-require APP_NAME . 'lib/timer.php';
+// require APP_NAME . 'lib/timer.php';
 
 //加载其它配置文件
 // require APP_NAME . 'config/yyy.php';

@@ -9,6 +9,7 @@
  * filename:	func.php
  * charset:		UTF-8
  * create date: 2012-9-24
+ * update date: 2012-10-11 删除 load_model()、load_lib() 函数，改用自动加载
  * 
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -385,40 +386,6 @@ function r($ca, $extra = array(), $code = 302) {
 }
 
 /**
- * 加载 model
- */
-function load_model($file) {
-	$realfile = APP_NAME . 'model/' . $file;
-	$lastchar = substr($file, -5, 5);
-	if (false === strpos($file, '.')) {
-		$realfile = $realfile . '.php';
-	}
-
-	if (!file_exists($realfile)) {
-		show_404('class model ' . $file . ' unexists');
-	} else {
-		require_once $realfile;
-	}
-}
-
-/**
- * 加载类库 lib
- */
-function load_lib($file) {
-	$realfile = APP_NAME . 'lib/' . $file;
-	$lastchar = substr($file, -5, 5);
-	if (false === strpos($file, '.')) {
-		$realfile = $realfile . '.php';
-	}
-
-	if (!file_exists($realfile)) {
-		show_404('class ' . $file . ' unexists');
-	} else {
-		require_once $realfile;
-	}
-}
-
-/**
  * 加载静态文件
  * 若是 css 或者 js 生成完整的代码
  * 否则返回文件名
@@ -439,3 +406,24 @@ function load_static($file = 'jquery.js') {
 		}
 	}
 }
+
+set_conf('autoload_config', $autoload_config);
+/**
+ * 自动加载类
+ * @param unknown_type $class
+ */
+function __autoload($class) {
+	$autoload_config = get_conf('autoload_config');
+	$flag = false;
+	foreach ($autoload_config as $autoload) {
+		$file = $autoload['path'] . strtolower($class) . $autoload['ext'];
+
+		if (is_file($file)) {
+			require $file;
+			$flag = true;
+			break;
+		}
+	}
+	$flag or show_error("class {$class} not found");
+}
+

@@ -81,6 +81,7 @@ WPHP_GLOBAL_CONFIG_NAME 全局变量存储索引
 可以通过 get_conf('变量名')访问
 theme_package			主题包名
 query_string			
+autoload_config			自动加载类库目录，保持文件名部分和类名一致，文件名小写
 db_conf 				返回数据库配置数据，索引是数据库组
 
 系统函数
@@ -109,7 +110,6 @@ class Muser extends Model {
 }
 
 //在控制器方法中
-load_model('muser');
 $user = Muser::singleton();	//其实可以传递任意值，如果只是使用 query 而不使用框架函数就无所谓
 $user_info = $user->query('SELECT * FROM user');
 //也可以直接 $user->db->query() 或者 $user->dbS->query()使用原始资源
