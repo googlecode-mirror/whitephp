@@ -92,8 +92,8 @@ function _load_ca($ca) {
 	$count = count($spilt);
 	$n     = 1; //控制器位于第几层，从零开始。后面方法用n时，只需传递n即可获取方法所在索引。
 	$con   = $spilt[0];
-	$c     = CONTROLLER;
-	$a     = ACTION;
+	$c     = DEFAULT_CONTROLLER;
+	$a     = DEFAULT_ACTION;
 	while (!file_exists(APP_NAME . 'controller/' . strtolower($con) . '.php')) {
 		if ($n < $count) {
 			$n++;
@@ -146,8 +146,8 @@ function p2q($ca = null) {
 	$ca = ltrim($ca, '/');
 	$a = $c = $extra = '';
 	if (!$ca) {
-		$c = CONTROLLER;
-		$a = ACTION;
+		$c = DEFAULT_CONTROLLER;
+		$a = DEFAULT_ACTION;
 	} else {
 		
 		$spilt = explode('/', $ca);
@@ -155,7 +155,6 @@ function p2q($ca = null) {
 		
 		if ($count == 1) {
 			$c = $ca;
-			$a = ACTION;
 		} else {
 			//处理不在控制器不在根目录的情况
 			$ret_tmp = _load_ca($ca);

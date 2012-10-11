@@ -67,6 +67,7 @@ if (isset($_SERVER['PATH_INFO'])) {
 		$query_string .= '&';
 	}
 }
+
 $query_string .= $_SERVER['QUERY_STRING'];
 
 $query_string = ltrim($query_string, '?/');
@@ -77,10 +78,10 @@ set_conf('query_string', $query_string);
 set_conf('theme_package', $theme_package);
 
 // $c controller
-$c = get_param('c') ? get_param('c') : CONTROLLER;
+$c = get_param(PARAM_CONTROLLER) ? get_param(PARAM_CONTROLLER) : DEFAULT_CONTROLLER;
 
 // $a action
-$a = get_param('a') ? get_param('a') : ACTION;
+$a = get_param(PARAM_ACTION) ? get_param(PARAM_ACTION) : DEFAULT_ACTION;
 
 //filter '..'
 $c = str_replace('..', '', $c);
