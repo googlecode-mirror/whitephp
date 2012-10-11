@@ -28,8 +28,6 @@ class Hello extends Controller {
 		/* 见 static/testdata.sql */
 
 		$ret = array();
-		
-		load_model('user');
 
  		User::$show_sql = true;
 		$model = User::singleton();
