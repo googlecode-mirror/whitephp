@@ -93,25 +93,26 @@ define('CUR_ACTION', $a);
 function_exists('wphp_custom_before_instance') && wphp_custom_before_instance();
 
 //加载控制器和方法
-if (file_exists(APP_NAME . 'controller/' . strtolower($c) . '.php')) {
-	require APP_NAME . 'controller/' . strtolower($c) . '.php';
+$file = APP_NAME . 'controller/' . strtolower($c) . '.php';
+if (file_exists($file)) {
+	require $file;
 	
 	//支持多层次目录,先放到一个数组中，取最后一个为控制器
 	$c_array = explode('/', $c);
 	$c       = array_pop($c_array);
 	if (!class_exists($c)) {
-		show_error('controller unexists');
+		function_exists('wphp_controller_unexists') ? wphp_controller_unexists($c) : show_error('not found');
 		exit;
 	}
 	if (!method_exists($c, $a)) {
-		show_error('action unexists');
+		function_exists('wphp_action_unexists') ? wphp_action_unexists($a) : show_error('not found');
 		exit;
 	}
 } else {
-	show_404('page not found');
+	function_exists('wphp_page_unexists') ? wphp_page_unexists($file) : show_error('not found');
+	exit;
 }
 
-//实例化类，类名暂不允许下划线分隔
 $c = ucfirst(strtolower($c));
 $c = new $c;
 
