@@ -18,6 +18,21 @@ function wphp_custom_change_query_string($query_string) {
 	return $query_string;
 }
 
+function wphp_controller_unexists($c) {
+	echo 'controller not found';
+	log_error('controller ' . $c . ' not found - ' . get_conf('query_string'));
+}
+
+function wphp_action_unexists($a) {
+	echo 'action not found';
+	log_error('action ' . $a . ' not found - ' . get_conf('query_string'));
+}
+
+function wphp_page_unexists($file) {
+	echo 'file not found';
+	log_error('file ' . $file . ' not found - ' . get_conf('query_string'));
+}
+
 function wphp_custom_before_instance() {
 	
 }
