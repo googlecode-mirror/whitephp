@@ -67,7 +67,7 @@ class Model {
 			
 			//因为从数据库并不是必须连接的，所以先判断一下，如果没有配置则不进行尝试而不终止程序运行。
 		if (array_key_exists('slave', self::$db_conf)) {
-				$this->$dbS = db_init('slave');
+				$this->dbS = db_init('slave');
 		}
 	}
 	
