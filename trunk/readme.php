@@ -71,8 +71,12 @@ IS_LOG 					是否记录错误日志
 IS_HIDE_INDEX_PAGE 		是否隐藏入口文件，需要配合 apche 的rewrite 模块或相关模块
 CHARSET 				字符集设计，建议保持 utf-8，默认即可
 TIME_ZONE 				时区设置，东八区使用 PRC 即可，默认即可
-CONTROLLER 				默认控制器，hello
-ACTION 					默认方法，index
+
+DEFAULT_CONTROLLER		默认控制器，hello
+DEFAULT_ACTION			默认方法，index
+
+PARAM_CONTROLLER		获取控制器的参数名 c
+PARAM_ACTION			获取方法的参数名 a
 
 LOG_PATH 				日志路径
 WPHP_GLOBAL_CONFIG_NAME 全局变量存储索引

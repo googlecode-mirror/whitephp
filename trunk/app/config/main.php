@@ -34,10 +34,16 @@ define('CHARSET', 'utf-8');
 define('TIME_ZONE', 'PRC');
 
 //默认控制器
-define('CONTROLLER', 'hello');
+define('DEFAULT_CONTROLLER', 'hello');
 
 //默认方法
-define('ACTION', 'index');
+define('DEFAULT_ACTION', 'index');
+
+//获取控制器的参数名
+define('PARAM_CONTROLLER', 'c');
+
+//获取方法的参数名
+define('PARAM_ACTION','a');
 
 //定义日志目录，相对于APP_PATH，不必写尾部斜线
 //请使用 ../../ 方式将目录置于框架内不能访问的位置
