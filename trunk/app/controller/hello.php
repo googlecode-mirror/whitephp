@@ -29,7 +29,7 @@ class Hello extends Controller {
 
 		$ret = array();
 
- 		User::$show_sql = true;
+ 		//User::$show_sql = true;
 		$model = User::singleton();
 
 		// 1 使用原始方法
@@ -95,5 +95,9 @@ class Hello extends Controller {
 			}
 		}
 		var_dump($ret);
+	}
+
+	public function hi() {
+
 	}
 }
