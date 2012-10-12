@@ -355,20 +355,21 @@ function show_404($message = '') {
  * @param unknown_type $file
  * @param unknown_type $data
  */
-function render($file, $data = array()) {
-	$theme_package = get_conf('theme_package');
-	$realfile = APP_NAME . 'view/' . $theme_package . '/' . $file;
-	$lastchar = substr($file, -5, 5);
-	if (false === strpos($lastchar, '.')) {
-		$realfile = $realfile . '.php';
+function render($_wphp_render_param_file, $_wphp_render_param_data = array()) {
+	$_wphp_render_realfile = APP_NAME . 'view/' . get_conf('theme_package') . '/' . $_wphp_render_param_file;
+	$_wphp_render_lastchar = substr($_wphp_render_param_file, -5, 5);
+	if (false === strpos($_wphp_render_lastchar, '.')) {
+		$_wphp_render_realfile = $_wphp_render_realfile . '.php';
 	}
 
-	if (!file_exists($realfile)) {
-		show_404('view file ' . $file . ' unexists!');
+	if (!file_exists($_wphp_render_realfile)) {
+		show_404('view file ' . $_wphp_render_param_file . ' unexists!');
 	} else {
-		extract($data);
-		require $realfile;
+		extract($_wphp_render_param_data);
+		unset($_wphp_render_lastchar, $_wphp_render_param_file, $_wphp_render_param_data);
+		require $_wphp_render_realfile;
 	}
+
 }
 
 /**
