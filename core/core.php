@@ -9,12 +9,15 @@
  * update date: 2012-9-26 代码重构，将 core 从应用层分离出来
  * update date: 2012-10-6 删除 pathurl 模式
  * update date: 2012-10-8 更新 query_string 获取方式，配合 PATH_INFO
+ * update date: 2012-10-12 增加输出控制
  * 
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
  * @link http://yungbo.com
  * @link http://weibo.com/itbudaoweng
  */
+
+ob_start();
 
 //版本号
 define('VERSION', '0.4');
@@ -121,4 +124,5 @@ $c->$a();
 
 function_exists('wphp_custom_after_instance') && wphp_custom_after_instance();
 
+ob_end_flush();
 //end
