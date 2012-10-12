@@ -7,8 +7,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<title>Highcharts 学习（根据文档）</title>
 <?php 
-		load_static('jquery.js');
-		load_static('highcharts.js');
+		echo load_static('jquery.min.js');
+		echo load_static('highcharts.js');
 ?>
 
 <script>
@@ -27,8 +27,8 @@ $(function () {
 					//这里处理数据
 					foreach ($data as $key=>$val) {
 						$d[] = (float)$val['id'];
-						$x[] = $val['name'];
-						$p[] = array($val['name'], (float)$val['id']);
+						$x[] = $val['username'];
+						$p[] = array($val['username'], (float)$val['id']);
 					}
 
 			?>
