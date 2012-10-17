@@ -115,17 +115,12 @@ class Model {
 		$fields = '';
 		//组合后的字段值
 		$values = '';
-		
-		$array_keys   = array_keys($data);
-		$array_values = array_values($data);
-		
-		foreach ($array_keys as $v) {
-			$fields .= ", `$v`";//whatch out the space bettwen `
+
+		foreach ($data as $key => $value) {
+			$fields .= ", `$key`";//whatch out the space bettwen `
+			$values .= ", " . check_input($value); //过滤下
 		}
 		
-		foreach ($array_values as $v) {
-			$values .= ", " . check_input($v); //过滤下
-		}
 		$fields = trim($fields, ', ');
 		$values = trim($values, ', ');
 		
