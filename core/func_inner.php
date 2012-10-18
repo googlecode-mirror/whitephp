@@ -248,7 +248,7 @@ function log_error($message = '') {
 		_sae_log_error($message);
 	} else {
 		if (!IS_LOG) {
-			echo '未启用错误日志，错误信息为：' . $message;
+			//echo '未启用错误日志，错误信息为：' . $message;
 			return;
 		}
 		
