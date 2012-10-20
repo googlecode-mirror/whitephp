@@ -14,7 +14,7 @@
  */
 
 function wphp_custom_change_query_string($query_string) {
-	//echo $query_string;
+	// echo $query_string;
 	return $query_string;
 }
 
@@ -34,16 +34,16 @@ function wphp_page_unexists($file) {
 }
 
 function wphp_custom_before_instance() {
-/*	$timer = new Timer();
+	$timer = new Timer();
 	$timer->start();
-	set_conf('timer', $timer);*/
+	set_conf('timer', $timer);
 }
 
 function wphp_custom_after_instance() {
-/*	$timer = get_conf('timer');
+	$timer = get_conf('timer');
 	$timer->end();
 	echo "<br>\r\n";
-	echo $timer->time(), ' s';*/
+	echo $timer->time(), ' s';
 	return;
 	
 	echo '<div style="display:none"><pre>';

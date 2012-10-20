@@ -92,7 +92,7 @@ function post($k, $defalut = '') {
  * @param  array  $header header数组
  * @return all    返回服务器返回的结果
  */
-function post_data($url, $data = array(), $header = array()) {
+function post_data($url, $data = '', $header = array()) {
 	$ch = curl_init($url);
 	ob_start();
 	curl_setopt($ch, CURLOPT_POST, 1);
@@ -249,8 +249,8 @@ function convert_str($str, $out_charset = null) {
 	$in_charset = strtolower(mb_detect_encoding($str, array('utf-8', 'gbk', 'gb2312')));
 	'cp936' == $in_charset && $in_charset = 'gbk';
 	
-	! defined('CHARSET') && define('CHARSET', 'utf-8');
-	! $out_charset && $out_charset = strtolower(CHARSET);
+	defined('CHARSET') or define('CHARSET', 'utf-8');
+	$out_charset or $out_charset = strtolower(CHARSET);
 	
 	if ($in_charset != $out_charset) {
 		$str = iconv($in_charset, $out_charset, $str);
@@ -267,8 +267,8 @@ function wphp_strlen($str, $charset = null) {
 	$charset or $charset = strtolower(mb_detect_encoding($str, array('utf-8', 'gbk', 'gb2312')));
 	'cp936' == $charset && $charset = 'gbk';
 	
-	! defined('CHARSET') && define('CHARSET', 'utf-8');
-	! $charset && $charset = strtolower(CHARSET);
+	defined('CHARSET') or define('CHARSET', 'utf-8');
+	$charset or $charset = strtolower(CHARSET);
 
 	return mb_strlen($str, $charset);
 }
