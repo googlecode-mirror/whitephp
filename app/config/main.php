@@ -78,6 +78,7 @@ define('IS_HIDE_INDEX_PAGE', true);
 $theme_package = 'default';
 
 //自动加载某文件夹下的以某种名称结尾的类
+//保持文件名和类名一致，文件名小写
 //path 对于的为相对于 SYS_PATH 的路径
 //ext 表示 class+ext 中的文件后缀 ext
 $autoload_config = array(
@@ -95,11 +96,6 @@ $autoload_config = array(
 // require APP_NAME . 'func/xxx.php';
 require APP_NAME . 'func/custom.php';
 require APP_NAME . 'func/verifycode.php';
-
-//加载扩展类
-//请保持类名和文件名一致，文件名小写，可直接自动加载，无需手动包含
-// require APP_NAME . 'lib/yyy.php';
-// require APP_NAME . 'lib/timer.php';
 
 //加载其它配置文件
 // require APP_NAME . 'config/yyy.php';
