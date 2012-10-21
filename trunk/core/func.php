@@ -361,6 +361,7 @@ function is_valid_ip($ip) {
  * 
  * 解决中文经过 json_encode() 处理后显示不直观的情况
  * 如默认会将“中文”变成"\u4e2d\u6587"，不直观
+ * 如无特殊需求，并不建议使用该函数，直接使用 json_encode 更好，省资源
  * json_encode() 的参数编码格式为 UTF-8 时方可正常工作
  * 
  * @param array|object $data
