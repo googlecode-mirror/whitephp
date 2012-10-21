@@ -240,22 +240,30 @@ function delete_param($url, $param) {
  * 
  * 建议编码格式尽量统一为 utf-8
  * 若引用外部文件造成编码格式未知可使用该函数
+ * 但是这个 mb_detect_encoding 相当不靠谱，如将 gbk 编码的 联通ADSL 判为 UTF-8
+ * 因此此函数能不用就不用
  * @param string $str
  * @param string $out_charset
  * @return string
  */
 function convert_str($str, $out_charset = null) {
-	$out_charset = strtolower($out_charset);
-	$in_charset = strtolower(mb_detect_encoding($str, array('utf-8', 'gbk', 'gb2312')));
-	'cp936' == $in_charset && $in_charset = 'gbk';
-	
-	defined('CHARSET') or define('CHARSET', 'utf-8');
-	$out_charset or $out_charset = strtolower(CHARSET);
-	
-	if ($in_charset != $out_charset) {
-		$str = iconv($in_charset, $out_charset, $str);
+    $in_charset = strtoupper(mb_detect_encoding($str, array('UTF-8', 'EUC-CN', 'CP936'), TRUE));
+	if (in_array($in_charset, array('CP936', 'EUC-CN'))) {
+		$in_charset = 'GBK';
 	}
-	return $str;
+
+	if ($out_charset) {
+		$out_charset = strtoupper($out_charset);
+	} else {
+		defined('CHARSET') or define('CHARSET', 'UTF-8');
+		$out_charset = strtoupper(CHARSET);
+	}
+
+    if ($in_charset != $out_charset) {
+        $str = iconv($in_charset, $out_charset, $str);
+    }
+
+    return $str;
 }
 
 /**
@@ -357,47 +365,6 @@ function is_valid_ip($ip) {
 }
 
 /**
- * json 编码
- * 
- * 解决中文经过 json_encode() 处理后显示不直观的情况
- * 如默认会将“中文”变成"\u4e2d\u6587"，不直观
- * 如无特殊需求，并不建议使用该函数，直接使用 json_encode 更好，省资源
- * json_encode() 的参数编码格式为 UTF-8 时方可正常工作
- * 
- * @param array|object $data
- * @return array|object
- */
-function ch_json_encode($data) {
-	/**
-	 * 将中文编码
-	 * @param array $data
-	 * @return string
-	 */
-	function ch_urlencode($data) {
-		if (is_array($data) || is_object($data)) {
-			foreach ($data as $k => $v) {
-				if (is_scalar($v)) {
-					if (is_array($data)) {
-						$data[$k] = urlencode($v);
-					} else if (is_object($data)) {
-						$data->$k = urlencode($v);
-					}
-				} else if (is_array($data)) {
-					$data[$k] = ch_urlencode($v); //递归调用该函数
-				} else if (is_object($data)) {
-					$data->$k = ch_urlencode($v);
-				}
-			}
-		}
-		return $data;
-	}
-	
-	$ret = ch_urlencode($data);
-	$ret = json_encode($ret);
-	return urldecode($ret);
-}
-
-/**
  * 转义特殊字符
  * 
  * 书写mysql语句时的可先对变量进行过滤
@@ -483,4 +450,45 @@ function wphp_iconv($in_charset, $out_charset, $data) {
 		$data = iconv($in_charset, $out_charset, $data);
 	}
 	return $data;
+}
+
+/**
+ * 对数组和标量进行 urlencode 处理
+ * @param array $data
+ * @return string
+ */
+function wphp_urlencode($data) {
+	if (is_array($data) || is_object($data)) {
+		foreach ($data as $k => $v) {
+			if (is_scalar($v)) {
+				if (is_array($data)) {
+					$data[$k] = urlencode($v);
+				} else if (is_object($data)) {
+					$data->$k = urlencode($v);
+				}
+			} else if (is_array($data)) {
+				$data[$k] = wphp_urlencode($v); //递归调用该函数
+			} else if (is_object($data)) {
+				$data->$k = wphp_urlencode($v);
+			}
+		}
+	}
+	return $data;
+}
+	
+/**
+ * json 编码
+ * 
+ * 解决中文经过 json_encode() 处理后显示不直观的情况
+ * 如默认会将“中文”变成"\u4e2d\u6587"，不直观
+ * 如无特殊需求，并不建议使用该函数，直接使用 json_encode 更好，省资源
+ * json_encode() 的参数编码格式为 UTF-8 时方可正常工作
+ * 
+ * @param array|object $data
+ * @return array|object
+ */
+function wphp_json_encode($data) {	
+	$ret = wphp_urlencode($data);
+	$ret = json_encode($ret);
+	return urldecode($ret);
 }
