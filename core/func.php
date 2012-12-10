@@ -108,7 +108,7 @@ function post_data($url, $data = '', $header = array()) {
 /**
  * 获得服务器端网址，即获取当前网址
  * @param boolean $with_query_string 是否附带 query_string 部分
- * @return Ambigous <string, unknown>
+ * @return string $url
  */
 function get_server_url($with_query_string = true) {
 	$url = 'http://localhost';
@@ -126,7 +126,7 @@ function get_server_url($with_query_string = true) {
 }
 
 /**
- * 获取网址跟目录
+ * 获取网址根目录
  * @return string
  */
 function get_server_root() {
@@ -146,13 +146,11 @@ function get_server_root() {
  * 获取客户端 IP
  */
 function get_ip() {
-    if (isset($_SERVER["HTTP_X_REAL_IP"])) {
-        $ip = $_SERVER["HTTP_X_REAL_IP"];
-	} else if (isset($_SERVER["HTTP_CLIENT_IP"])) {
-		$ip = $_SERVER["HTTP_CLIENT_IP"];
-	} else if (isset($_SERVER["REMOTE_ADDR"])) {
+     if (isset($_SERVER["REMOTE_ADDR"]) && $_SERVER["REMOTE_ADDR"]) {
 		$ip = $_SERVER["REMOTE_ADDR"];
-	} else {
+	} else if (isset($_SERVER["HTTP_X_REAL_IP"]) && $_SERVER["HTTP_X_REAL_IP"]) {
+        $ip = $_SERVER["HTTP_X_REAL_IP"];
+	} else{
 		$ip = "0.0.0.0";
 	}
 	return $ip;
@@ -163,9 +161,9 @@ function get_ip() {
  * 从 query_string 中获取参数值
  * 
  * @param string $param 参数名
- * @param unknown_type $query_string query_string 如 c=h&a=index
- * @param unknown_type $default
- * @return Ambigous <unknown, multitype:string >
+ * @param string $query_string query_string 如 c=h&a=index
+ * @param string $default
+ * @return string
  */
 function get_param($param = null, $query_string = null, $default = '') {
 	$seperation = '&';
@@ -198,7 +196,7 @@ function get_param($param = null, $query_string = null, $default = '') {
  * @param  string $seperation  参数分隔符
  * @return string              替换参数值之后的结果
  */
-function add_param($url, $param, $replacement) {
+function add_param($param, $url, $replacement) {
 	$seperation = '&';
 
 	if (preg_match("/[?|$seperation|\|]$param=[^$seperation]*/", $url)) {
@@ -221,7 +219,7 @@ function add_param($url, $param, $replacement) {
  * @param  string $seperation 参数分隔符
  * @return string             删除参数之后的结果
  */
-function delete_param($url, $param) {
+function delete_param($param, $url) {
 	$seperation = '&';
 	$url = preg_replace("/[?|&]$param=[^&]*/", '', $url);
 
@@ -268,16 +266,21 @@ function convert_str($str, $out_charset = null) {
 
 /**
  * 查看字符长度
- * @param unknown_type $str
+ * @param string $str
+ * @param string $charset
  */
 function wphp_strlen($str, $charset = null) {
 	$charset = strtolower($charset);
-	$charset or $charset = strtolower(mb_detect_encoding($str, array('utf-8', 'gbk', 'gb2312')));
-	'cp936' == $charset && $charset = 'gbk';
+	$charset or $charset = strtoupper(mb_detect_encoding($str, array('UTF-8', 'EUC-CN', 'CP936'), TRUE));
+		
+	if (in_array($charset, array('CP936', 'EUC-CN'))) {
+		$charset = 'GBK';
+	}
 	
-	defined('CHARSET') or define('CHARSET', 'utf-8');
-	$charset or $charset = strtolower(CHARSET);
-
+	if (!$charset) {
+		defined('CHARSET') or define('CHARSET', 'utf-8');
+		$charset = CHARSET;
+	}
 	return mb_strlen($str, $charset);
 }
 
@@ -293,12 +296,11 @@ function stop_xss($str, $replacement = '*') {
 	$naughty = 'alert|applet|audio|basefont|base|behavior|bgsound|blink|body|embed|expression|form|frameset|frame|head|html|ilayer|iframe|input|isindex|layer|link|meta|object|plaintext|style|script|textarea|title|video|xml|xss';
 	$str = preg_replace('#<(/*\s*)('.$naughty.')([^><]*)([><]*)#is', $replacement, $str);
 	$str = preg_replace('#(alert|cmd|passthru|eval|exec|expression|system|fopen|fsockopen|file|file_get_contents|readfile|unlink)(\s*)\((.*?)\)#si', "\${1}\${2}{$replacement}\${3}{$replacement}", $str);
-
 	return $str;
 }
 
 /**
- * 转化文件名过滤掉危险字符
+ * 过滤文件名中的特殊字符
  * @param string $filename
  * @return string
  */
@@ -365,11 +367,13 @@ function is_valid_ip($ip) {
 }
 
 /**
- * 转义特殊字符
+ * 相当于 mysql_real_escape_string 函数
+ * 
+ * 对非数值类型的加单引号
  * 
  * 书写mysql语句时的可先对变量进行过滤
  * 此函数会自动对字符串加引号
- * @param unknown_type $value
+ * @param string $value
  * @return string
  */
 function check_input($value) {
@@ -383,8 +387,9 @@ function check_input($value) {
 }
 
 /**
- * 转义函数，用来替代 mysql*_escape_* 函数
- * @param unknown_type $str
+ * 转义函数
+ * 用来替代 mysql_real_escape_string 函数
+ * @param string $str
  */
 function wphp_escape($str) {
 	$search  = array(
@@ -418,14 +423,17 @@ function wphp_escape($str) {
  */
 function wphp_ip2long($ip) {
 	$ip_arr = explode('.', $ip);
-	$iplong = (16777216 * intval($ip_arr[0])) + (65536 * intval($ip_arr[1])) + (256 * intval($ip_arr[2])) + intval($ip_arr[3]);
+	$iplong = (16777216 * intval($ip_arr[0])) +
+			 (65536 * intval($ip_arr[1])) +
+			 (256 * intval($ip_arr[2])) +
+			 intval($ip_arr[3]);
 	return $iplong;
 }
 
 /**
- * 对字符串、对象、数组进行转码
+ * 对字符串、对象、数组进行编码的转换
  * 
- * 和 iconv 参数使用方式相同
+ * 参数位置和 iconv 保持一致
  * @param string $in_charset
  * @param string $out_charset
  * @param array|string $data
@@ -454,6 +462,8 @@ function wphp_iconv($in_charset, $out_charset, $data) {
 
 /**
  * 对数组和标量进行 urlencode 处理
+ * 通常调用 wphp_json_encode() 
+ * 处理 json_encode 中文显示问题
  * @param array $data
  * @return string
  */
