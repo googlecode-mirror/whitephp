@@ -9,7 +9,7 @@
  * update date: 2012-8-14 改用单例模式，调用方法发生变化，具体方式见类说明
  * update date: 2012-9-20 更新单例模式，启用新数据库配置时重新链接，增加数据库时间检测
  * 
- * XXX 增加数据库执行时间，当显示 sql 时显示执行时间
+ * XXX 应该生成表描述，确保字段的正确性
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
  * @link http://yungbo.com

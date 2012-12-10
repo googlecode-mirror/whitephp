@@ -84,7 +84,7 @@ $theme_package = 'default';
 $autoload_config = array(
 		array(
 				'path' => APP_NAME . 'lib/',
-				'ext' => '.php',
+				'ext' => '.class.php',
 		),
 		array(
 				'path' => APP_NAME . 'model/',
