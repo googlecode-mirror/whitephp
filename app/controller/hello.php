@@ -17,8 +17,6 @@
  */
 class Hello extends Controller {
 	public function index() {
-		$file = 'js/jquery.min.js';
-		echo load_static($file);
 		$title   = 'WPHP 配置成功了';
 		$content = '
 		<p>WPHP 是 WhitePHP 的缩写，它是一个简单高效的 PHP 框架。WhitePHP 极其简单，就像一张任你书写的白纸一样。</p>
