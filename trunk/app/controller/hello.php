@@ -29,6 +29,7 @@ class Hello extends Controller {
 		));
 	}
 	
+	/*
 	//测试数据库
 	//请注意及时隐藏方法
 	//使用 Model 的子类
@@ -119,4 +120,5 @@ class Hello extends Controller {
 		$data['data'] = array ( 0 => array ( 'id' => '1', 'username' => '赵彬言', ), 1 => array ( 'id' => '2', 'username' => '胡锦涛', ), 2 => array ( 'id' => '3', 'username' => 'Xi Jinping', ), 3 => array ( 'id' => '4', 'username' => 'Yetian', ), 4 => array ( 'id' => '5', 'username' => 'Shiyuan', ), 5 => array ( 'id' => '6', 'username' => '\'单引号', ), );
 		render('vtestchart.php', $data);
 	}
+	*/
 }
