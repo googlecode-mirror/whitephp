@@ -67,7 +67,6 @@ IS_DB_ACTIVE			是否启用数据库
 
 自定义配置常量
 SYS_MODE 				开发模式， development testing production
-IS_PATH_URL 			是否使用 path url，严重不建议启用
 
 IS_LOG 					是否记录错误日志
 IS_HIDE_INDEX_PAGE 		是否隐藏入口文件，需要配合 apche 的rewrite 模块或相关模块
