@@ -29,96 +29,96 @@ class Hello extends Controller {
 		));
 	}
 	
-	/*
-	//测试数据库
-	//请注意及时隐藏方法
-	//使用 Model 的子类
-	public function testdb() {
-		/* 见 static/testdata.sql */
-
-		$ret = array();
-
- 		//User::$show_sql = true;
-		$model = User::singleton();
-
-		// 1 使用原始方法
-		$sql = 'select id, username from user limit 10';
-		$q = $model->db->query($sql);
-// 		$q   = $model->query($sql);
-		
-		if ($q) {
-			while (null != ($r = $q->fetch_assoc())) {
-				$ret[] = $r;
-			}
-		}
-		var_dump($ret);
-		// var_export($ret);
-		
-		// 2 使用系统提供的方法
-		// var_dump($model->select('*', '1 limit 10'));
-	}
-	
-	//测试数据库1
-	// 请注意及时隐藏方法
-	//使用 Model 类
-	public function testdb1() {
-		/* 见 static/testdata.sql */
-	
-		$ret = array();
-		// Model::$show_sql = true;
-		$model = Model::singleton('user');//表名
-	
-		// 1 使用原始方法
-		// $sql = 'select id, username from user wherelimit 10';
-		// $q =  $model->db->query($sql);
-		// $q   = $model->query($sql);
-		// if ($q) {
-		// 	while (null != ($r = $q->fetch_assoc())) {
-		// 		$ret[] = $r;
-		// 	}
-		// }
-		// var_dump($ret);
-	
-		// 2 使用系统提供的方法
-		// 若使用系统函数（如insert,delete,update,select,select_line）
-		// 必须保证正确设置了表名即 $model = Model::singleton('user');
-		// $model->insert(array('username'=>'hhh', 'password'=>'sss'));
-		// $model->update("username='google', password='abc'", 'id=1');		
-		// $model->delete('id=2');
-		var_dump($model->select('*', '1 limit 10'));
-	}
-
-	//测试数据库2
-	// 请注意及时隐藏方法
-	//使用原始 mysql 资源链接
-	public function testdb2() {
-		/* 见 static/testdata.sql */
-	
-		$ret = array();
-		
-		//直接获取数据库链接资源
-		$model = db_init();
-		$sql = 'select id, username from user limit 10';
-		$q   = $model->query($sql);
-	
-		if ($q) {
-			while (null != ($r = $q->fetch_assoc())) {
-				$ret[] = $r;
-			}
-		}
-		var_dump($ret);
-	}
-
-	// 请注意及时隐藏方法
-	public function hi() {
-		$data['data'] = 'hello world';
-		render('vhi.php', $data);
-	}
-
-	//及时隐藏方法
-	public function testchart() {
-		$data['data'] = array ( 0 => array ( 'id' => '1', 'username' => '赵彬言', ), 1 => array ( 'id' => '2', 'username' => '胡锦涛', ), 2 => array ( 'id' => '3', 'username' => 'Xi Jinping', ), 3 => array ( 'id' => '4', 'username' => 'Yetian', ), 4 => array ( 'id' => '5', 'username' => 'Shiyuan', ), 5 => array ( 'id' => '6', 'username' => '\'单引号', ), );
-		render('vtestchart.php', $data);
-	}
-	*/
+//
+//	//测试数据库
+//	//请注意及时隐藏方法
+//	//使用 Model 的子类
+//	public function testdb() {
+//		/* 见 static/testdata.sql */
+//
+//		$ret = array();
+//
+// 		//User::$show_sql = true;
+//		$model = User::singleton();
+//
+//		// 1 使用原始方法
+//		$sql = 'select id, username from user limit 10';
+//		$q = $model->db->query($sql);
+//// 		$q   = $model->query($sql);
+//
+//		if ($q) {
+//			while (null != ($r = $q->fetch_assoc())) {
+//				$ret[] = $r;
+//			}
+//		}
+//		var_dump($ret);
+//		// var_export($ret);
+//
+//		// 2 使用系统提供的方法
+//		// var_dump($model->select('*', '1 limit 10'));
+//	}
+//
+//	//测试数据库1
+//	// 请注意及时隐藏方法
+//	//使用 Model 类
+//	public function testdb1() {
+//		/* 见 static/testdata.sql */
+//
+//		$ret = array();
+//		// Model::$show_sql = true;
+//		$model = Model::singleton('user');//表名
+//
+//		// 1 使用原始方法
+//		// $sql = 'select id, username from user wherelimit 10';
+//		// $q =  $model->db->query($sql);
+//		// $q   = $model->query($sql);
+//		// if ($q) {
+//		// 	while (null != ($r = $q->fetch_assoc())) {
+//		// 		$ret[] = $r;
+//		// 	}
+//		// }
+//		// var_dump($ret);
+//
+//		// 2 使用系统提供的方法
+//		// 若使用系统函数（如insert,delete,update,select,select_line）
+//		// 必须保证正确设置了表名即 $model = Model::singleton('user');
+//		// $model->insert(array('username'=>'hhh', 'password'=>'sss'));
+//		// $model->update("username='google', password='abc'", 'id=1');
+//		// $model->delete('id=2');
+//		var_dump($model->select('*', '1 limit 10'));
+//	}
+//
+//	//测试数据库2
+//	// 请注意及时隐藏方法
+//	//使用原始 mysql 资源链接
+//	public function testdb2() {
+//		/* 见 static/testdata.sql */
+//
+//		$ret = array();
+//
+//		//直接获取数据库链接资源
+//		$model = db_init();
+//		$sql = 'select id, username from user limit 10';
+//		$q   = $model->query($sql);
+//
+//		if ($q) {
+//			while (null != ($r = $q->fetch_assoc())) {
+//				$ret[] = $r;
+//			}
+//		}
+//		var_dump($ret);
+//	}
+//
+//	// 请注意及时隐藏方法
+//	public function hi() {
+//		$data['data'] = 'hello world';
+//		render('vhi.php', $data);
+//	}
+//
+//	//及时隐藏方法
+//	public function testchart() {
+//		$data['data'] = array ( 0 => array ( 'id' => '1', 'username' => '赵彬言', ), 1 => array ( 'id' => '2', 'username' => '胡锦涛', ), 2 => array ( 'id' => '3', 'username' => 'Xi Jinping', ), 3 => array ( 'id' => '4', 'username' => 'Yetian', ), 4 => array ( 'id' => '5', 'username' => 'Shiyuan', ), 5 => array ( 'id' => '6', 'username' => '\'单引号', ), );
+//		render('vtestchart.php', $data);
+//	}
+//
 }
