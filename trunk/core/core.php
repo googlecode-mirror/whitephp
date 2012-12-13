@@ -20,7 +20,7 @@
 ob_start();
 
 //版本号
-define('VERSION', '0.4.1');
+define('VERSION', '0.4.2');
 
 //加载主配置文件
 require APP_NAME . 'config/main.php';
