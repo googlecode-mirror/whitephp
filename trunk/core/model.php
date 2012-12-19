@@ -346,6 +346,10 @@ class Model {
 		}
 		return $t;
 	}
+
+	public function __clone() {
+        trigger_error('Clone is not allowed.', E_USER_ERROR);
+    }
 	
 	/**
 	 * 关闭数据库
