@@ -41,16 +41,16 @@ class Model {
 	//从数据库资源
 	public $dbS;
 	
+	//所有的连库资源，array
+	public static $connectionArr;
+	
 	//数据表名
 	public $tb_name;
 		
 	//是否输出 sql 语句
 	public static $show_sql = false;
 	
-	//数据库组
-	private static $db_group;
-	
-	//数据库配置数组
+	//数据库配置数组 array
 	private static $db_conf;
 	
 	//实例的对象
@@ -58,45 +58,77 @@ class Model {
 	
 	/**
 	 * 连接数据库
+	 * @param string $db_group 数据库组 default 
 	 */
 	private function __construct($db_group = 'default') {
-		self::$db_group = $db_group;
-		$this->db       = db_init(self::$db_group);
-			
-		self::$db_conf = get_conf('db_conf');
-			
-			//因为从数据库并不是必须连接的，所以先判断一下，如果没有配置则不进行尝试而不终止程序运行。
-		if (array_key_exists('slave', self::$db_conf)) {
-				$this->dbS = db_init('slave');
-		}
+		return self::connect($db_group);
 	}
 	
 	/**
-	 * 单例
+	 * 不算是严格意义上的单例了
+	 * 只是为了用最少次数去链接数据库
 	 * Model::singleton()
 	 * @param string $tb_name 默认表名，使用过程中可以随时变更 Model::$tb_name = 'new_tb_name';
 	 * @param string $db_group 数据库配置文件
 	 */
 	public static function singleton($tb_name = 'sample_table_name', $db_group = 'default') {
-		
+	
 		//当不存在对象或者启用新的数据库时重新连库
-		if (!(self::$singleton instanceof self) || (self::$singleton instanceof self && $db_group != self::$db_group)) {
-			$t1 = microtime(true);
+		if (!(self::$singleton instanceof self)) {
 			self::$singleton = new self($db_group);
-			$t2 = microtime(true);
-
-			if (self::$show_sql) {
-				$time = self::$singleton->timer($t1, $t2);
-				echo "db group ${db_group} contructed!<br>\r\n",
-					 "db connection: $time<br>\n";
-			}
+			self::$connectionArr[$db_group] = self::$singleton;
+		} else if (!isset(self::$connectionArr[$db_group])) {
+			self::$singleton = new self($db_group);
+			self::$connectionArr[$db_group] = self::$singleton;
+		} else {
+			self::$singleton = self::$connectionArr[$db_group];
 		}
-		
+	
 		//总是保持表名最新
-		self::$singleton->tb_name = $tb_name;
-
+		if ($tb_name) {
+			self::$singleton->tb_name = $tb_name;
+		}
+	
 		return self::$singleton;
 	}
+	
+	private function connect($db_group = 'default') {
+		$t1 = microtime(true);
+		$this->db = db_init($db_group);
+		$t2 = microtime(true);
+		
+		if (self::$show_sql) {
+			$time = $this->timer($t1, $t2);
+			echo "db group ${db_group} contructed!<br>\r\n",
+			"db connection: $time<br>\n";
+		}
+	
+		if (array_key_exists('slave', get_conf('db_conf'))) {
+				$this->dbS = db_init('slave');
+		}
+	}
+	
+	
+// 	public static function singleton($tb_name = 'sample_table_name', $db_group = 'default') {
+		
+// 		//当不存在对象或者启用新的数据库时重新连库
+// 		if (!(self::$singleton instanceof self) || (self::$singleton instanceof self && $db_group != self::$db_group)) {
+// 			$t1 = microtime(true);
+// 			self::$singleton = new self($db_group);
+// 			$t2 = microtime(true);
+
+// 			if (self::$show_sql) {
+// 				$time = self::$singleton->timer($t1, $t2);
+// 				echo "db group ${db_group} contructed!<br>\r\n",
+// 					 "db connection: $time<br>\n";
+// 			}
+// 		}
+		
+// 		//总是保持表名最新
+// 		self::$singleton->tb_name = $tb_name;
+
+// 		return self::$singleton;
+// 	}
 	
 	/**
 	 * 增加数据
@@ -347,7 +379,7 @@ class Model {
 		return $t;
 	}
 
-	public function __clone() {
+	public final function __clone() {
         trigger_error('Clone is not allowed.', E_USER_ERROR);
     }
 	
@@ -356,10 +388,10 @@ class Model {
 	 */
 	public function __destruct() {
 		//echo "model destructed!<br>\r\n";
-		if ($this->db->error) {
+		if ($this->db) {
 			
-			if ($this->db->error) {
-				show_error($this->db->error);
+			if ($this->db->errno) {
+				show_error($this->db->errno . ':' . $this->db->error);
 			}
 			$this->db->close();
 		}
