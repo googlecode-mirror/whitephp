@@ -10,8 +10,8 @@
  * update date: 2012-9-20 更新单例模式，启用新数据库配置时重新链接，增加数据库时间检测
  * update date: 2012-12-24 对内不同库多次实例，改善主从机制，一个主库配一个从库
  * 	                       （若存在多个从库，可在数据库配置文件跟据一定算法确定具体库）
+ * update date: 2012-12-25 更新命名规范，方法下划线，属性下划线
  *
- * XXX 应该生成表描述，确保字段的正确性
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
  * @link http://yungbo.com
@@ -25,7 +25,7 @@
  * $model = Model::singleton();
  * $model->query();
  * $model->db->query();
- * $model->dbS->query();
+ * $model->db_slave->query();
  * 以下注释中，Model 也可以是其子类，不再赘述 
  * 
  * 或者直接不用此模型类
@@ -39,7 +39,7 @@ class Model {
 	public $db;
 	
 	//从数据库资源
-	public $dbS;
+	public $db_slave;
 
 	//数据表名
 	public $tb_name;
@@ -51,7 +51,7 @@ class Model {
 	public $db_group;
 
 	//所有的连库资源，array
-	public static $connectionArr;
+	public static $connection_arr;
 
 	//实例的对象
 	private static $singleton;
@@ -76,12 +76,12 @@ class Model {
 		//当不存在对象或者启用新的数据库时重新连库
 		if (!(self::$singleton instanceof self)) {
 			self::$singleton = new self($db_group);
-			self::$connectionArr[$db_group] = self::$singleton;
-		} else if (!isset(self::$connectionArr[$db_group])) {
+			self::$connection_arr[$db_group] = self::$singleton;
+		} else if (!isset(self::$connection_arr[$db_group])) {
 			self::$singleton = new self($db_group);
-			self::$connectionArr[$db_group] = self::$singleton;
+			self::$connection_arr[$db_group] = self::$singleton;
 		} else {
-			self::$singleton = self::$connectionArr[$db_group];
+			self::$singleton = self::$connection_arr[$db_group];
 		}
 	
 		//总是保持表名最新
@@ -104,8 +104,8 @@ class Model {
 			"db connection: $time<br>\n";
 		}
 	
-		if (array_key_exists($db_group . 'Slave', get_conf('db_conf'))) {
-			$this->dbS = db_init($db_group . 'Slave');
+		if (array_key_exists($db_group . '_slave', get_conf('db_conf'))) {
+			$this->db_slave = db_init($db_group . '_slave');
 		}
 	}
 
@@ -301,13 +301,13 @@ class Model {
 
 		//如果是查库
 		if (preg_match('/^select /i', $sql)) {
-			if ($this->dbS) {
-				$ret = $this->_baseSlaveQuery($sql);
+			if ($this->db_slave) {
+				$ret = $this->_base_slave_query($sql);
 			} else {
-				$ret = $this->_baseQuery($sql);
+				$ret = $this->_base_query($sql);
 			}
 		} else {
-			$ret = $this->_baseQuery($sql);
+			$ret = $this->_base_query($sql);
 		}
 
 		$t2 = microtime(true);
@@ -316,7 +316,7 @@ class Model {
 	}
 
 	//主库基础查询
-	private function _baseQuery($sql) {
+	private function _base_query($sql) {
 		if (!$this->db->ping() or $this->db->errno == 2006) {
 			$this->connect($this->db_group);
 		}
@@ -325,11 +325,11 @@ class Model {
 	}
 
 	//从库基础查询
-	private function _baseSlaveQuery($sql) {
-		if (!$this->dbS->ping() or $this->dbS->errno == 2006) {
+	private function _base_slave_query($sql) {
+		if (!$this->db_slave->ping() or $this->db_slave->errno == 2006) {
 			$this->connect($this->db_group);
 		}
-		$ret = $this->dbS->query($sql);
+		$ret = $this->db_slave->query($sql);
 		return $ret;
 	}
 	
@@ -374,8 +374,8 @@ class Model {
 			$this->db->close();
 		}
 		
-		if ($this->dbS) {
-			$this->dbS->close();
+		if ($this->db_slave) {
+			$this->db_slave->close();
 		}
 	}
 }

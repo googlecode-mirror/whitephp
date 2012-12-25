@@ -42,8 +42,8 @@ function wphp_custom_before_instance() {
 function wphp_custom_after_instance() {
 	$timer = get_conf('timer');
 	$timer->end();
-	echo "<br>\r\n";
-	echo $timer->time(), ' s';
+	// echo "<br>\r\n";
+	// echo $timer->time(), ' s';
 	return;
 	
 	echo '<div style="display:none"><pre>';
