@@ -8,7 +8,9 @@
  * create date: 2012-5-25
  * update date: 2012-8-14 改用单例模式，调用方法发生变化，具体方式见类说明
  * update date: 2012-9-20 更新单例模式，启用新数据库配置时重新链接，增加数据库时间检测
- * 
+ * update date: 2012-12-24 对内不同库多次实例，改善主从机制，一个主库配一个从库
+ * 	                       （若存在多个从库，可在数据库配置文件跟据一定算法确定具体库）
+ *
  * XXX 应该生成表描述，确保字段的正确性
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -19,8 +21,6 @@
 /**
  * 模型基类
  * 
- * 建议使用原生 sql 语句，配合 check_input() 函数保证变量的安全
- * 
  * 如需显示sql请提前设置 xxx::$show_sql 为 true
  * $model = Model::singleton();
  * $model->query();
@@ -29,7 +29,7 @@
  * 以下注释中，Model 也可以是其子类，不再赘述 
  * 
  * 或者直接不用此模型类
- * $model = db_init();//默认使用主数据库，db_init() 直接连库，返回一个数据库资源
+ * $model = db_init();//默认使用主数据库，db_init() 直接连库，返回一个 Mysqli 实例
  * 
  * @author Think
  */
@@ -40,19 +40,19 @@ class Model {
 	
 	//从数据库资源
 	public $dbS;
-	
-	//所有的连库资源，array
-	public static $connectionArr;
-	
+
 	//数据表名
 	public $tb_name;
 		
 	//是否输出 sql 语句
 	public static $show_sql = false;
-	
-	//数据库配置数组 array
-	private static $db_conf;
-	
+
+	//当前实例数据库组
+	public $db_group;
+
+	//所有的连库资源，array
+	public static $connectionArr;
+
 	//实例的对象
 	private static $singleton;
 	
@@ -65,7 +65,7 @@ class Model {
 	}
 	
 	/**
-	 * 不算是严格意义上的单例了
+	 * 不是单例了
 	 * 只是为了用最少次数去链接数据库
 	 * Model::singleton()
 	 * @param string $tb_name 默认表名，使用过程中可以随时变更 Model::$tb_name = 'new_tb_name';
@@ -95,6 +95,7 @@ class Model {
 	private function connect($db_group = 'default') {
 		$t1 = microtime(true);
 		$this->db = db_init($db_group);
+		$this->db_group = $db_group;
 		$t2 = microtime(true);
 		
 		if (self::$show_sql) {
@@ -103,33 +104,11 @@ class Model {
 			"db connection: $time<br>\n";
 		}
 	
-		if (array_key_exists('slave', get_conf('db_conf'))) {
-				$this->dbS = db_init('slave');
+		if (array_key_exists($db_group . 'Slave', get_conf('db_conf'))) {
+			$this->dbS = db_init($db_group . 'Slave');
 		}
 	}
-	
-	
-// 	public static function singleton($tb_name = 'sample_table_name', $db_group = 'default') {
-		
-// 		//当不存在对象或者启用新的数据库时重新连库
-// 		if (!(self::$singleton instanceof self) || (self::$singleton instanceof self && $db_group != self::$db_group)) {
-// 			$t1 = microtime(true);
-// 			self::$singleton = new self($db_group);
-// 			$t2 = microtime(true);
 
-// 			if (self::$show_sql) {
-// 				$time = self::$singleton->timer($t1, $t2);
-// 				echo "db group ${db_group} contructed!<br>\r\n",
-// 					 "db connection: $time<br>\n";
-// 			}
-// 		}
-		
-// 		//总是保持表名最新
-// 		self::$singleton->tb_name = $tb_name;
-
-// 		return self::$singleton;
-// 	}
-	
 	/**
 	 * 增加数据
 	 * $data
@@ -138,17 +117,20 @@ class Model {
 	 * VALUES (NULL, '胡锦涛', '123456abc');
 	 */
 	public function insert($data = array()) {
-		$t1 = microtime(true);
-		
 		//组合后的 sql 语句
 		$sql = '';
-		
+
+		if (!$this->tb_name) {
+			return false;
+		}
+
 		//组合后的字段
 		$fields = '';
 		//组合后的字段值
 		$values = '';
 
 		foreach ($data as $key => $value) {
+			$key = str_replace('`', '', $key);
 			$fields .= ", `$key`";//whatch out the space bettwen `
 			$values .= ", " . check_input($value); //过滤下
 		}
@@ -160,14 +142,13 @@ class Model {
 		$sql .= ' `' . $this->tb_name . '`';
 		$sql .= ' (' . $fields . ') ';
 		$sql .= ' VALUES (' . $values . ')';
-				
-		$q = $this->db->query($sql);
+		$ret = $this->query($sql);
 
-		$t2 = microtime(true);
+		if ($ret) {
+			$ret = $this->db->insert_id;
+		}
 
-		self::show_mysql($sql, $t1, $t2);
-
-		return $q;
+		return $ret;
 	}
 	
 	/**
@@ -176,7 +157,9 @@ class Model {
 	 * @return bool $q 只要语句正常执行了就会是 true
 	 */
 	public function delete($where = null) {
-		$t1 = microtime(true);
+		if (!$this->tb_name) {
+			return false;
+		}
 		$sql = '';
 		$q = false;
 
@@ -184,14 +167,10 @@ class Model {
 
 		$sql = 'DELETE FROM `' . $this->tb_name . '`' . $sqlwhere;
 		if (!is_null($where)) {
-			$q = $this->db->query($sql);
+			$q = $this->query($sql);
 		} else {
 			show_error("sql error: $sql");
 		}
-			
-		$t2 = microtime(true);
-
-		self::show_mysql($sql, $t1, $t2);
 
 		return $q;
 	}
@@ -203,7 +182,9 @@ class Model {
 	 * @return bool $q 只有语句执行成功就返回 true
 	 */
 	public function update($data = array(), $where = null) {
-		$t1 = microtime(true);
+		if (!$this->tb_name) {
+			return false;
+		}
 		$sql = '';
 		$q = false;
 		
@@ -224,14 +205,10 @@ class Model {
 		$sql = 'UPDATE `' . $this->tb_name . '` SET ' . $update_data . $sqlwhere;
 
 		if (!is_null($where)) {
-			$q = $this->db->query($sql);
+			$q = $this->query($sql);
 		} else {
 			show_error("sql error: $sql");
 		}
-		
-		$t2 = microtime(true);
-		
-		self::show_mysql($sql, $t1, $t2);
 
 		return $q;
 	}
@@ -243,8 +220,9 @@ class Model {
 	 * @return array $ret
 	 */
 	public function select($field = '*', $where = null) {
-		$t1 = microtime(true);
-		
+		if (!$this->tb_name) {
+			return array();
+		}
 		$ret       = array();
 		$field_new = '';
 		if (is_array($field)) {
@@ -259,24 +237,16 @@ class Model {
 		is_null($where) or $where = ' WHERE ' . trim($where);
 		
 		$sql = 'SELECT ' . $field_new . ' FROM `' . $this->tb_name . '`' . $where;
-		
-		if ($this->dbS) {
-			$q = $this->dbS->query($sql);
-		} else {
-			$q = $this->db->query($sql);
-		}
+
+		$q = $this->query($sql);
 		
 		if ($q && $q->num_rows > 0) {
 			//mysqli_result::fetch_assoc
-			while (null != ($r = $q->fetch_assoc())) {
+			while ($r = $q->fetch_assoc()) {
 				$ret[] = $r;
 			}
 			$q->close();
 		}
-
-		$t2 = microtime(true);
-		
-		self::show_mysql($sql, $t1, $t2);
 
 		return $ret;
 	}
@@ -288,8 +258,9 @@ class Model {
 	 * @return array $ret
 	 */
 	public function select_line($field = '*', $where = null) {
-		$t1 = microtime(true);
-		
+		if (!$this->tb_name) {
+			return array();
+		}
 		$ret       = array();
 		$field_new = '';
 		if (is_array($field)) {
@@ -301,57 +272,64 @@ class Model {
 		}
 		$field_new = trim($field_new, ',');
 		
-		is_null($where) or $where = ' WHERE ' . trim($where);
+		!$where or $where = ' WHERE ' . trim($where);
 		
 		$sql = 'SELECT ' . $field_new . ' FROM `' . $this->tb_name . '`' . $where . ' LIMIT 1';
 		
 		//仅仅查询一条数据
-		// 		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
-		
-		self::show_mysql($sql);
-		
-		if ($this->dbS) {
-			$q = $this->dbS->query($sql);
-		} else {
-			$q = $this->db->query($sql);
-		}
-		
+		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
+		$q = $this->query($sql);
+
 		if ($q && $q->num_rows > 0) {
 			//mysqli_result::fetch_assoc
-			while (null != ($r = $q->fetch_assoc())) {
-				$ret = $r;
-			}
+			$ret = $q->fetch_assoc();
 			$q->close();
 		}
-		
-		$t2 = microtime(true);
-		
-		self::show_mysql($sql, $t1, $t2);
 
 		return $ret;
 	}
 	
 	/**
+	 * 主 query 函数，超时重连
 	 * 提供原生的查询接口，并且自动设置主从
-	 * 建议使用该函数或者使用原生的 Model::$db->query()
 	 * @param string $sql
 	 */
 	public function query($sql) {
 		$t1 = microtime(true);
-
+		$sql = trim($sql);
 		$ret = array();
 
+		//如果是查库
 		if (preg_match('/^select /i', $sql)) {
 			if ($this->dbS) {
-				$ret = $this->dbS->query($sql);
+				$ret = $this->_baseSlaveQuery($sql);
 			} else {
-				$ret = $this->db->query($sql);
+				$ret = $this->_baseQuery($sql);
 			}
+		} else {
+			$ret = $this->_baseQuery($sql);
 		}
 
 		$t2 = microtime(true);
-
 		self::show_mysql($sql, $t1, $t2);
+		return $ret;
+	}
+
+	//主库基础查询
+	private function _baseQuery($sql) {
+		if (!$this->db->ping() or $this->db->errno == 2006) {
+			$this->connect($this->db_group);
+		}
+		$ret = $this->db->query($sql);
+		return $ret;
+	}
+
+	//从库基础查询
+	private function _baseSlaveQuery($sql) {
+		if (!$this->dbS->ping() or $this->dbS->errno == 2006) {
+			$this->connect($this->db_group);
+		}
+		$ret = $this->dbS->query($sql);
 		return $ret;
 	}
 	
