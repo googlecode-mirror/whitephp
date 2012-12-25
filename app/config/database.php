@@ -26,19 +26,19 @@ define('IS_DB_ACTIVE', TRUE);
 $db_conf['default'] = array(
 	'db_username' => 'root',
 	'db_passwd' => '123456',
-	'db_database' => 'testdata'
+	'db_database' => 'testdata',
 	'db_host' => 'localhost',	//默认 localhost
 	'db_port' => '3306',		//默认 3306
 );
 
-//从数据库
-$db_conf['defaultSlave'] = array(
-	'db_username' => 'root',
-	'db_passwd' => '123456',
-	'db_database' => 'testdata',
-	'db_host' => 'localhost',
-	'db_port' => '3306',
-);
+// 从数据库
+// $db_conf['default_slave'] = array(
+// 	'db_username' => 'root',
+// 	'db_passwd' => '123456',
+// 	'db_database' => 'testdata',
+// 	'db_host' => 'localhost',
+// 	'db_port' => '3306',
+// );
 
 //如果是 SAE 环境
 if (defined('SAE_MYSQL_USER')) {
@@ -51,7 +51,7 @@ if (defined('SAE_MYSQL_USER')) {
 		'db_port' => SAE_MYSQL_PORT
 	);
 
-	$db_conf['defaultSlave'] = array(
+	$db_conf['default_slave'] = array(
 		'db_username' => SAE_MYSQL_USER,
 		'db_passwd' => SAE_MYSQL_PASS,
 		'db_database' => SAE_MYSQL_DB,
@@ -73,7 +73,7 @@ $db_conf['test'] = array(
 
 多个从数据库实现示例
 if (time()%2==0) {
-	$db_conf['testSlave'] = array(
+	$db_conf['test_slave'] = array(
 		'db_username' => 'root',
 		'db_passwd' => '123456',
 		'db_database' => 'testdata',
@@ -81,7 +81,7 @@ if (time()%2==0) {
 		'db_port' => '3306',
 	);
 } else {
-	$db_conf['testSlave'] = array(
+	$db_conf['test_slave'] = array(
 		'db_username' => 'root',
 		'db_passwd' => '123456',
 		'db_database' => 'testdata',
