@@ -119,7 +119,7 @@ var_dump($user_info->num_rows);
 
 //1，2情况下，如果需要解决主从延时的问题时，可以直接调用主数据库资源
 // $user->db->query(); 使用主数据库
-// $user->dbS->query(); 使用从数据库
+// $user->db_slave->query(); 使用从数据库
 
 3，直接使用最原始的资源
 $user = db_init();	//默认获取的是 default 组的数据库配置文件
