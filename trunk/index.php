@@ -14,7 +14,7 @@
 
 //定义入口文件所在目录
 //如无特殊说明，定义目录均存在尾部斜线，框架内同
-define('SYS_PATH', trim(dirname(__FILE__), '\/') . '/');
+define('SYS_PATH', rtrim(dirname(__FILE__), '\/') . '/');
 
 //定义入口文件名称
 define('INDEX_PAGE', basename(__FILE__));
