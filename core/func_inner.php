@@ -162,17 +162,14 @@ function p2q($ca = null) {
 			for ($i = 1; $i < $n + 2; $i++) {
 				array_shift($spilt);
 			}
-			
-			foreach ($spilt as $k => $v) {
-				$_k = $k + 1;
-				$extra .= "&wphp_param{$_k}={$v}";
-			}
 		}
 	}
-	$url_query = "c={$c}&a={$a}" . $extra;
+	//$url_query = "c={$c}&a={$a}" . $extra;
+	$url_query = PARAM_CONTROLLER . '=' . $c . '&' . PARAM_ACTION . '=' . $a;
+
 	return array(
-		'c' => $c,
-		'a' => $a,
+		PARAM_CONTROLLER => $c,
+		PARAM_ACTION => $a,
 		//'segment' => $spilt,
 		'url_query' => $url_query
 	);
