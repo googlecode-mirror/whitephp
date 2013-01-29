@@ -13,20 +13,12 @@
  */
 
 /*
-WPHP
-
-WhitePHP, or WPHP for short, a PHP framework like whitepaper that you can deal with it as you like. I was bored with big framework. It just gives me too much. Guess what, I dont't found the right framework even. So why not write a framework myself. This is how this framework was born. This framework learn from codeigniter, lazyphp. Thanks you all!
-I will keep this framework simple, secure and high efficient.
-
-WhitePHP，即WPHP，是一个非常容易上手的PHP框架。因为现有的框架结构有点复杂，有时候是杀鸡用牛刀。所以在一天晚上，自己写了这个框架。此框架借鉴了CodeIgniter和Lazyphp，谢谢你们，谢谢开源。
-我将会保持这个框架简单、安全、高效。
 
 WPHP框架
 WPHP 是 WhitePHP 的缩写，它是一个简单高效的 PHP 框架。WhitePHP 极其简单，就像一张任你书写的白纸一样。
 
-该框架遵循 MVC 模式，MVC 各个部分可以从清晰的目录结构中辨别出来。即使没用过其它框架也会很快上手，因为此框架设计之初就是因为其他框架给的太多，定义了太多的函数，所以该框架尽可能的降低了学习成本。
-
-注意框架将安全相关的东西交给了开发人员。
+WhitePHP，即WPHP，是一个非常容易上手的PHP框架。因为现有的框架结构有点复杂，有时候是杀鸡用牛刀。所以在一天晚上，自己写了这个框架。此框架借鉴了CodeIgniter和Lazyphp，谢谢你们，谢谢开源。
+我将会保持这个框架简单、高效。框架将安全相关的东西交给了开发人员。
 
 从0.4版本开始，不在PHP端支持伪静态，请利用服务器进行配置。
 
@@ -34,15 +26,8 @@ WPHP 有以下特点：
 
 极其小巧，简单高效
 单入口文件
-完整的 MVC 模式支持
-完美支持原生 PHP
-自定义函数少，学习成本低
-多主题支持
-易扩展
 数据库主从机制
 多数据库支持
-错误处理机制
-兼容 SAE 环境
 
 注意：
 -1，PHP version >= 5.2.6
@@ -96,41 +81,4 @@ db_conf 				返回数据库配置数据，索引是数据库组
 
 升级
 直接覆盖 core 目录即可
-
----------------- 数据库使用说明 -----------------
- * 详见控制器示例文件
- * $model = Model::singleton();
- * $model->query();
- 
-1，可以直接实例化，并为参数提供表名即可返回一个数据库资源。
-在控制器的某个方法中
-$user = Model::singleton('user');	//如若不传递第二个参数，获取的是 default 组的数据库配置文件
-$user_info = $user->select('*', '1 LIMIT 2');
-var_dump($user_info);
-
-2，在模型文件夹建立模型文件
-在书写 __construct() 函数时提供默认参数为表名，用 load_model() 函数加载之后，可以使用该资源。
-muser.php
-class Muser extends Model {
-}
-
-//在控制器方法中
-$user = Muser::singleton();	//其实可以传递任意值，如果只是使用 query 而不使用框架函数就无所谓
-$user_info = $user->query('SELECT * FROM user');
-var_dump($user_info->num_rows);
-
-//1，2情况下，如果需要解决主从延时的问题时，可以直接调用主数据库资源
-// $user->db->query(); 使用主数据库
-// $user->db_slave->query(); 使用从数据库
-
-3，直接使用最原始的资源
-$user = db_init();	//默认获取的是 default 组的数据库配置文件
-$user_info = $user->query('SELECT * FROM user');
-var_dump($user_info->num_rows);
-
-为解决安全问题，可使用系统函数 check_input 处理组成sql语句前的变量。
-即：
-$user = check_input(post('username'));
-$sql = "select count(*) from user where username = $user";
-...
 
