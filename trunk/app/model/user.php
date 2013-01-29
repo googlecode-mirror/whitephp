@@ -2,6 +2,7 @@
 <?php
 /**
  * 模型示例
+ * 建议将对数据库的操作作为一个属性来处理，以便获得更好的扩展性
  * 
  * filename:	user.php
  * charset:		UTF-8
@@ -13,15 +14,17 @@
  * @link http://weibo.com/itbudaoweng
  */
 
-class User extends Model {
-	/**
-	 * 实例类，建议设置当前表名和数据库配置【非必须】
-	 * 使用系统提供的方法，若使用系统函数（如insert,delete,update,select,select_line）
-	 * 必须保证正确设置了表名即 $model = Model::singleton('user');
-	 * @param unknown_type $tb_name
-	 * @param unknown_type $db_group
-	 */
-	public static function singleton($tb_name = 'user', $db_group = 'default') {
-		return parent::singleton($tb_name, $db_group);
+class User {
+	
+	//数据库操作基类实例
+	public $db;
+	
+	public function __construct() {
+		$this->db = Model::singleton($tb_name = 'user', $db_group = 'default');
+	}
+
+	public function get_row($id='1') {
+		$where = 'id='.(int)$id;
+		return $this->db->select_line('*', $where);
 	}
 }
