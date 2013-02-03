@@ -238,15 +238,7 @@ class Model {
 		
 		$sql = 'SELECT ' . $field_new . ' FROM `' . $this->tb_name . '`' . $where;
 
-		$q = $this->query($sql);
-		
-		if ($q && $q->num_rows > 0) {
-			//mysqli_result::fetch_assoc
-			while ($r = $q->fetch_assoc()) {
-				$ret[] = $r;
-			}
-			$q->close();
-		}
+		$ret = $this->query($sql);
 
 		return $ret;
 	}
@@ -278,15 +270,9 @@ class Model {
 		
 		//仅仅查询一条数据
 		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
-		$q = $this->query($sql);
+		$ret = $this->query($sql);
 
-		if ($q && $q->num_rows > 0) {
-			//mysqli_result::fetch_assoc
-			$ret = $q->fetch_assoc();
-			$q->close();
-		}
-
-		return $ret;
+		return $ret[0];
 	}
 	
 	/**
