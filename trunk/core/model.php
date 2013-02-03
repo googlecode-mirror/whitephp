@@ -290,6 +290,7 @@ class Model {
 	}
 	
 	/**
+	 * 查库返回结果集，否则返回sql执行结果
 	 * 主 query 函数，超时重连
 	 * 提供原生的查询接口，并且自动设置主从
 	 * @param string $sql
@@ -305,6 +306,16 @@ class Model {
 				$ret = $this->_base_slave_query($sql);
 			} else {
 				$ret = $this->_base_query($sql);
+			}
+
+			if ($ret && $ret->num_rows > 0) {
+				//mysqli_result::fetch_assoc
+				$newret = array();
+				while ($r = $ret->fetch_assoc()) {
+					$newret[] = $r;
+				}
+				$ret->close();
+				$ret = $newret;
 			}
 		} else {
 			$ret = $this->_base_query($sql);
