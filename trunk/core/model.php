@@ -11,6 +11,7 @@
  * update date: 2012-12-24 对内不同库多次实例，改善主从机制，一个主库配一个从库
  * 	                       （若存在多个从库，可在数据库配置文件跟据一定算法确定具体库）
  * update date: 2012-12-25 更新命名规范，方法下划线，属性下划线
+ * update date: 2013-02-03 若要使用该类方法，需要提供最后参数即表名 如 select('xx', '1', 'xxtable');
  *
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -116,9 +117,13 @@ class Model {
 	 * INSERT INTO `user` (`id`, `username`, `password`) 
 	 * VALUES (NULL, '胡锦涛', '123456abc');
 	 */
-	public function insert($data = array()) {
+	public function insert($data = array(), $tb_name = null) {
 		//组合后的 sql 语句
 		$sql = '';
+
+		if ($tb_name) {
+			$this->tb_name = $tb_name;
+		}
 
 		if (!$this->tb_name) {
 			return false;
@@ -156,7 +161,12 @@ class Model {
 	 * @param string $where WHERE 条件以及后续语句
 	 * @return bool $q 只要语句正常执行了就会是 true
 	 */
-	public function delete($where = null) {
+	public function delete($where = null, $tb_name = null) {
+
+		if ($tb_name) {
+			$this->tb_name = $tb_name;
+		}
+
 		if (!$this->tb_name) {
 			return false;
 		}
@@ -181,7 +191,12 @@ class Model {
 	 * @param string $where WHERE 条件以及后续语句
 	 * @return bool $q 只有语句执行成功就返回 true
 	 */
-	public function update($data = array(), $where = null) {
+	public function update($data = array(), $where = null, $tb_name = null) {
+
+		if ($tb_name) {
+			$this->tb_name = $tb_name;
+		}
+
 		if (!$this->tb_name) {
 			return false;
 		}
@@ -219,7 +234,12 @@ class Model {
 	 * @param string $where WHERE 条件，及limit等片段
 	 * @return array $ret
 	 */
-	public function select($field = '*', $where = null) {
+	public function select($field = '*', $where = null, $tb_name = null) {
+
+		if ($tb_name) {
+			$this->tb_name = $tb_name;
+		}
+
 		if (!$this->tb_name) {
 			return array();
 		}
@@ -249,7 +269,12 @@ class Model {
 	 * @param string $where
 	 * @return array $ret
 	 */
-	public function select_line($field = '*', $where = null) {
+	public function select_line($field = '*', $where = null, $tb_name = null) {
+		
+		if ($tb_name) {
+			$this->tb_name = $tb_name;
+		}
+
 		if (!$this->tb_name) {
 			return array();
 		}
