@@ -297,7 +297,13 @@ class Model {
 		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
 		$ret = $this->query($sql);
 
-		return $ret[0];
+		if ($ret) {
+			$ret = $ret[0];
+		} else {
+			$ret = array();
+		}
+
+		return $ret;
 	}
 	
 	/**
