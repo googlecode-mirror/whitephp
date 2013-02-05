@@ -327,6 +327,8 @@ class Model {
 				}
 				$ret->close();
 				$ret = $newret;
+			} else {
+				$ret = array();
 			}
 		} else {
 			$ret = $this->_base_query($sql);
