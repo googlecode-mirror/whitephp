@@ -234,6 +234,7 @@ if (!function_exists('make_href')) {
 
 /*------------------------ 日志处理函数 ----------------------------*/
 
+set_conf('log_filename', $log_filename);
 /**
  * 记录日志
  * 写日志用绝对路径
@@ -255,16 +256,23 @@ function log_error($message = '') {
 		
 		//error_log 函数需要启用完整路径
 		//其实这个完全可以直接 a+ 方式写文件，没必要非得用 error_log 函数
-		$log_path = SYS_PATH . APP_NAME . LOG_PATH . '/' . date('Y-m') . '.txt';
+		$log_path = SYS_PATH . APP_NAME . LOG_PATH . '/';
+		
+		$log_filename = get_conf('log_filename');
+
+		if (!file_exists($log_path)) {
+			mkdir($log_path);
+		}
 		
 		if (function_exists('error_log')) {
-			if (!is_writeable(SYS_PATH . APP_NAME . LOG_PATH . '/')) {
+			
+			if (!is_writeable($log_path)) {
 				echo "<br>\n", 'error log permition denied!';
 				die;
 			}
-			error_log($error, 3, $log_path);
+			error_log($error, 3, $log_path . $log_filename);
 		} else {
-			_wphp_log_error($error, $log_path);
+			_wphp_log_error($error, $log_path . $log_filename);
 		}
 	}
 	
