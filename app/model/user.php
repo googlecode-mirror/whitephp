@@ -18,13 +18,14 @@ class User {
 	
 	//数据库操作基类实例
 	public $db;
+	public $_tablename = 'user';
 	
 	public function __construct() {
-		$this->db = Model::singleton($tb_name = 'user', $db_group = 'default');
+		$this->db = Model::singleton($this->_tablename, 'default');
 	}
 
 	public function get_row($id='1') {
 		$where = 'id='.(int)$id;
-		return $this->db->select_line('*', $where);
+		return $this->db->select_line('*', $where, $this->_tablename);
 	}
 }
