@@ -66,7 +66,7 @@ if (defined('SAE_MYSQL_USER')) {
 $db_conf['test'] = array(
 	'db_username' => 'root',
 	'db_passwd' => '123456',
-	'db_database' => 'testdata'
+	'db_database' => 'testdata',
 	'db_host' => 'localhost',	//默认 localhost
 	'db_port' => '3306',		//默认 3306
 );

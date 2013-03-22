@@ -21,7 +21,7 @@ class User {
 	public $_tablename = 'user';
 	
 	public function __construct() {
-		$this->db = Model::singleton($this->_tablename, 'default');
+		$this->db = Model::singleton('default');
 	}
 
 	public function get_row($id='1') {

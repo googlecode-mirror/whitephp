@@ -12,6 +12,7 @@
  * 	                       （若存在多个从库，可在数据库配置文件跟据一定算法确定具体库）
  * update date: 2012-12-25 更新命名规范，方法下划线，属性下划线
  * update date: 2013-02-03 若要使用该类方法，需要提供最后参数即表名 如 select('xx', '1', 'xxtable');
+ * update date: 2013-03-23 获取实例时不再传递表名
  *
  * @author Zhao Binyan <itbudaoweng@gmail.com>
  * @copyright 2011-2012 Zhao Binyan
@@ -42,19 +43,18 @@ class Model {
 	//从数据库资源
 	public $db_slave;
 
-	//数据表名
-	public $tb_name;
-		
+	//当前实例数据库组
+	public $db_group;
+
 	//是否输出 sql 语句
 	public static $show_sql = false;
 
-	//当前实例数据库组
-	public $db_group;
+	//执行时间超过多少秒显示红色警告
+	public static $show_sql_red_time = 1;
 
 	//所有的连库资源，array
 	public static $connection_arr;
 
-	//实例的对象
 	private static $singleton;
 	
 	/**
@@ -69,27 +69,18 @@ class Model {
 	 * 不是单例了
 	 * 只是为了用最少次数去链接数据库
 	 * Model::singleton()
-	 * @param string $tb_name 默认表名，使用过程中可以随时变更 Model::$tb_name = 'new_tb_name';
 	 * @param string $db_group 数据库配置文件
 	 */
-	public static function singleton($tb_name = 'sample_table_name', $db_group = 'default') {
+	public static function singleton($db_group = 'default') {
 	
 		//当不存在对象或者启用新的数据库时重新连库
-		if (!(self::$singleton instanceof self)) {
-			self::$singleton = new self($db_group);
-			self::$connection_arr[$db_group] = self::$singleton;
-		} else if (!isset(self::$connection_arr[$db_group])) {
+		if (empty(self::$connection_arr[$db_group])) {
 			self::$singleton = new self($db_group);
 			self::$connection_arr[$db_group] = self::$singleton;
 		} else {
 			self::$singleton = self::$connection_arr[$db_group];
 		}
-	
-		//总是保持表名最新
-		if ($tb_name) {
-			self::$singleton->tb_name = $tb_name;
-		}
-	
+
 		return self::$singleton;
 	}
 	
@@ -121,11 +112,8 @@ class Model {
 		//组合后的 sql 语句
 		$sql = '';
 
-		if ($tb_name) {
-			$this->tb_name = $tb_name;
-		}
-
-		if (!$this->tb_name) {
+		if (! $tb_name) {
+			show_error('empty table name');
 			return false;
 		}
 
@@ -144,7 +132,7 @@ class Model {
 		$values = trim($values, ', ');
 		
 		$sql .= 'INSERT INTO';
-		$sql .= ' `' . $this->tb_name . '`';
+		$sql .= ' `' . $tb_name . '`';
 		$sql .= ' (' . $fields . ') ';
 		$sql .= ' VALUES (' . $values . ')';
 		$ret = $this->query($sql);
@@ -163,19 +151,17 @@ class Model {
 	 */
 	public function delete($where = null, $tb_name = null) {
 
-		if ($tb_name) {
-			$this->tb_name = $tb_name;
-		}
-
-		if (!$this->tb_name) {
+		if (! $tb_name) {
+			show_error('empty table name');
 			return false;
 		}
+
 		$sql = '';
 		$q = false;
 
 		$sqlwhere = ' WHERE ' . trim($where);
 
-		$sql = 'DELETE FROM `' . $this->tb_name . '`' . $sqlwhere;
+		$sql = 'DELETE FROM `' . $tb_name . '`' . $sqlwhere;
 		if (!is_null($where)) {
 			$q = $this->query($sql);
 		} else {
@@ -193,13 +179,11 @@ class Model {
 	 */
 	public function update($data = array(), $where = null, $tb_name = null) {
 
-		if ($tb_name) {
-			$this->tb_name = $tb_name;
-		}
-
-		if (!$this->tb_name) {
+		if (! $tb_name) {
+			show_error('empty table name');
 			return false;
 		}
+
 		$sql = '';
 		$q = false;
 		
@@ -217,7 +201,7 @@ class Model {
 		
 		$update_data = trim($update_data, ', ');
 		
-		$sql = 'UPDATE `' . $this->tb_name . '` SET ' . $update_data . $sqlwhere;
+		$sql = 'UPDATE `' . $tb_name . '` SET ' . $update_data . $sqlwhere;
 
 		if (!is_null($where)) {
 			$q = $this->query($sql);
@@ -236,13 +220,11 @@ class Model {
 	 */
 	public function select($field = '*', $where = null, $tb_name = null) {
 
-		if ($tb_name) {
-			$this->tb_name = $tb_name;
+		if (! $tb_name) {
+			show_error('empty table name');
+			return false;
 		}
 
-		if (!$this->tb_name) {
-			return array();
-		}
 		$ret       = array();
 		$field_new = '';
 		if (is_array($field)) {
@@ -256,7 +238,7 @@ class Model {
 		
 		is_null($where) or $where = ' WHERE ' . trim($where);
 		
-		$sql = 'SELECT ' . $field_new . ' FROM `' . $this->tb_name . '`' . $where;
+		$sql = 'SELECT ' . $field_new . ' FROM `' . $tb_name . '`' . $where;
 
 		$ret = $this->query($sql);
 
@@ -271,13 +253,11 @@ class Model {
 	 */
 	public function select_line($field = '*', $where = null, $tb_name = null) {
 		
-		if ($tb_name) {
-			$this->tb_name = $tb_name;
+		if (! $tb_name) {
+			show_error('empty table name');
+			return false;
 		}
 
-		if (!$this->tb_name) {
-			return array();
-		}
 		$ret       = array();
 		$field_new = '';
 		if (is_array($field)) {
@@ -291,7 +271,7 @@ class Model {
 		
 		!$where or $where = ' WHERE ' . trim($where);
 		
-		$sql = 'SELECT ' . $field_new . ' FROM `' . $this->tb_name . '`' . $where . ' LIMIT 1';
+		$sql = 'SELECT ' . $field_new . ' FROM `' . $tb_name . '`' . $where . ' LIMIT 1';
 		
 		//仅仅查询一条数据
 		$sql = preg_replace('/limit.*/i', 'LIMIT 1', $sql);
@@ -379,7 +359,7 @@ class Model {
 	 */
 	public function timer($t1 = 0, $t2 = 0) {
 		$t = $t2 - $t1;
-		if ($t > 1) {
+		if ($t > self::$show_sql_red_time) {
 			$t = "<span style='color:red'>$t seconds</span>";
 		} else {
 			$t = "<span style='color:green'>$t seconds</span>";
