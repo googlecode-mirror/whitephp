@@ -241,14 +241,16 @@ set_conf('log_filename', $log_filename);
  * @param string $message
  */
 function log_error($message = '') {
+
+	if (!IS_LOG) {
+		//echo '未启用错误日志，错误信息为：' . $message;
+		return;
+	}
+
 	//sae 环境未解决日志记录问题，不建议写到 storage里，可尝试sae_debug
 	if (defined('SAE_APPNAME')) {
-		_sae_log_error($message);
+		sae_debug($message);
 	} else {
-		if (!IS_LOG) {
-			//echo '未启用错误日志，错误信息为：' . $message;
-			return;
-		}
 		
 		$error = date('Y-m-d H:i:s');
 		$error .= ' ' . $message;
@@ -280,17 +282,18 @@ function log_error($message = '') {
 }
 
 /**
- * 记录日志的同时，显示到页面上
+ * 和 log_error 一样了
  * @param string $message
  */
-function show_error($message = '') {
-	if (defined('SAE_APPNAME')) {
-		_sae_show_error($message);
-	} else {
+function show_error($message = '', $is_show = false) {
+	if ($is_show) {
 		echo $message;
+	}
+	if (defined('SAE_APPNAME')) {
+		sae_debug($message);
+	} else {
 		log_error($message);
 	}
-	// 	exit;
 }
 
 /**
@@ -305,38 +308,6 @@ function _wphp_log_error($message, $path) {
 	$handle = fopen($path, 'a+');
 	fputs($handle, $message);
 	fclose($handle);
-}
-
-/**
- * 记录错误日志，SAE环境专用，一般无需单独使用
- * @param string $message
- */
-function _sae_log_error($message = '') {
-	$display_error = ini_get('display_error'); //获取当前错误显示状态
-	//如果当前显示错误日志，则先改为不显示的，然后再将状态设置回去
-	if ($display_error === 'on') {
-		sae_set_display_errors(false);
-		sae_debug($message);
-		sae_set_display_errors(true);
-	} else {
-		sae_debug($message);
-	}
-}
-
-/**
- * 记录错误日志并显示，SAE环境专用，一般无需单独使用
- * @param string $message
- */
-function _sae_show_error($message = '') {
-	$display_error = ini_get('display_error'); //获取当前错误显示状态
-	if ($display_error === 'on') {
-		sae_debug($message);
-	} else {
-		sae_set_display_errors(true);
-		sae_debug($message);
-		sae_set_display_errors(false);
-	}
-	// 	exit;
 }
 
 /**
