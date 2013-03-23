@@ -54,7 +54,7 @@ $log_filename = date('Y-m') . '.txt';
 define('WPHP_GLOBAL_CONFIG_NAME', 'wphp_config');
 
 //是否隐藏前端控制器，同时注意修改服务器配置
-define('IS_HIDE_INDEX_PAGE', true);
+define('IS_HIDE_INDEX_PAGE', false);
 
 //参考
 /**
