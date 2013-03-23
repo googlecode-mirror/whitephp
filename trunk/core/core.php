@@ -27,6 +27,7 @@ require APP_NAME . 'config/main.php';
 
 //设置时区，编码等信息
 header('Content-Type:text/html; charset=' . CHARSET);
+date_default_timezone_set(TIME_ZONE);
 
 //工作环境
 switch (SYS_MODE) {
