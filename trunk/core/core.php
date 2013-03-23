@@ -27,7 +27,6 @@ require APP_NAME . 'config/main.php';
 
 //设置时区，编码等信息
 header('Content-Type:text/html; charset=' . CHARSET);
-date_default_timezone_set(TIME_ZONE);
 
 //工作环境
 switch (SYS_MODE) {
@@ -36,16 +35,16 @@ switch (SYS_MODE) {
 		error_reporting(E_ALL | E_STRICT);
 		break;
 	case 'testing':
-		error_reporting(E_ALL & ~E_NOTICE | E_STRICT);
 		ini_set('display_errors', 'On');
+		error_reporting(E_ALL & ~E_NOTICE | E_STRICT);
 		break;
 	case 'production':
-		error_reporting(E_ALL & ~E_NOTICE);
 		ini_set('display_errors', 'Off');
+		error_reporting(E_ALL & ~E_NOTICE);
 		break;
 	default:
+		ini_set('display_errors', 'Off');
 		error_reporting(0);
-		ini_set('display_errors', 'On');
 		show_error('bad SYS_MODE');
 }
 
@@ -59,22 +58,9 @@ if (IS_DB_ACTIVE) {
 	require CORE_NAME . 'model.php';
 }
 
-//将 PATH_INFO 和 QUERY_STRING 统一起来
-//为支持直接使用 /c=x&a=y 和 ?c=x&a=y
-//配合 $_SERVER['PATH_INFO'] 和 $_SERVER['QUERY_STRING']
-$query_string = '';
+$query_string = $_SERVER['QUERY_STRING'];
 
-if (isset($_SERVER['PATH_INFO'])) {
-	$query_string .= $_SERVER['PATH_INFO'];
-	if ($_SERVER['QUERY_STRING']) {
-		$query_string .= '&';
-	}
-}
-
-$query_string .= $_SERVER['QUERY_STRING'];
-
-$query_string = ltrim($query_string, '?/');
-
+//如需要做伪静态，除了服务器配置，也可以交给 wphp_custom_change_query_string 处理，可能用到 $_SERVER['PATH_INFO']
 function_exists('wphp_custom_change_query_string') && $query_string = wphp_custom_change_query_string($query_string);
 
 set_conf('query_string', $query_string);

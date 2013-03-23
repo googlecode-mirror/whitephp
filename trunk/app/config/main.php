@@ -30,8 +30,11 @@ define('IS_LOG', TRUE);
 //直接使用 utf-8 即可，已自动在操作数据库那里转换为 utf8
 define('CHARSET', 'utf-8');
 
-//设置时区
-define('TIME_ZONE', 'PRC');
+date_default_timezone_set('PRC');
+//ini_set('date.timezone', 'PRC');
+
+set_time_limit(300);
+//ini_set('max_execution_time', 300);//0 for no limit
 
 //默认控制器
 define('DEFAULT_CONTROLLER', 'hello');
@@ -100,4 +103,3 @@ require APP_NAME . 'func/custom.php';
 //加载其它配置文件
 // require APP_NAME . 'config/yyy.php';
 require APP_NAME . 'config/database.php';
-

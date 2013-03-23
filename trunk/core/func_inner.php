@@ -144,7 +144,7 @@ function _load_ca($ca) {
  */
 function p2q($ca = null) {
 	$ca = ltrim($ca, '/');
-	$a = $c = $extra = '';
+	$a = $c = '';
 	if (!$ca) {
 		$c = DEFAULT_CONTROLLER;
 		$a = DEFAULT_ACTION;
@@ -164,7 +164,7 @@ function p2q($ca = null) {
 			}
 		}
 	}
-	//$url_query = "c={$c}&a={$a}" . $extra;
+
 	$url_query = PARAM_CONTROLLER . '=' . $c . '&' . PARAM_ACTION . '=' . $a;
 
 	return array(
