@@ -88,19 +88,24 @@ function post($k, $defalut = '') {
 /**
  * 模拟简单的 post 请求
  * @param  string $url
- * @param  string $data 类型和 QUERY_STRING 相同，即由 & 连接的字符串 a=1&b=2
+ * @param  string|array $data 
  * @param  array  $header header数组
- * @return all    返回服务器返回的结果
+ * @param  array  $curl_options 配置数组 具体配置 http://www.php.net/manual/zh/function.curl-setopt.php
+ * @return string    返回服务器返回的结果
  */
-function post_data($url, $data = '', $header = array()) {
+function post_data($url, $data = '', $header = array(), $curl_options = array()) {
 	$ch = curl_init($url);
-	ob_start();
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);//返回文件流，不直接输出
 	curl_setopt($ch, CURLOPT_POST, 1);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-	curl_exec($ch);
-	$output = ob_get_contents();
-	ob_clean();
+	curl_setopt_array($ch, $curl_options);
+	$output = curl_exec($ch);
+
+	if (curl_errno($ch)) {
+		echo curl_error($ch);
+	}
+
 	curl_close($ch);
 	return $output;
 }
